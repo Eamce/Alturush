@@ -22,13 +22,12 @@ class _UploadSrImage extends State<UploadSrImage> {
   final _name = TextEditingController();
   final _idNumber = TextEditingController();
   final _imageTxt = TextEditingController();
-  final _bookletTxt = TextEditingController();
+
   final picker = ImagePicker();
   List<String> selectedImages = List();
   final _formKey = GlobalKey<FormState>();
   List loadDiscount;
   var discountId;
-  bool visible;
 
   camera() async{
     final pickedFile = await picker.getImage(source: ImageSource.camera);
@@ -48,7 +47,6 @@ class _UploadSrImage extends State<UploadSrImage> {
       if (pickedFile != null){
         _imageBooklet = File(pickedFile.path);
         newFileName = _imageBooklet.toString();
-        _bookletTxt.text = _imageBooklet.toString().split('/').last;
       }
     });
   }
@@ -60,14 +58,8 @@ class _UploadSrImage extends State<UploadSrImage> {
       await Navigator.of(context).push(_signIn());
     }else{
       loading();
-      if(visible == true){
-        String base64Image = base64Encode(_image.readAsBytesSync());
-        String base64Booklet = base64Encode(_imageBooklet.readAsBytesSync());
-        await db.uploadId1(discountId,_name.text,_idNumber.text,base64Image,base64Booklet);
-      }if(visible == false){
-        String base64Image = base64Encode(_image.readAsBytesSync());
-        await db.uploadId(discountId,_name.text,_idNumber.text,base64Image);
-      }
+      String base64Image = base64Encode(_image.readAsBytesSync());
+      await db.uploadId(discountId,_name.text,_idNumber.text,base64Image);
       Navigator.of(context).pop();
       successMessage();
     }
@@ -172,14 +164,6 @@ class _UploadSrImage extends State<UploadSrImage> {
                       discountId = loadDiscount[index]['id'];
                       _idType.text = loadDiscount[index]['discount_name'];
                       Navigator.of(context).pop();
-                      if(discountId=='1'){
-                        visible = true;
-
-                      }
-                      else{
-                        visible = false;
-
-                      }
                     },
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(25.0, 15.0, 25.0, 15.0),
@@ -187,8 +171,7 @@ class _UploadSrImage extends State<UploadSrImage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(loadDiscount[index]['discount_name'],style: TextStyle(fontSize: 15.0,fontWeight: FontWeight.bold)),
-                          Text(loadDiscount[index]['discount_percent'].toString(),style: TextStyle(fontSize: 15.0,fontWeight: FontWeight.bold)),
-                        ],
+                         ],
                       ),
                       //                       child: Text('$f. ${lGetAmountPerTenant[index]['d_bu_name']} - ${lGetAmountPerTenant[index]['d_tenant']}  ₱${oCcy.format(double.parse(lGetAmountPerTenant[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
                     ),
@@ -204,7 +187,6 @@ class _UploadSrImage extends State<UploadSrImage> {
 
   @override
   void initState() {
-    visible = false;
     super.initState();
   }
   @override
@@ -318,7 +300,6 @@ class _UploadSrImage extends State<UploadSrImage> {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
                     child:TextFormField(
-                      keyboardType: TextInputType.number,
                       cursorColor: Colors.deepOrange.withOpacity(0.8),
                       controller: _idNumber,
                       validator: (value) {
@@ -373,52 +354,6 @@ class _UploadSrImage extends State<UploadSrImage> {
                             ),
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(3.0)),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Visibility(
-                    visible: visible,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(35, 15, 5, 0),
-                      child: new Text(
-                        "Upload booklet image for sr. citizen",
-                        style: GoogleFonts.openSans(
-                            fontStyle: FontStyle.normal, fontSize: 15.0),
-                      ),
-                    ),
-                  ),
-                  Visibility(
-                    visible: visible,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
-                      child:InkWell(
-                        onTap: (){
-                          FocusScope.of(context).requestFocus(FocusNode());
-                          bookletCamera();
-                        },
-                        child: IgnorePointer(
-                          child: TextFormField(
-                            textInputAction: TextInputAction.done,
-                            cursorColor: Colors.deepOrange.withOpacity(0.8),
-                            controller: _bookletTxt,
-                            validator: (value) {
-                              if (value.isEmpty) {
-                                return 'Please capture an image';
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
-                              prefixIcon: Icon(Icons.camera_alt_outlined,color: Colors.grey,),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Colors.deepOrange.withOpacity(0.8),
-                                    width: 2.0),
-                              ),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(3.0)),
-                            ),
                           ),
                         ),
                       ),

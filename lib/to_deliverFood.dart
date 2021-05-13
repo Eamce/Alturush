@@ -319,7 +319,7 @@ class _ToDeliver extends State<ToDeliverFood> {
                           stream: _streamController.stream,
                           builder: (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData)
-                              return  ListView.builder(
+                              return ListView.builder(
                                     itemCount:snapshot.data.length,
                                     itemBuilder: (BuildContext context, int index) {
                                       return GestureDetector(

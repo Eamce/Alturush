@@ -129,6 +129,96 @@ class _GroceryMain extends State<GroceryMain> with SingleTickerProviderStateMixi
     });
   }
 
+  void selectGcCategory(BuildContext context,logo,businessUnit,bUnitCode) async{
+    List categoryData;
+    var res = await db.getGcCategories();
+    if (!mounted) return;
+    setState(() {
+      categoryData = res['user_details'];
+    });
+    showModalBottomSheet(
+        isScrollControlled: true,
+        isDismissible: true,
+        context: context,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(topRight:  Radius.circular(10),topLeft:  Radius.circular(10)),
+        ),
+        builder: (ctx) {
+          return Container(
+            height: MediaQuery.of(context).size.height/1.5,
+            child: Scrollbar(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(25.0, 20.0, 20.0, 20.0),
+                    child:Text("Category",style: TextStyle(fontSize: 25.0,fontWeight: FontWeight.bold),),
+                  ),
+
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children:[
+                            ListView.builder(
+                                physics: BouncingScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: categoryData.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return GestureDetector(
+                                    onTap: () async{
+                                      Navigator.pop(context);
+                                      await Navigator.of(context).push(_loadGC(logo,categoryData[index]['category_name'],categoryData[index]['category_no'],businessUnit,bUnitCode));
+                                      listenCartCount();
+                                      loadProfile();
+                                    },
+                                    child:Container(
+                                      height: 120.0,
+                                      width: 30.0,
+                                      child: Card(
+                                        color: Colors.white,
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            ListTile(
+                                              leading:Container(
+                                                width: 60.0,
+                                                height: 60.0,
+                                                decoration: new BoxDecoration(
+                                                  image: new DecorationImage(
+                                                    image: new NetworkImage(categoryData[index]['image']),
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                  borderRadius: new BorderRadius.all(new Radius.circular(50.0)),
+                                                  border: new Border.all(
+                                                    color: Colors.black54,
+                                                    width: 0.5,
+                                                  ),
+                                                ),
+                                              ),
+                                              title: Text(categoryData[index]['category_name'].toString(),style: GoogleFonts.openSans(color: Colors.black54,fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 22.0),),
+                                            ),
+                                          ],
+                                        ),
+                                        elevation: 0,
+                                        margin: EdgeInsets.all(3),
+                                      ),
+                                    ),
+                                  );
+                                }),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -233,9 +323,23 @@ class _GroceryMain extends State<GroceryMain> with SingleTickerProviderStateMixi
                           title: Text('Profile',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 16.0),),
                           onTap: () async{
                             Navigator.of(context).pop();
+                            // SharedPreferences prefs = await SharedPreferences.getInstance();
+                            // String status  = prefs.getString('s_status');
+                            // status != null ? Navigator.of(context).push(_profilePage()) : Navigator.of(context).push(_signIn());
+
                             SharedPreferences prefs = await SharedPreferences.getInstance();
-                            String status  = prefs.getString('s_status');
-                            status != null ? Navigator.of(context).push(_profilePage()) : Navigator.of(context).push(_signIn());
+                            String username = prefs.getString('s_customerId');
+                            if(username == null){
+                              await Navigator.of(context).push(_signIn());
+                              getCounter();
+                              listenCartCount();
+                              loadProfile();
+                            }else{
+                              await Navigator.of(context).push(_signIn());
+                              getCounter();
+                              listenCartCount();
+                              loadProfile();
+                            }
                           }
                       ),
                       ListTile(
@@ -243,9 +347,22 @@ class _GroceryMain extends State<GroceryMain> with SingleTickerProviderStateMixi
                           title: Text('Add discount',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 16.0),),
                           onTap: () async{
                             Navigator.of(context).pop();
+                            // SharedPreferences prefs = await SharedPreferences.getInstance();
+                            // String status  = prefs.getString('s_status');
+                            // status != null ? Navigator.of(context).push(viewIds()) : Navigator.of(context).push(_signIn());
                             SharedPreferences prefs = await SharedPreferences.getInstance();
-                            String status  = prefs.getString('s_status');
-                            status != null ? Navigator.of(context).push(viewIds()) : Navigator.of(context).push(_signIn());
+                            String username = prefs.getString('s_customerId');
+                            if(username == null){
+                              await Navigator.of(context).push(_signIn());
+                              getCounter();
+                              listenCartCount();
+                              loadProfile();
+                            }else{
+                              await Navigator.of(context).push(_signIn());
+                              getCounter();
+                              listenCartCount();
+                              loadProfile();
+                            }
                           }
                       ),
                       // ListTile(
@@ -318,9 +435,10 @@ class _GroceryMain extends State<GroceryMain> with SingleTickerProviderStateMixi
                           itemBuilder: (BuildContext context, int index) {
                             return InkWell(
                               onTap: () async{
-                                await Navigator.of(context).push(_loadGC(buData[index]['logo'],buData[index]['business_unit'],buData[index]['bunit_code']));
-                                listenCartCount();
-                                loadProfile();
+                                selectGcCategory(context,buData[index]['logo'],buData[index]['business_unit'],buData[index]['bunit_code']);
+                                // await Navigator.of(context).push(_loadGC(buData[index]['logo'],buData[index]['business_unit'],buData[index]['bunit_code']));
+                                // listenCartCount();
+                                // loadProfile();
                               },
                               child:Container(
                                 height: 120.0,
@@ -509,9 +627,9 @@ Route _loadFood(){
   );
 }
 
-Route _loadGC(buLogo,buName,buCode){
+Route _loadGC(logo,categoryName,categoryNo,businessUnit,bUnitCode){
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => GcLoadStore(buLogo:buLogo,buName:buName,buCode:buCode),
+    pageBuilder: (context, animation, secondaryAnimation) => GcLoadStore(logo:logo,categoryName:categoryName,categoryNo:categoryNo,businessUnit:businessUnit,bUnitCode:bUnitCode),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;

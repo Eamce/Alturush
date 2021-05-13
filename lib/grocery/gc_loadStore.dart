@@ -15,11 +15,13 @@ import 'gcview_item.dart';
 import 'gc_cart.dart';
 
 class GcLoadStore extends StatefulWidget {
-  final buLogo;
-  final buName;
-  final buCode;
+  final logo;
+  final categoryName;
+  final categoryNo;
+  final businessUnit;
+  final bUnitCode;
 
-  GcLoadStore({Key key, @required this.buLogo,this.buName,this.buCode}) : super(key: key);
+  GcLoadStore({Key key, @required this.logo,this.categoryName,this.categoryNo,this.businessUnit,this.bUnitCode}) : super(key: key);
   @override
   _GcLoadStore createState() => _GcLoadStore();
 }
@@ -43,6 +45,7 @@ class _GcLoadStore extends State<GcLoadStore> {
   List listSubtotal;
   var checkIfEmptyStore;
   var offset = 0;
+  String categoryName = "";
 
   ScrollController scrollController;
   ScrollController  _categoryController;
@@ -62,7 +65,7 @@ class _GcLoadStore extends State<GcLoadStore> {
             height: 30.0,
             decoration: new BoxDecoration(
               image: new DecorationImage(
-                image: new NetworkImage(widget.buLogo),
+                image: new NetworkImage(widget.logo),
                 fit: BoxFit.cover,
               ),
               borderRadius: new BorderRadius.all(new Radius.circular(50.0)),
@@ -116,7 +119,7 @@ class _GcLoadStore extends State<GcLoadStore> {
       isLoading = true;
 //      cartLoading = true;
     });
-    Map res = await db.getGcStoreCi(offset.toString());
+    Map res = await db.getGcStoreCi(offset.toString(),widget.categoryNo);
     if (!mounted) return;
     setState(() {
       cartLoading = false;
@@ -128,7 +131,7 @@ class _GcLoadStore extends State<GcLoadStore> {
   }
 
   Future loadStore1() async{
-    Map res = await db.getGcStoreCi(offset.toString());
+    Map res = await db.getGcStoreCi(offset.toString(),widget.categoryNo);
     if (!mounted) return;
     setState(() {
       cartLoading = false;
@@ -219,13 +222,12 @@ class _GcLoadStore extends State<GcLoadStore> {
     });
   }
 
-  List getCategories;
-  void displayCategory(BuildContext context) async{
+  void selectGcCategory(BuildContext context) async{
+    List categoryData;
     var res = await db.getGcCategories();
     if (!mounted) return;
     setState(() {
-      isLoading = false;
-      getCategories = res['user_details'];
+      categoryData = res['user_details'];
     });
     showModalBottomSheet(
         isScrollControlled: true,
@@ -236,43 +238,75 @@ class _GcLoadStore extends State<GcLoadStore> {
         ),
         builder: (ctx) {
           return Container(
-            height: MediaQuery.of(context).size.height  * 0.4,
-            child:Container(
-              child: Scrollbar(
-                child: ListView(
-                  controller: _categoryController,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children:[
-                        SizedBox(height:10.0),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(15.0, 0.0, 20.0, 0.0),
-                          child:Text("Categories",style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold),),
-                        ),
-                        SizedBox(height:10.0),
-                        ListView.builder(
-                          physics: BouncingScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: getCategories == null ? 0 : getCategories.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return getCategories.length == null ? ListTile(
-                              title: Text("No category for this tenant yet"),
-                            ):ListTile(
-                              title: Text(getCategories[index]['category_name']),
-                              onTap: (){
-                                categoryId = getCategories[index]['category_no'];
-                                getItemsByCategories();
-                                Navigator.pop(context);
-                              },
-                            );
-                          },
+            height: MediaQuery.of(context).size.height/1.5,
+            child: Scrollbar(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(25.0, 20.0, 20.0, 20.0),
+                    child:Text("Category",style: TextStyle(fontSize: 25.0,fontWeight: FontWeight.bold),),
+                  ),
+
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children:[
+                            ListView.builder(
+                                physics: BouncingScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: categoryData.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return GestureDetector(
+                                    onTap: () async{
+                                      categoryId = categoryData[index]['category_no'];
+                                      categoryName = categoryData[index]['category_name'];
+                                      getItemsByCategories();
+                                      Navigator.pop(context);
+                                      loadProfile();
+                                    },
+                                    child:Container(
+                                      height: 120.0,
+                                      width: 30.0,
+                                      child: Card(
+                                        color: Colors.white,
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            ListTile(
+                                              leading:Container(
+                                                width: 60.0,
+                                                height: 60.0,
+                                                decoration: new BoxDecoration(
+                                                  image: new DecorationImage(
+                                                    image: new NetworkImage(categoryData[index]['image']),
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                  borderRadius: new BorderRadius.all(new Radius.circular(50.0)),
+                                                  border: new Border.all(
+                                                    color: Colors.black54,
+                                                    width: 0.5,
+                                                  ),
+                                                ),
+                                              ),
+                                              title: Text(categoryData[index]['category_name'].toString(),style: GoogleFonts.openSans(color: Colors.black54,fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 22.0),),
+                                            ),
+                                          ],
+                                        ),
+                                        elevation: 0,
+                                        margin: EdgeInsets.all(3),
+                                      ),
+                                    ),
+                                  );
+                                }),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           );
@@ -320,6 +354,8 @@ class _GcLoadStore extends State<GcLoadStore> {
   @override
   void initState() {
     super.initState();
+    print(widget.categoryNo);
+    categoryName = widget.categoryName;
     loadStore();
     getGcCounter();
     loadProfile();
@@ -395,7 +431,7 @@ class _GcLoadStore extends State<GcLoadStore> {
                                       height: 50.0,
                                       decoration: new BoxDecoration(
                                         image: new DecorationImage(
-                                          image: new NetworkImage(widget.buLogo),
+                                          image: new NetworkImage(widget.logo),
                                           fit: BoxFit.cover,
                                         ),
                                         borderRadius: new BorderRadius.all(new Radius.circular(50.0)),
@@ -406,7 +442,7 @@ class _GcLoadStore extends State<GcLoadStore> {
                                       ),
                                     ),
                                     title: Text(
-                                      widget.buName,
+                                      widget.businessUnit,
                                       style: GoogleFonts.openSans(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
@@ -468,6 +504,10 @@ class _GcLoadStore extends State<GcLoadStore> {
                           },
                         ),
                       ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(10, 20, 5, 5),
+                        child: new Text(categoryName, style: GoogleFonts.openSans(fontWeight: FontWeight.bold, fontStyle: FontStyle.normal, fontSize: 20.0),),
+                      ),
                       SizedBox(
                         height: 20.0,
                       ),
@@ -498,7 +538,7 @@ class _GcLoadStore extends State<GcLoadStore> {
                                     loadStoreData[index]['price'],
                                     loadStoreData[index]['uom'],
                                     loadStoreData[index]['uom_id'],
-                                    widget.buCode
+                                    widget.bUnitCode
                                 ));
                                getGcCounter();
                                loadProfile();
@@ -575,7 +615,7 @@ class _GcLoadStore extends State<GcLoadStore> {
                                     getItemsByCategoriesList[index]['price'],
                                     getItemsByCategoriesList[index]['uom'],
                                     getItemsByCategoriesList[index]['uom_id'],
-                                    widget.buCode
+                                    widget.bUnitCode
                                 ));
                                 getGcCounter();
                                 loadProfile();
@@ -640,7 +680,7 @@ class _GcLoadStore extends State<GcLoadStore> {
                 children: <Widget>[
                   SleekButton(
                     onTap:(){
-                      displayCategory(context);
+                      selectGcCategory(context);
                     },
                     style: SleekButtonStyle.flat(
                       color: Colors.green,
@@ -791,22 +831,6 @@ Route _profilePage() {
 Route _loadFood(){
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => MyHomePage(),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      var begin = Offset(0.0, 1.0);
-      var end = Offset.zero;
-      var curve = Curves.decelerate;
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
-}
-
-Route _createRoute() {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => CreateAccountSignIn(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;

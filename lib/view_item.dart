@@ -24,47 +24,37 @@ class _ViewItem extends State<ViewItem>{
   final db = RapidA();
   final oCcy = new NumberFormat("#,##0.00", "en_US");
   final itemCount = TextEditingController();
-//  bool _isLogged = false;
+
   List loadItemData;
-  List loadFlavorData;
-  List loadDrinksData;
-  List loadFriesData;
-  List loadSideData;
-  List loadAddonsData;
-  List checkLoadAddonsSideData;
-  List checkLoadAddonDessertData;
-  List addonSideData,loadAddonDessertSideData;
-
   var isLoading = true;
-  var labelFlavor = "";
-  var labelDrinks = "";
-  var labelFries = "";
-  var labelSides = "" ,checkLoadAddonsSideDataInt,checkLoadAddonDessertDataInt;
-  var labelAddonSide = "";
-  var labelAddonDessert = "";
-  int flavorGroupValue ;
-  int drinksGroupValue ;
-  int friesGroupValue ;
-  int sidesGroupValue ;
   int _counter = 1;
-  int flavorId;
-  int drinkId,drinkUom;
-  int friesId,friesUom;
-  int sideId,sideUom;
 
-  var boolFlavorId = false;
-  var boolDrinkId = false;
-  var boolFriesId = false;
-  var boolSideId = false;
+  String uomId,uomPrice;
+  String choiceUomId,choiceId;
+  String flavorId;
 
-  List<bool> side = new List<bool>();
-  List<bool> dessert = new List<bool>();
   List<String> selectedSideItems = List();
   List<String> selectedSideItemsUom = List();
-  List<String> selectedDessertItemsUom = List();
-  List<String> selectedDessertItems = List();
+
+  int choiceDataGroupValue;
+  int uomDataGroupValue ;
+  int flavorDataGroupValue;
+
+  List addonData;
+  List choicesData;
+  List uomData;
+  List flavorData;
+
+  bool addonDataVisible;
+  bool choicesDataVisible;
+  bool uomDataVisible;
+  bool flavorDataVisible;
 
   Future loadStore() async{
+    addonDataVisible = true;
+    choicesDataVisible = true;
+    uomDataVisible = true;
+    flavorDataVisible = true;
     setState(() {
       isLoading = true;
     });
@@ -74,6 +64,49 @@ class _ViewItem extends State<ViewItem>{
       loadItemData = res['user_details'];
       isLoading = false;
       itemCount.text = "1";
+      addonData = loadItemData[1]['addon_data'];
+      choicesData = loadItemData[2]['choices_data'];
+      uomData = loadItemData[3]['uom_data'];
+      flavorData = loadItemData[4]['flavor_data'];
+
+      if(addonData.toString() == '[[]]'){
+        addonDataVisible = false;
+      }
+      if(choicesData.toString() == '[[]]'){
+        choicesDataVisible = false;
+      }
+      if(uomData.toString() == '[[]]'){
+        uomDataVisible = false;
+      }
+      if(flavorData.toString() == '[[]]'){
+        flavorDataVisible = false;
+      }
+
+      for(int q = 0;q<choicesData.length;q++) {
+        if (choicesData[q]['default'] == '1') {
+          choiceDataGroupValue = q;
+          choiceUomId = choicesData[q]['sub_productid'];
+          choiceId = choicesData[q]['uom_id'];
+          break;
+        }
+      }
+
+      for(int q = 0;q<uomData.length;q++) {
+          if (uomData[q]['default'] == '1') {
+            uomDataGroupValue = q;
+            uomId = uomData[q]['uom_id'];
+            break;
+          }
+      }
+
+      for(int q = 0;q<flavorData.length;q++) {
+        if (flavorData[q]['default'] == '1') {
+          flavorDataGroupValue = q;
+          flavorId = flavorData[q]['flavor_id'];
+          break;
+        }
+      }
+
     });
   }
 
@@ -122,7 +155,7 @@ class _ViewItem extends State<ViewItem>{
           );
         },
       );
-      await db.addToCartCiTest(widget.buCode,widget.tenantCode,widget.prodId,widget.productUom,flavorId,drinkId,drinkUom,friesId,friesUom,sideId,sideUom,selectedSideItems,selectedSideItemsUom,selectedDessertItems,selectedDessertItemsUom,boolFlavorId,boolDrinkId,boolFriesId,boolSideId,_counter);
+      // await db.addToCartCiTest(widget.buCode,widget.tenantCode,widget.prodId,widget.productUom,flavorId,drinkId,drinkUom,friesId,friesUom,sideId,sideUom,selectedSideItems,selectedSideItemsUom,selectedDessertItems,selectedDessertItemsUom,boolFlavorId,boolDrinkId,boolFriesId,boolSideId,_counter);
     }
   }
 
@@ -143,72 +176,10 @@ class _ViewItem extends State<ViewItem>{
     });
   }
 
-  Future loadFlavor() async{
-    var res = await db.loadFlavor(widget.prodId);
-    if (!mounted) return;
-    setState(() {
-      loadFlavorData = res['user_details'];
-
-    });
-  }
-
-  Future loadDrinks() async{
-    var res = await db.loadDrinks(widget.prodId);
-    if (!mounted) return;
-    setState(() {
-      loadDrinksData = res['user_details'];
-    });
-  }
-
-  Future loadFries() async{
-    var res = await db.loadFries(widget.prodId);
-    if (!mounted) return;
-    setState((){
-      loadFriesData = res['user_details'];
-    });
-  }
-
-  Future  loadSide() async{
-    var res = await db.loadSide(widget.prodId);
-    if (!mounted) return;
-    setState((){
-      loadSideData = res['user_details'];
-    });
-  }
-
-  Future checkAddon()async{
-    var res = await db.checkAddon(widget.prodId);
-    if (!mounted) return;
-    setState((){
-      checkLoadAddonsSideData = res['user_details'];
-    });
-  }
-
-  Future addonSide() async{
-    var res = await db.loadAddonSide(widget.prodId);
-    if (!mounted) return;
-    setState((){
-      addonSideData = res['user_details'];
-
-    });
-  }
-
-  Future addonDessert() async{
-    var res = await db.loadAddonDessertSide(widget.prodId);
-    if (!mounted) return;
-    setState((){
-      loadAddonDessertSideData = res['user_details'];
-
-    });
-  }
-
   @override
   void initState(){
-
     super.initState();
     loadStore();
-    checkAddon();
-    addonSide();
   }
 
   @override
@@ -255,29 +226,6 @@ class _ViewItem extends State<ViewItem>{
                           shrinkWrap: true,
                           itemCount: 1,
                           itemBuilder: (BuildContext context, int index){
-                            if(loadItemData[index]['no_flavor']!=null){
-                              boolFlavorId = true;
-                              labelFlavor = "Flavor";
-                              loadFlavor();
-                            }
-                            if(loadItemData[index]['no_drinks']!=null){
-                              boolDrinkId = true;
-                              labelDrinks = "Select drinks";
-                              loadDrinks();
-                            }
-                            if(loadItemData[index]['no_fries']!=null){
-                              boolFriesId = true;
-                              labelFries = "Fries";
-                              loadFries();
-                            }
-                            if(loadItemData[index]['no_sides']!=null){
-                              boolSideId = true;
-                              labelSides = "Sides";
-                              loadSide();
-                            }
-                            if(loadItemData[index]['variation']!=null){
-                              checkAddon();
-                            }
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children:[
@@ -306,302 +254,251 @@ class _ViewItem extends State<ViewItem>{
                                   padding: EdgeInsets.fromLTRB(20.0, 0.0, 5.0, 5.0),
                                   child: new Text(loadItemData[index]['description'].toString(), style: GoogleFonts.openSans( fontStyle: FontStyle.normal,fontSize: 15.0),),
                                 ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(20.0, 0.0, 5.0, 5.0),
-                                  child: new Text(labelFlavor, style: GoogleFonts.openSans(fontWeight: FontWeight.bold, fontStyle: FontStyle.normal,fontSize: 18.0),),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 5.0),
-                                  child: ListView.builder(
-                                      physics: NeverScrollableScrollPhysics(),
-                                      shrinkWrap: true,
-                                      itemCount:loadFlavorData == null ? 0 : loadFlavorData.length,
-                                      itemBuilder: (BuildContext context, int index1) {
-                                        return Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Flexible(
-                                                  fit: FlexFit.loose,
-                                                  child: RadioListTile(
-                                                    title: Text(loadFlavorData[index1]['add_on_flavors'],style: TextStyle(fontSize: 17,),),
-                                                    value: index1,
-                                                    groupValue: flavorGroupValue,
-                                                    onChanged: (newValue) {
-                                                      setState(() {
-                                                        flavorGroupValue = newValue;
-                                                        flavorId = int.parse(loadFlavorData[index1]['flavor_id']);
+                                Divider(
 
-                                                      });
-                                                    },
-                                                  ),
-                                                ),
-//                                              Padding(
-//                                                padding: EdgeInsets.fromLTRB(10.0, 0.0, 15.0, 5.0),
-//                                                child: Text(loadFlavorData[index]['add_on_flavors'],style: TextStyle(fontSize: 17,color: Colors.black54),),
-//                                              ),
-                                                Padding(
-                                                  padding: EdgeInsets.fromLTRB(20.0, 0.0, 15.0, 10.0),
-                                                  child:  Text('+ ₱ ${loadFlavorData[index1]['addon_price']}', style: TextStyle(fontSize: 17,),),
-                                                ),
-
-                                              ],
-                                            )
-                                          ],
-                                        );
-                                      }
-                                  ),
                                 ),
-
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(20.0, 0.0, 5.0, 5.0),
-                                  child: new Text(labelDrinks, style: GoogleFonts.openSans(fontWeight: FontWeight.bold, fontStyle: FontStyle.normal,fontSize: 18.0),),
-                                ),
-
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 5.0),
-                                  child: ListView.builder(
-                                      physics: NeverScrollableScrollPhysics(),
-                                      shrinkWrap: true,
-                                      itemCount:loadDrinksData == null ? 0 : loadDrinksData.length,
-                                      itemBuilder: (BuildContext context, int index2) {
-                                        return Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Flexible(
-                                                  fit: FlexFit.loose,
-                                                  child: RadioListTile(
-                                                    title: Text("${loadDrinksData[index2]['product_name']} (${loadDrinksData[index2]['unit_measure']})",style: TextStyle(fontSize: 17,),),
-                                                    value: index2,
-                                                    groupValue: drinksGroupValue,
-                                                    onChanged: (newValue) {
-                                                      setState(() {
-                                                        drinksGroupValue = newValue;
-                                                        drinkId = int.parse(loadDrinksData[index2]['drink_id']);
-                                                        drinkUom = int.parse(loadDrinksData[index2]['uom_id']);
-                                                      });
-                                                    },
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsets.fromLTRB(20.0, 0.0, 15.0, 10.0),
-                                                  child:  Text('+ ₱ ${loadDrinksData[index2]['addon_price']}', style: TextStyle(fontSize: 17,),),
-                                                ),
-                                              ],
-                                            )
-                                          ],
-                                        );
-                                      }
-                                  ),
-                                ),
-
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(20.0, 0.0, 5.0, 5.0),
-                                  child: new Text(labelFries, style: GoogleFonts.openSans(fontWeight: FontWeight.bold, fontStyle: FontStyle.normal,fontSize: 18.0),),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 5.0),
-                                  child: ListView.builder(
-                                      physics: NeverScrollableScrollPhysics(),
-                                      shrinkWrap: true,
-                                      itemCount:loadFriesData == null ? 0 : loadFriesData.length,
-                                      itemBuilder: (BuildContext context, int index3) {
-
-                                        return Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Flexible(
-                                                  fit: FlexFit.loose,
-                                                  child: RadioListTile(
-                                                    title: Text('${loadFriesData[index3]['product_name']} ${loadFriesData[index3]['unit_measure']}',style: TextStyle(fontSize: 17,),),
-                                                    value: index3,
-                                                    groupValue: friesGroupValue,
-                                                    onChanged: (newValue) {
-                                                      setState((){
-                                                        friesGroupValue = newValue;
-                                                        friesId = int.parse(loadFriesData[index3]['fries_id']);
-                                                        friesUom = int.parse(loadFriesData[index3]['uom_id']);
-                                                      });
-                                                    },
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsets.fromLTRB(20.0, 0.0, 15.0, 10.0),
-                                                  child:  Text('+ ₱ ${loadFriesData[index3]['addon_price']}', style: TextStyle(fontSize: 17,),),
-                                                ),
-                                              ],
-                                            )
-                                          ],
-                                        );
-                                      }
-                                  ),
-                                ),
-
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(20.0, 0.0, 5.0, 5.0),
-                                  child: new Text(labelSides, style: GoogleFonts.openSans(fontWeight: FontWeight.bold, fontStyle: FontStyle.normal,fontSize: 18.0),),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(20.0, 0.0, 5.0, 5.0),
-                                  child: ListView.builder(
-                                      physics: NeverScrollableScrollPhysics(),
-                                      shrinkWrap: true,
-                                      itemCount:loadSideData == null ? 0 : loadSideData.length,
-                                      itemBuilder: (BuildContext context, int index4) {
-
-                                        return Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Flexible(
-                                                  fit: FlexFit.loose,
-                                                  child: RadioListTile(
-                                                    title: Text('${loadSideData[index4]['product_name']} ${loadSideData[index4]['unit_measure']}',style: TextStyle(fontSize: 17,),),
-                                                    value: index4,
-                                                    groupValue: sidesGroupValue,
-                                                    onChanged: (newValue) {
-                                                      setState((){
-                                                        friesGroupValue = newValue;
-                                                        sideId = int.parse(loadSideData[index4]['side_id']);
-                                                        sideUom = int.parse(loadSideData[index4]['uom_id']);
-                                                      });
-                                                    },
-                                                  ),
-                                                ),
-
-                                                Padding(
-                                                  padding: EdgeInsets.fromLTRB(20.0, 0.0, 15.0, 0.0),
-                                                  child:  Text('+ ₱ ${loadSideData[index4]['addon_price']}', style: TextStyle(fontSize: 17,),),
-                                                ),
-                                              ],
-                                            )
-                                          ],
-                                        );
-                                      }
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(20.0, 0.0, 5.0, 0.0),
-                                  child: ListView.builder(
-                                      physics: NeverScrollableScrollPhysics(),
-                                      shrinkWrap: true,
-                                      itemCount:checkLoadAddonsSideData == null ? 0 : checkLoadAddonsSideData.length,
-                                      itemBuilder: (BuildContext context, int index) {
-                                        if(checkLoadAddonsSideData[index]['addon_sides']=='1'){
-                                          labelAddonSide = "Side";
-                                          addonSide();
-                                        }if(checkLoadAddonsSideData[index]['addon_dessert']=='1'){
-                                          labelAddonDessert = "Dessert";
-                                          addonDessert();
-                                        }
-                                        return Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                          ],
-                                        );
-                                      }
-                                  ),
-                                ),
-
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(20.0, 0.0, 15.0, 5.0),
-                                  child: Text(labelAddonSide,style: GoogleFonts.openSans(fontWeight: FontWeight.bold, fontStyle: FontStyle.normal,fontSize: 18.0),),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 10.0),
-                                  child: ListView.builder(
-                                      physics: NeverScrollableScrollPhysics(),
-                                      shrinkWrap: true,
-                                      itemCount:addonSideData == null ? 0 : addonSideData.length,
-                                      itemBuilder: (BuildContext context, int index1) {
-                                        side.add(false);
-                                        return Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            CheckboxListTile(
-                                              title: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                Visibility(
+                                  visible:addonDataVisible,
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 10.0),
+                                        child: Text("Select add-ons",style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold),),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 10.0),
+                                        child: ListView.builder(
+                                            physics: NeverScrollableScrollPhysics(),
+                                            shrinkWrap: true,
+                                            itemCount:addonData == null ? 0 : addonData.length,
+                                            itemBuilder: (BuildContext context, int index1) {
+                                              String uomName = "";
+                                              if(addonData[index1]['unit']!=null){
+                                                uomName = addonData[index1]['unit'];
+                                              }
+                                              side.add(false);
+                                              return Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
-                                                  Text(addonSideData[index1]['product_name']),
-                                                  Text('+ ₱ ${addonSideData[index1]['addon_price']}')
+                                                  CheckboxListTile(
+                                                    activeColor: Colors.deepOrange,
+                                                    title: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        Text('${addonData[index1]['sub_productname']}  $uomName'),
+                                                        Text('+ ₱ ${addonData[index1]['addon_price']}')
+                                                      ],
+                                                    ),
+                                                    value: side[index1],
+                                                    onChanged: (bool value){
+                                                      setState(() {
+                                                        side[index1] = value;
+                                                         // selectedSideItems.clear();
+                                                        // selectedSideItemsUom.clear();
+                                                        if (value) {
+                                                          selectedSideItems.add(addonData[index1]['sub_productid']);
+                                                          selectedSideItemsUom.add(addonData[index1]['uom_id']);
+                                                        }
+                                                        else{
+                                                          selectedSideItems.remove(addonData[index1]['sub_productid']);
+                                                          selectedSideItemsUom.remove(addonData[index1]['uom_id']);
+                                                        }
+                                                      });
+                                                    },
+                                                    controlAffinity: ListTileControlAffinity.leading,
+                                                  ),
                                                 ],
-                                              ),
-                                              value: side[index1],
-                                              onChanged: (bool value){
-                                                setState(() {
-                                                  side[index1] = value;
-//                                                   selectedItems.clear();
-                                                  if (value) {
-                                                    selectedSideItems.add(addonSideData[index1]['product_id']);
-                                                    selectedSideItemsUom.add(addonSideData[index1]['uom_id']);
-                                                  }
-                                                  else{
-                                                    selectedSideItems.remove(addonSideData[index1]['product_id']);
-                                                    selectedSideItemsUom.remove(addonSideData[index1]['uom_id']);
-                                                  }
-                                                });
-                                              },
-                                              controlAffinity: ListTileControlAffinity.leading,
-                                            ),
-                                          ],
-                                        );
-                                      }
+                                              );
+                                            }
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
 
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(20.0, 0.0, 15.0, 5.0),
-                                  child: Text(labelAddonDessert,style: GoogleFonts.openSans(fontWeight: FontWeight.bold, fontStyle: FontStyle.normal,fontSize: 18.0),),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 10.0),
-                                  child: ListView.builder(
-                                      physics: NeverScrollableScrollPhysics(),
-                                      shrinkWrap: true,
-                                      itemCount:loadAddonDessertSideData == null ? 0 : loadAddonDessertSideData.length,
-                                      itemBuilder: (BuildContext context, int index1) {
-                                        dessert.add(false);
-                                        return Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            CheckboxListTile(
-                                              title: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                Visibility(
+                                  visible:choicesDataVisible,
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 10.0),
+                                        child: Text("Select side",style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold),),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 10.0),
+                                        child: ListView.builder(
+                                            physics: NeverScrollableScrollPhysics(),
+                                            shrinkWrap: true,
+                                            itemCount:choicesData == null ? 0 : choicesData.length,
+                                            itemBuilder: (BuildContext context, int index2) {
+                                              String uomName = "";
+                                              if(choicesData[index2]['unit']!=null){
+                                                uomName = choicesData[index2]['unit'].toString();
+                                              }
+                                              return Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
-                                                  Text(loadAddonDessertSideData[index1]['product_name']),
-                                                  Text('+ ₱ ${loadAddonDessertSideData[index1]['addon_price']}')
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Flexible(
+                                                        fit: FlexFit.loose,
+                                                        child: RadioListTile(
+                                                          activeColor: Colors.deepOrange,
+                                                          // title: Text('${choicesData[index2]['sub_productname']} $uomName + ₱ ${choicesData[index2]['addon_price']}',style: TextStyle(fontSize: 17,),),
+                                                          title: Row(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                            children: [
+                                                              Text('${choicesData[index2]['sub_productname']}  $uomName'),
+                                                              Text('+ ₱ ${choicesData[index2]['addon_price']}'),
+                                                            ],
+                                                          ),
+                                                          value: index2,
+                                                          groupValue: choiceDataGroupValue,
+                                                          onChanged: (newValue) {
+                                                            setState((){
+                                                              choiceDataGroupValue = newValue;
+                                                              choiceUomId = choicesData[index2]['uom_id'];
+                                                              choiceId = choicesData[index2]['sub_productid'];
+                                                            });
+                                                          },
+                                                        ),
+                                                      ),
+                                                      // Padding(
+                                                      //   padding: EdgeInsets.fromLTRB(20.0, 0.0, 15.0, 0.0),
+                                                      //   child:  Text('+ ₱ ${choicesData[index2]['addon_price']}', style: TextStyle(fontSize: 17,),),
+                                                      // ),
+                                                    ],
+                                                  )
                                                 ],
-                                              ),
-                                              value: dessert[index1],
-                                              onChanged: (bool value){
-                                                dessert[index1] = value;
-                                                setState(() {
-                                                  if (value) {
-                                                    selectedDessertItems.add(loadAddonDessertSideData[index1]['product_id']);
-                                                    selectedDessertItemsUom.add(loadAddonDessertSideData[index1]['uom_id']);
-                                                  }
-                                                  else{
-                                                    selectedDessertItems.remove(loadAddonDessertSideData[index1]['product_id']);
-                                                    selectedDessertItemsUom.remove(loadAddonDessertSideData[index1]['uom_id']);
-                                                  }
+                                              );
+                                            }
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Visibility(
+                                  visible:uomDataVisible,
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 10.0),
+                                        child: Text("Change size",style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold),),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 10.0),
+                                        child: ListView.builder(
+                                            physics: NeverScrollableScrollPhysics(),
+                                            shrinkWrap: true,
+                                            itemCount:uomData == null ? 0 : uomData.length,
+                                            itemBuilder: (BuildContext context, int index3) {
+                                              String uomName = "";
+                                              if(uomData[index3]['unit']!=null){
+                                                uomName = uomData[index3]['unit'].toString();
+                                              }
+                                              return Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Flexible(
+                                                        fit: FlexFit.loose,
+                                                        child: RadioListTile(
+                                                          activeColor: Colors.deepOrange,
+                                                          // title: Text('${uomData[index3]['price_productname']} $uomName  ₱ ${uomData[index3]['price']}',style: TextStyle(fontSize: 17,),),
+                                                          title: Row(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                            children: [
+                                                              Text('${uomData[index3]['price_productname']}  $uomName'),
+                                                              Text('₱ ${uomData[index3]['price']}'),
+                                                            ],
+                                                          ),
+                                                          value: index3,
+                                                          groupValue: uomDataGroupValue,
+                                                          onChanged: (newValue) {
+                                                            setState((){
+                                                              uomDataGroupValue = newValue;
+                                                              uomId = uomData[index3]['uom_id'];
+                                                            });
+                                                          },
+                                                        ),
+                                                      ),
+                                                      // Padding(
+                                                      //   padding: EdgeInsets.fromLTRB(20.0, 0.0, 15.0, 0.0),
+                                                      //   child:  Text('+ ₱ ${choicesData[index2]['addon_price']}', style: TextStyle(fontSize: 17,),),
+                                                      // ),
+                                                    ],
+                                                  )
+                                                ],
+                                              );
+                                            }
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
 
-                                                });
-                                              },
-                                              controlAffinity: ListTileControlAffinity.leading,
-                                            ),
-                                          ],
-                                        );
-                                      }
+                                Visibility(
+                                  visible:flavorDataVisible,
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 10.0),
+                                        child: Text("Add flavor",style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold),),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 10.0),
+                                        child: ListView.builder(
+                                            physics: NeverScrollableScrollPhysics(),
+                                            shrinkWrap: true,
+                                            itemCount:flavorData == null ? 0 : flavorData.length,
+                                            itemBuilder: (BuildContext context, int index4) {
+                                              String uomName = "";
+                                              if(flavorData[index4]['unit']!=null){
+                                                uomName = flavorData[index4]['unit'].toString();
+                                              }
+                                              return Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Flexible(
+                                                        fit: FlexFit.loose,
+                                                        child: RadioListTile(
+                                                          activeColor: Colors.deepOrange,
+                                                          // title: Text('${uomData[index3]['price_productname']} $uomName  ₱ ${uomData[index3]['price']}',style: TextStyle(fontSize: 17,),),
+                                                          title: Row(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                            children: [
+                                                              Text('${flavorData[index4]['flavor_name']}  $uomName'),
+                                                              Text('₱ ${flavorData[index4]['price']}'),
+                                                            ],
+                                                          ),
+                                                          value: index4,
+                                                          groupValue: flavorDataGroupValue,
+                                                          onChanged: (newValue) {
+                                                            setState((){
+                                                              flavorDataGroupValue = newValue;
+                                                              flavorId = flavorData[index4]['flavor_id'];
+                                                            });
+                                                          },
+                                                        ),
+                                                      ),
+                                                      // Padding(
+                                                      //   padding: EdgeInsets.fromLTRB(20.0, 0.0, 15.0, 0.0),
+                                                      //   child:  Text('+ ₱ ${choicesData[index2]['addon_price']}', style: TextStyle(fontSize: 17,),),
+                                                      // ),
+                                                    ],
+                                                  )
+                                                ],
+                                              );
+                                            }
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
 
@@ -609,7 +506,6 @@ class _ViewItem extends State<ViewItem>{
                             );
                           }
                       ),
-
                     ],
                   ),
                 ),

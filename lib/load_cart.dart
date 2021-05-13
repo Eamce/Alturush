@@ -145,7 +145,92 @@ class _LoadCart extends State<LoadCart> {
         });
   }
 
+  // viewAddon(cartId) async{
+  //
+  // }
 
+  // void viewAddon(BuildContext context,cartId) async{
+  //   List viewAddonList;
+  //   var res = await db.viewAddon(cartId);
+  //   if (!mounted) return;
+  //   setState(() {
+  //     viewAddonList = res['user_details'];
+  //   });
+  //
+  //   showModalBottomSheet(
+  //       isScrollControlled: true,
+  //       isDismissible: true,
+  //       context: context,
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.only(topRight:  Radius.circular(10),topLeft:  Radius.circular(10)),
+  //       ),
+  //       builder: (ctx) {
+  //         return Container(
+  //           height: MediaQuery.of(context).size.height/1.5,
+  //           child: Scrollbar(
+  //             child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Padding(
+  //                   padding: EdgeInsets.fromLTRB(25.0, 20.0, 20.0, 20.0),
+  //                   child:Text("Category",style: TextStyle(fontSize: 25.0,fontWeight: FontWeight.bold),),
+  //                 ),
+  //
+  //                 Expanded(
+  //                   child: ListView(
+  //                     children: [
+  //                       Column(
+  //                         crossAxisAlignment: CrossAxisAlignment.start,
+  //                         children:[
+  //                           ListView.builder(
+  //                               physics: BouncingScrollPhysics(),
+  //                               shrinkWrap: true,
+  //                               itemCount: categoryData.length,
+  //                               itemBuilder: (BuildContext context, int index) {
+  //                                 return Container(
+  //                                   height: 120.0,
+  //                                   width: 30.0,
+  //                                   child: Card(
+  //                                     color: Colors.white,
+  //                                     child: Column(
+  //                                       mainAxisAlignment: MainAxisAlignment.center,
+  //                                       children: <Widget>[
+  //                                         ListTile(
+  //                                           leading:Container(
+  //                                             width: 60.0,
+  //                                             height: 60.0,
+  //                                             decoration: new BoxDecoration(
+  //                                               image: new DecorationImage(
+  //                                                 image: new NetworkImage(categoryData[index]['image']),
+  //                                                 fit: BoxFit.cover,
+  //                                               ),
+  //                                               borderRadius: new BorderRadius.all(new Radius.circular(50.0)),
+  //                                               border: new Border.all(
+  //                                                 color: Colors.black54,
+  //                                                 width: 0.5,
+  //                                               ),
+  //                                             ),
+  //                                           ),
+  //                                           title: Text(categoryData[index]['category'].toString(),style: GoogleFonts.openSans(color: Colors.black54,fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 22.0),),
+  //                                         ),
+  //                                       ],
+  //                                     ),
+  //                                     elevation: 0,
+  //                                     margin: EdgeInsets.all(3),
+  //                                   ),
+  //                                 );
+  //                               }),
+  //                         ],
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         );
+  //       });
+  // }
 
   List loadItemData;
   Future loadItem(productId,prodUom) async{
@@ -883,101 +968,110 @@ class _LoadCart extends State<LoadCart> {
 //                            shrinkWrap: true,
                             itemCount:loadCartData == null ? 0 : loadCartData.length,
                             itemBuilder: (BuildContext context, int index) {
-                              return InkWell(
-                                onTap: () {
-//                                  displayAddon(context,loadCartData[index]['prod_name'],loadCartData[index]['prod_id'],loadCartData[index]['prod_uom']);
-                                },
-                                child: Container(
-                                  height: 150.0,
-                                  width: 30.0,
-                                  child: Card(
-                                    color: Colors.transparent,
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                      children: [
-                                        Row(
-                                          children: <Widget>[
-                                            Padding(
-                                              padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
-                                                child: Container(
-                                                  width: 80.0,
-                                                  height: 60.0,
-                                                  decoration: new BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    image: new DecorationImage(
-                                                      image: new NetworkImage(loadCartData[index]['prod_image']),
-                                                      fit: BoxFit.scaleDown,
-                                                    ),
-                                                  )),
-                                            ),
-                                            Container(
-                                              child:Column(
-                                                crossAxisAlignment:CrossAxisAlignment.start,
-                                                children: <Widget>[
-                                                  Padding(
-                                                      padding: EdgeInsets.fromLTRB(15, 10, 5, 5),
-                                                      child:Text('${loadCartData[index]['prod_name']}', overflow: TextOverflow.clip,
-                                                        style: GoogleFonts.openSans(
-                                                            fontStyle:
-                                                            FontStyle.normal,
-                                                            fontSize: 13.0),
-                                                      ),
+                              return Container(
+                                height: 150.0,
+                                width: 30.0,
+                                child: Card(
+                                  color: Colors.transparent,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Row(
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
+                                              child: Container(
+                                                width: 80.0,
+                                                height: 60.0,
+                                                decoration: new BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  image: new DecorationImage(
+                                                    image: new NetworkImage(loadCartData[index]['prod_image']),
+                                                    fit: BoxFit.scaleDown,
                                                   ),
-                                                  Padding(
-                                                    padding: EdgeInsets.fromLTRB(15, 0, 5, 5),
-                                                    child: new Text('${loadCartData[index]['bu_name']} - ${loadCartData[index]['tenant_name']}', overflow: TextOverflow.clip,
+                                                )),
+                                          ),
+                                          Container(
+                                            child:Column(
+                                              crossAxisAlignment:CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                Padding(
+                                                    padding: EdgeInsets.fromLTRB(15, 10, 5, 5),
+                                                    child:Text('${loadCartData[index]['prod_name']}', overflow: TextOverflow.clip,
                                                       style: GoogleFonts.openSans(
                                                           fontStyle:
                                                           FontStyle.normal,
                                                           fontSize: 13.0),
                                                     ),
+                                                ),
+                                                Padding(
+                                                  padding: EdgeInsets.fromLTRB(15, 0, 5, 5),
+                                                  child: new Text('${loadCartData[index]['bu_name']} - ${loadCartData[index]['tenant_name']}', overflow: TextOverflow.clip,
+                                                    style: GoogleFonts.openSans(
+                                                        fontStyle:
+                                                        FontStyle.normal,
+                                                        fontSize: 13.0),
                                                   ),
-                                                  Row(
-                                                    children: <Widget>[
-                                                      Padding(
-                                                        padding: EdgeInsets.fromLTRB(15, 0, 5, 0),
-                                                        child: new Text(
-                                                          "₱ ${loadCartData[index]['total'].toString()}",
-                                                          style: TextStyle(
-                                                            fontWeight:
-                                                            FontWeight.bold,
-                                                            fontSize: 15,
-                                                            color: Colors.deepOrange,
-                                                          ),
+                                                ),
+                                                Row(
+                                                  children: <Widget>[
+                                                    Padding(
+                                                      padding: EdgeInsets.fromLTRB(15, 0, 5, 0),
+                                                      child: new Text(
+                                                        "₱ ${loadCartData[index]['total'].toString()}",
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                          FontWeight.bold,
+                                                          fontSize: 15,
+                                                          color: Colors.deepOrange,
                                                         ),
                                                       ),
-                                                    ],
-                                                  ),
-                                                  Row(
-                                                    children: <Widget>[
-                                                      Padding(
-                                                        padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                                          child:RawMaterialButton(
-                                                            onPressed: () {
+                                                    ),
+                                                  ],
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: <Widget>[
+                                                    Padding(
+                                                      padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                                        child:RawMaterialButton(
+                                                          onPressed: () async{
+                                                            SharedPreferences prefs = await SharedPreferences.getInstance();
+                                                            String username = prefs.getString('s_customerId');
+                                                            if(username == null){
+                                                              await Navigator.of(context).push(_signIn());
+                                                            }else{
                                                               removeFromCart(loadCartData[index]['d_id']);
-                                                            },
-                                                            elevation: 1.0,
+                                                            }
+
+                                                          },
+                                                          elevation: 1.0,
 //                                                            fillColor: Colors.transparent,
-                                                            child: Icon(
-                                                              Icons.delete_outline,
-                                                              size: 25.0,
-                                                            ),
+                                                          child: Icon(
+                                                            Icons.delete_outline,
+                                                            size: 25.0,
+                                                          ),
 //                                                          padding: EdgeInsets.all(15.0),
-                                                            shape: CircleBorder(),
-                                                          )
-                                                      ),
-                                                      Padding(
-                                                        padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                                        child:Container(
-                                                          width: 50.0,
-                                                          child: TextButton(
-                                                            style: TextButton.styleFrom(
-                                                              primary: Colors.blue,
-                                                              onSurface: Colors.red,
-                                                            ),
-                                                            child: Text('-'),
-                                                            onPressed: (){
+                                                          shape: CircleBorder(),
+                                                        )
+                                                    ),
+                                                    Padding(
+                                                      padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                                      child:Container(
+                                                        width: 50.0,
+                                                        child: TextButton(
+                                                          style: TextButton.styleFrom(
+                                                            primary: Colors.blue,
+                                                            onSurface: Colors.red,
+                                                          ),
+                                                          child: Text('-'),
+                                                          onPressed: () async{
+                                                            SharedPreferences prefs = await SharedPreferences.getInstance();
+                                                            String username = prefs.getString('s_customerId');
+                                                            if(username == null){
+                                                              await Navigator.of(context).push(_signIn());
+                                                            }else{
                                                               setState(() {
                                                                 var x = loadCartData[index]['cart_qty'];
                                                                 int d = int.parse(x.toString());
@@ -985,55 +1079,76 @@ class _LoadCart extends State<LoadCart> {
                                                                 if(d<1){
                                                                   loadCartData[index]['cart_qty']=1;
                                                                 }
-                                                                updateCartQty(loadCartData[index]['d_id'].toString(),loadCartData[index]['cart_qty'].toString());
                                                               });
-//                                                              qtyGlobal1 = int.parse(loadCartData[index]['d_quantity']);
-//                                                                decrement(loadCartData[index]['d_id'], loadCartData[index]['d_quantity'],index);
-//                                                              removeFromCart(loadCartData[index]['d_id']);
-                                                            },
-                                                          ),
-                                                        ),
-                                                      ),
+                                                              updateCartQty(loadCartData[index]['d_id'].toString(),loadCartData[index]['cart_qty'].toString());
+                                                            }
 
-                                                      Padding(
-                                                        padding:EdgeInsets.fromLTRB(1, 5, 5, 5),
-                                                        child:Text(loadCartData[index]['cart_qty'].toString()),
-                                                      ),
-                                                      Padding(
-                                                        padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                                        child:Container(
-                                                          width: 50.0,
-                                                          child: TextButton(
-                                                            style: TextButton.styleFrom(
-                                                              primary: Colors.blue,
-                                                              onSurface: Colors.red,
-                                                            ),
-                                                            child: Text('+'),
-//                                                          color: Colors.deepOrange,
-                                                            onPressed: (){
-                                                              setState(() {
-                                                                var x = loadCartData[index]['cart_qty'];
-                                                                int d = int.parse(x.toString());
-                                                                loadCartData[index]['cart_qty'] = d+=1;   //code ni boss rene
-                                                                updateCartQty(loadCartData[index]['d_id'].toString(),loadCartData[index]['cart_qty'].toString());
-                                                              });
-//                                                              removeFromCart(loadCartData[index]['d_id']);
-                                                            },
-                                                          ),
+
+                                                          },
                                                         ),
                                                       ),
-                                                    ],
-                                                  )
-                                                ],
-                                              ),
+                                                    ),
+
+                                                    Padding(
+                                                      padding:EdgeInsets.fromLTRB(1, 5, 5, 5),
+                                                      child:Text(loadCartData[index]['cart_qty'].toString()),
+                                                    ),
+                                                    Padding(
+                                                      padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                                      child:Container(
+                                                        width: 50.0,
+                                                        child: TextButton(
+                                                          style: TextButton.styleFrom(
+                                                            primary: Colors.blue,
+                                                            onSurface: Colors.red,
+                                                          ),
+                                                          child: Text('+'),
+//                                                          color: Colors.deepOrange,
+                                                          onPressed: ()async {
+                                                              SharedPreferences prefs = await SharedPreferences.getInstance();
+                                                              String username = prefs.getString('s_customerId');
+                                                              if(username == null){
+                                                                await Navigator.of(context).push(_signIn());
+                                                              }else{
+                                                                setState(() {
+                                                                  var x = loadCartData[index]['cart_qty'];
+                                                                  int d = int.parse(x.toString());
+                                                                  loadCartData[index]['cart_qty'] = d+=1;   //code ni boss rene
+                                                                });
+                                                                updateCartQty(loadCartData[index]['d_id'].toString(),loadCartData[index]['cart_qty'].toString());
+                                                              }
+                                                          },
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                                      child:Container(
+                                                        width: 100.0,
+                                                        child: TextButton(
+                                                          style: TextButton.styleFrom(
+                                                            primary: Colors.blue,
+                                                            onSurface: Colors.red,
+                                                          ),
+                                                          child: Text('view more'),
+                                                          onPressed: ()async {
+                                                              // viewAddon(context,loadCartData[index]['d_id']);
+                                                              // print(loadCartData[index]['d_id']);
+                                                            },
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
+                                              ],
                                             ),
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                    elevation: 0,
-                                    margin: EdgeInsets.all(3),
+                                          ),
+                                        ],
+                                      )
+                                    ],
                                   ),
+                                  elevation: 0,
+                                  margin: EdgeInsets.all(3),
                                 ),
                               );
                             }),
@@ -1092,7 +1207,13 @@ class _LoadCart extends State<LoadCart> {
                               Flexible(
                                 child: SleekButton(
                                   onTap: () async {
-                                    selectType(context);
+                                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                                    String username = prefs.getString('s_customerId');
+                                    if(username == null){
+                                      await Navigator.of(context).push(_signIn());
+                                    }else{
+                                      selectType(context);
+                                    }
                                   },
                                   style: SleekButtonStyle.flat(
                                     color: Colors.deepOrange,

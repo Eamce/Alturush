@@ -223,8 +223,18 @@ class _MyHomePageState extends State<MyHomePage>  {
                           onTap: () async{
                             Navigator.of(context).pop();
                             SharedPreferences prefs = await SharedPreferences.getInstance();
-                            String status  = prefs.getString('s_status');
-                            status != null ? Navigator.of(context).push(viewIds()) : Navigator.of(context).push(_signIn());
+                            String username = prefs.getString('s_customerId');
+                            if(username == null){
+                              await Navigator.of(context).push(_signIn());
+                              getCounter();
+                              listenCartCount();
+                              loadProfile();
+                            }else{
+                              await Navigator.of(context).push(_loadCart());
+                              getCounter();
+                              listenCartCount();
+                              loadProfile();
+                            }
                           }
                       ),
                       // ListTile(

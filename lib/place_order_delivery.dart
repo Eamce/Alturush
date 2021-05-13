@@ -28,6 +28,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
   final placeOrderBrg = TextEditingController();
   final placeContactNo = TextEditingController();
   final placeRemarks = TextEditingController();
+  final specialInstruction = TextEditingController();
   final street = TextEditingController();
   final houseNo = TextEditingController();
   final deliveryDate = TextEditingController();
@@ -42,7 +43,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
   List getOrder;
   // List barrioData;
   // List getAllowLoc;
-  List getTenantLimit;
+  // List getTenantLimit;
   List checkFee;
   List loadDiscountedPerson;
   var isLoading = true;
@@ -205,8 +206,10 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                           townId = getItemsData[index]['d_brgId'];
                           deliveryCharge = double.parse(getItemsData[index]['d_charge_amt']);
                           grandTotal = deliveryCharge + subtotal;
+                          minimumAmount = double.parse(getItemsData[index]['minimum_order_amount']);
                           updateDefaultShipping(getItemsData[index]['id'],getItemsData[index]['d_customerId']);
                           Navigator.pop(context);
+
                         },
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 15.0),
@@ -256,11 +259,26 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
     });
   }
 
+  List<String> subTotalTenant = [];
   Future getTenantSegregate() async{
+    subTotalTenant.clear();
     var res = await db.getTenantSegregate();
     if (!mounted) return;
     setState(() {
       getTenant = res['user_details'];
+      for(var q=0;q<getTenant.length;q++){
+
+        if(getTenant[q]['total'] < minimumAmount){
+          subTotalTenant.add('false');
+          }
+        else{
+          subTotalTenant.add('true');
+        }
+
+        //print(getTenant[q]['total']);
+        // print(minimumAmount);
+      }
+
     });
   }
 
@@ -626,7 +644,8 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
 
    submitPlaceOrder() async{
      FocusScope.of(context).requestFocus(FocusNode());
-      if(minimumAmount>subtotal){
+     print(subTotalTenant);
+      if(subTotalTenant.contains('false')){
       return showDialog<void>(
         context: context,
         barrierDismissible: false, // user must tap button!
@@ -708,7 +727,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
           },
         );
      }
-    else if(deliveryDate.text.isEmpty || placeOrderTown.text.isEmpty || placeOrderBrg.text.isEmpty || placeContactNo.text.isEmpty || placeRemarks.text.isEmpty || placeContactNo.text.length < 10 || changeFor.text.isEmpty)
+    else if(deliveryDate.text.isEmpty || placeOrderTown.text.isEmpty || placeOrderBrg.text.isEmpty || placeContactNo.text.isEmpty || placeRemarks.text.isEmpty || specialInstruction.text.isEmpty || placeContactNo.text.length < 10 || changeFor.text.isEmpty)
     {
       return showDialog<void>(
         context: context,
@@ -756,7 +775,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
        if(username == null){
          Navigator.of(context).push(_signIn());
        }else{
-         Navigator.of(context).push(_submitOrder(changeFor.text,int.parse(townId),int.parse(barrioId),placeContactNo.text,placeOrderTown.text,placeOrderBrg.text,street.text,houseNo.text,placeRemarks.text,deliveryCharge,grandTotal,deliveryDate.text,deliveryTime.text,groupValue));
+         Navigator.of(context).push(_submitOrder(changeFor.text,int.parse(townId),int.parse(barrioId),placeContactNo.text,placeOrderTown.text,placeOrderBrg.text,street.text,houseNo.text,placeRemarks.text,specialInstruction.text,deliveryCharge,grandTotal,deliveryDate.text,deliveryTime.text,groupValue));
        }
     }
   }
@@ -1337,7 +1356,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                 ),
                                 Padding(
                                   padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
-                                  child: new Text("Landmark or Special instructions*", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                                  child: new Text("Landmark*", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                                 ),
                                 Padding(
                                   padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
@@ -1363,6 +1382,35 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                     ),
                                   ),
                                 ),
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
+                                  child: new Text("Special instruction*", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                                ),
+                                Padding(
+                                  padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                  child: new TextFormField(
+                                    keyboardType: TextInputType.multiline,
+                                    textInputAction: TextInputAction.done,
+                                    cursorColor: Colors.deepOrange,
+                                    controller: specialInstruction,
+                                    validator: (value) {
+                                      if (value.isEmpty) {
+                                        return 'Please enter some value';
+                                      }
+                                      return null;
+                                    },
+                                    maxLines: 4,
+                                    decoration: InputDecoration(
+                                      hintText:"E.g Near at plaza/Be ware of dogs",
+                                      contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
+                                      focusedBorder:OutlineInputBorder(
+                                        borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
+                                      ),
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
+                                    ),
+                                  ),
+                                ),
+
                                 Padding(
                                   padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
                                   child: new Text("In case the product is out of stock", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
@@ -1571,9 +1619,9 @@ Widget _myRadioButton({String title, int value, Function onChanged}) {
   );
 }
 
-Route _submitOrder(changeForText,townId,barrioId,contactNo,placeOrderTown,placeOrderBrg,street,houseNo,placeRemark,deliveryCharge,grandTotal,deliveryDate,deliveryTime,groupValue) {
+Route _submitOrder(changeForText,townId,barrioId,contactNo,placeOrderTown,placeOrderBrg,street,houseNo,placeRemark,specialInstruction,deliveryCharge,grandTotal,deliveryDate,deliveryTime,groupValue) {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => SubmitOrder(changeForText:changeForText,townId:townId,barrioId:barrioId,contactNo:contactNo,placeOrderTown:placeOrderTown,placeOrderBrg:placeOrderBrg,street:street,houseNo:houseNo,placeRemark:placeRemark,deliveryCharge:deliveryCharge,grandTotal:grandTotal,deliveryDate:deliveryDate,deliveryTime:deliveryTime,groupValue:groupValue),
+    pageBuilder: (context, animation, secondaryAnimation) => SubmitOrder(changeForText:changeForText,townId:townId,barrioId:barrioId,contactNo:contactNo,placeOrderTown:placeOrderTown,placeOrderBrg:placeOrderBrg,street:street,houseNo:houseNo,placeRemark:placeRemark,specialInstruction:specialInstruction,deliveryCharge:deliveryCharge,grandTotal:grandTotal,deliveryDate:deliveryDate,deliveryTime:deliveryTime,groupValue:groupValue),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;

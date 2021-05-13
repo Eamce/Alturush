@@ -17,6 +17,7 @@ class SubmitOrder extends StatefulWidget {
   final int barrioId;
   final String contactNo;
   final String placeRemark;
+  final String specialInstruction;
   final String placeOrderTown;
   final String placeOrderBrg;
   final String street;
@@ -28,7 +29,7 @@ class SubmitOrder extends StatefulWidget {
   final deliveryDate;
   final deliveryTime;
 
-  SubmitOrder({Key key, @required this.changeForText, this.townId, this.barrioId, this.contactNo,this.placeRemark,this.placeOrderTown,this.placeOrderBrg,this.street,this.houseNo,this.deliveryCharge,this.grandTotal,this.groupValue,this.deliveryDate,this.deliveryTime}) : super(key: key);
+  SubmitOrder({Key key, @required this.changeForText, this.townId, this.barrioId, this.contactNo,this.placeRemark,this.specialInstruction,this.placeOrderTown,this.placeOrderBrg,this.street,this.houseNo,this.deliveryCharge,this.grandTotal,this.groupValue,this.deliveryDate,this.deliveryTime}) : super(key: key);
 
   @override
   _SubmitOrder createState() => _SubmitOrder();
@@ -53,19 +54,19 @@ class _SubmitOrder extends State<SubmitOrder>  {
     // prefs.setString('houseNo', widget.houseNo);
     // prefs.setString('placeRemark', widget.placeRemark);
 
-    await db.placeOrder(widget.townId.toString(),widget.barrioId.toString(),widget.contactNo,widget.placeRemark,widget.houseNo,widget.changeForText,widget.street,widget.deliveryCharge.toString(),widget.deliveryDate.toString(),widget.deliveryTime.toString(),widget.groupValue.toString());
-
-    print(widget.townId.toString());
-    print(widget.barrioId.toString());
-    print(widget.contactNo);
-    print(widget.placeRemark);
-    print(widget.houseNo);
-    print(widget.changeForText);
-    print(widget.street);
-    print(widget.deliveryCharge.toString());
-    print(widget.deliveryDate.toString());
-    print(widget.deliveryTime.toString());
-    print(widget.groupValue.toString());
+    await db.placeOrder(widget.townId.toString(),widget.barrioId.toString(),widget.contactNo,widget.placeRemark,widget.specialInstruction,widget.houseNo,widget.changeForText,widget.street,widget.deliveryCharge.toString(),widget.deliveryDate.toString(),widget.deliveryTime.toString(),widget.groupValue.toString());
+    //
+    // print(widget.townId.toString());
+    // print(widget.barrioId.toString());
+    // print(widget.contactNo);
+    // print(widget.placeRemark);
+    // print(widget.houseNo);
+    // print(widget.changeForText);
+    // print(widget.street);
+    // print(widget.deliveryCharge.toString());
+    // print(widget.deliveryDate.toString());
+    // print(widget.deliveryTime.toString());
+    // print(widget.groupValue.toString());
 
   }
 
@@ -365,6 +366,15 @@ class _SubmitOrder extends State<SubmitOrder>  {
                           padding: EdgeInsets.fromLTRB(20, 5, 10, 5),
                           child: Text("${widget.placeRemark.toString()}",style: GoogleFonts.openSans(fontSize: 17.0),),
                         ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(10, 10, 10, 5),
+                        child: Text("Special instruction",style: GoogleFonts.openSans(fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 17.0),),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(20, 5, 10, 5),
+                        child: Text("${widget.specialInstruction.toString()}",style: GoogleFonts.openSans(fontSize: 17.0),),
+                      ),
+
 //                        Padding(
 //                          padding: EdgeInsets.fromLTRB(10, 10, 10, 5),
 //                            child: Text("Ticket #: ${list[0]['d_ticket_id']}",style: GoogleFonts.openSans(fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 17.0),),

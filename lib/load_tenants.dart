@@ -74,58 +74,96 @@ class _LoadTenants extends State<LoadTenants> {
         ),
         builder: (ctx) {
           return Container(
-            height: MediaQuery.of(context).size.height/2,
+            height: MediaQuery.of(context).size.height/1.5,
             child: Scrollbar(
-              child: ListView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children:[
-                      ListView.builder(
-                          physics: BouncingScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: categoryData.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.pop(context);
-                                Navigator.of(context).push(_loadStore(categoryData[index]['category_id'],buCode,logo,tenantId,tenantName));
-                              },
-                              child:Container(
-                                height: 120.0,
-                                width: 30.0,
-                                child: Card(
-                                  color: Colors.white,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      ListTile(
-                                        leading:Container(
-                                          width: 60.0,
-                                          height: 60.0,
-                                          decoration: new BoxDecoration(
-                                            image: new DecorationImage(
-                                              image: new NetworkImage(categoryData[index]['image']),
-                                              fit: BoxFit.cover,
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(25.0, 20.0, 20.0, 20.0),
+                    child:Text("Category",style: TextStyle(fontSize: 25.0,fontWeight: FontWeight.bold),),
+                  ),
+
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children:[
+                            ListView.builder(
+                                physics: BouncingScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: categoryData.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return GestureDetector(
+                                    onTap: () async{
+                                      Navigator.pop(context);
+                                      if(index == 0){
+                                        await Navigator.of(context).push(_loadStore('All items',categoryData[index]['category_id'],buCode,logo,tenantId,tenantName));
+                                        getCounter();
+                                        loadProfile();
+                                      }else{
+                                        await Navigator.of(context).push(_loadStore(categoryData[index]['category'],categoryData[index]['category_id'],buCode,logo,tenantId,tenantName));
+                                        getCounter();
+                                        loadProfile();
+                                      }
+
+                                      },
+                                    child:Container(
+                                      height: 120.0,
+                                      width: 30.0,
+                                      child: Card(
+                                        color: Colors.white,
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            index == 0 ? ListTile(
+                                              leading:Container(
+                                                width: 60.0,
+                                                height: 60.0,
+                                                decoration: new BoxDecoration(
+                                                  image: new DecorationImage(
+                                                    image: new NetworkImage(categoryData[index]['image']),
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                  borderRadius: new BorderRadius.all(new Radius.circular(50.0)),
+                                                  border: new Border.all(
+                                                    color: Colors.black54,
+                                                    width: 0.5,
+                                                  ),
+                                                ),
+                                              ),
+                                              title: Text("All items",style: GoogleFonts.openSans(color: Colors.black54,fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 22.0),),
+                                            ): ListTile(
+                                              leading:Container(
+                                                width: 60.0,
+                                                height: 60.0,
+                                                decoration: new BoxDecoration(
+                                                  image: new DecorationImage(
+                                                    image: new NetworkImage(categoryData[index]['image']),
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                  borderRadius: new BorderRadius.all(new Radius.circular(50.0)),
+                                                  border: new Border.all(
+                                                    color: Colors.black54,
+                                                    width: 0.5,
+                                                  ),
+                                                ),
+                                              ),
+                                              title: Text(categoryData[index]['category'].toString(),style: GoogleFonts.openSans(color: Colors.black54,fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 22.0),),
                                             ),
-                                            borderRadius: new BorderRadius.all(new Radius.circular(50.0)),
-                                            border: new Border.all(
-                                              color: Colors.black54,
-                                              width: 0.5,
-                                            ),
-                                          ),
+                                          ],
                                         ),
-                                        title: Text(categoryData[index]['category'].toString(),style: GoogleFonts.openSans(color: Colors.black54,fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 22.0),),
+                                        elevation: 0,
+                                        margin: EdgeInsets.all(3),
                                       ),
-                                    ],
-                                  ),
-                                  elevation: 0,
-                                  margin: EdgeInsets.all(3),
-                                ),
-                              ),
-                            );
-                          }),
-                    ],
+                                    ),
+                                  );
+                                }),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -291,6 +329,7 @@ class _LoadTenants extends State<LoadTenants> {
                             return GestureDetector(
                               onTap: () {
                                 selectCategory(context,widget.buCode,loadTenants[index]['logo'], loadTenants[index]['tenant_id'], loadTenants[index]['d_tenant_name']);
+
                                 // Navigator.of(context).push(_loadStore(widget.buCode,loadTenants[index]['logo'], loadTenants[index]['tenant_id'], loadTenants[index]['d_tenant_name']));
 
                               },
@@ -450,9 +489,9 @@ Route _profilePage() {
   );
 }
 
-Route _loadStore(categoryId,buCode, storeLogo, tenantCode, tenantName) {
+Route _loadStore(categoryName,categoryId,buCode, storeLogo, tenantCode, tenantName) {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => LoadStore(categoryId:categoryId, buCode:buCode, storeLogo:storeLogo, tenantCode:tenantCode, tenantName:tenantName),
+    pageBuilder: (context, animation, secondaryAnimation) => LoadStore(categoryName:categoryName,categoryId:categoryId, buCode:buCode, storeLogo:storeLogo, tenantCode:tenantCode, tenantName:tenantName),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1.0, 0.0);
       var end = Offset.zero;

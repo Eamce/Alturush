@@ -20,13 +20,14 @@ import 'package:url_launcher/url_launcher.dart';
 import 'grocery/groceryMain.dart';
 
 class LoadStore extends StatefulWidget {
+  final categoryName;
   final categoryId;
   final buCode;
   final storeLogo;
   final tenantCode;
   final tenantName;
 
-  LoadStore({Key key, @required this.categoryId, this.buCode,this.storeLogo, this.tenantCode, this.tenantName}) : super(key: key);
+  LoadStore({Key key, @required this.categoryName, this.categoryId, this.buCode,this.storeLogo, this.tenantCode, this.tenantName}) : super(key: key);
   @override
   _LoadStore createState() => _LoadStore();
 }
@@ -46,6 +47,7 @@ class _LoadStore extends State<LoadStore> {
   var checkIfEmptyStore;
   var subtotal;
   Timer timer;
+  String categoryName = "";
 
   Future checkEmptyStore() async{
     var res = await db.checkEmptyStore(widget.tenantCode);
@@ -91,9 +93,14 @@ class _LoadStore extends State<LoadStore> {
     super.initState();
     getCounter();
     loadProfile();
-    loadStore();
-    checkEmptyStore();
+    if(widget.categoryName == 'All items'){
+      getItemsByCategoriesAll();
+    }else{
+      loadStore();
+    }
 
+    checkEmptyStore();
+    categoryName = widget.categoryName;
   }
 
 
@@ -113,35 +120,48 @@ class _LoadStore extends State<LoadStore> {
         ),
         builder: (ctx) {
           return Container(
-            height: MediaQuery.of(context).size.height/2,
+            height: MediaQuery.of(context).size.height/1.5,
             child: Scrollbar(
-              child: ListView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children:[
-                      ListView.builder(
-                          physics: BouncingScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: categoryData.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.pop(context);
-                                print(categoryData[index]['category_id']);
-                                getItemsByCategories(categoryData[index]['category_id']);
-                                // Navigator.of(context).push(_loadStore(categoryData[index]['category_id'],buCode,logo,tenantId,tenantName));
-                              },
-                              child:Container(
-                                height: 120.0,
-                                width: 30.0,
-                                child: Card(
-                                  color: Colors.white,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      ListTile(
-                                        leading:Container(
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(25.0, 20.0, 20.0, 20.0),
+                    child:Text("Category",style: TextStyle(fontSize: 25.0,fontWeight: FontWeight.bold),),
+                  ),
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children:[
+                            ListView.builder(
+                                physics: BouncingScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: categoryData.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      if(index == 0){
+                                        getItemsByCategoriesAll();
+                                      }else{
+                                        categoryName = categoryData[index]['category'];
+                                        getItemsByCategories(categoryData[index]['category_id']);
+                                      }
+
+                                      // Navigator.of(context).push(_loadStore(categoryData[index]['category_id'],buCode,logo,tenantId,tenantName));
+                                    },
+                                    child:Container(
+                                      height: 120.0,
+                                      width: 30.0,
+                                      child: Card(
+                                        color: Colors.white,
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            index == 0 ? ListTile(
+                                          leading:Container(
                                           width: 60.0,
                                           height: 60.0,
                                           decoration: new BoxDecoration(
@@ -156,17 +176,37 @@ class _LoadStore extends State<LoadStore> {
                                             ),
                                           ),
                                         ),
-                                        title: Text(categoryData[index]['category'].toString(),style: GoogleFonts.openSans(color: Colors.black54,fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 22.0),),
+                                        title: Text("All items",style: GoogleFonts.openSans(color: Colors.black54,fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 22.0),),
+                                      ) : ListTile(
+                                              leading:Container(
+                                                width: 60.0,
+                                                height: 60.0,
+                                                decoration: new BoxDecoration(
+                                                  image: new DecorationImage(
+                                                    image: new NetworkImage(categoryData[index]['image']),
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                  borderRadius: new BorderRadius.all(new Radius.circular(50.0)),
+                                                  border: new Border.all(
+                                                    color: Colors.black54,
+                                                    width: 0.5,
+                                                  ),
+                                                ),
+                                              ),
+                                              title: Text(categoryData[index]['category'].toString(),style: GoogleFonts.openSans(color: Colors.black54,fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 22.0),),
+                                            ),
+                                          ],
+                                        ),
+                                        elevation: 0,
+                                        margin: EdgeInsets.all(3),
                                       ),
-                                    ],
-                                  ),
-                                  elevation: 0,
-                                  margin: EdgeInsets.all(3),
-                                ),
-                              ),
-                            );
-                          }),
-                    ],
+                                    ),
+                                  );
+                                }),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -180,6 +220,16 @@ class _LoadStore extends State<LoadStore> {
   getItemsByCategories(categoryId) async{
     cat = false;
     var res = await db.getItemsByCategories(categoryId);
+    if (!mounted) return;
+    setState(() {
+      getItemsByCategoriesList = res['user_details'];
+      cat = true;
+    });
+  }
+
+  getItemsByCategoriesAll() async{
+    cat = false;
+    var res = await db.getItemsByCategoriesAll(widget.tenantCode);
     if (!mounted) return;
     setState(() {
       getItemsByCategoriesList = res['user_details'];
@@ -347,7 +397,7 @@ class _LoadStore extends State<LoadStore> {
                             background:Colors.redAccent ,
                             radius: 20,
                             padding: const EdgeInsets.all(15),
-                            text: "We also deliver groceries",
+                            text: "Order groceries here",
                             gradientColors: [Colors.green, Colors.lightGreen],
                             onPressed: () {
                               Navigator.of(context).push(_loadGrocery());
@@ -359,13 +409,7 @@ class _LoadStore extends State<LoadStore> {
                         visible: checkIfEmptyStore == false ? false : true,
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(10, 20, 5, 5),
-                          child: new Text(
-                            "Best Seller",
-                            style: GoogleFonts.openSans(
-                                fontWeight: FontWeight.bold,
-                                fontStyle: FontStyle.normal,
-                                fontSize: 15.0),
-                          ),
+                          child: new Text(categoryName, style: GoogleFonts.openSans(fontWeight: FontWeight.bold, fontStyle: FontStyle.normal, fontSize: 20.0),),
                         ),
                       ),
 
@@ -818,6 +862,8 @@ Route _loadGrocery(){
     },
   );
 }
+
+
 
 Route _signIn() {
   return PageRouteBuilder(
