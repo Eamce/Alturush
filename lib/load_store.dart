@@ -78,7 +78,7 @@ class _LoadStore extends State<LoadStore> {
       cartLoading = false;
       listCounter = res['user_details'];
       cartCount = listCounter[0]['num'];
-
+      print(cartCount);
     });
   }
 
@@ -568,7 +568,8 @@ class _LoadStore extends State<LoadStore> {
                                       loadStoreData[index]['tenant_id'],
                                       loadStoreData[index]['product_id'],
                                       loadStoreData[index]['product_uom'],
-                                      loadStoreData[index]['unit_measure']
+                                      loadStoreData[index]['unit_measure'],
+                                      loadStoreData[index]['price']
                                   ));
                                   getCounter();
                                 },
@@ -638,7 +639,8 @@ class _LoadStore extends State<LoadStore> {
                                       getItemsByCategoriesList[index]['tenant_id'],
                                       getItemsByCategoriesList[index]['product_id'],
                                       getItemsByCategoriesList[index]['product_uom'],
-                                      getItemsByCategoriesList[index]['unit_measure']
+                                      getItemsByCategoriesList[index]['unit_measure'],
+                                      getItemsByCategoriesList[index]['price'],
                                   ));
                                   getCounter();
                                 },
@@ -798,10 +800,10 @@ class _LoadStore extends State<LoadStore> {
 
 }
 
-Route _viewItem(buCode, tenantCode, prodId,productUom,unitOfMeasure) {
+Route _viewItem(buCode, tenantCode, prodId,productUom,unitOfMeasure,price) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) =>
-        ViewItem(buCode: buCode, tenantCode: tenantCode, prodId: prodId,productUom:productUom,unitOfMeasure:unitOfMeasure),
+        ViewItem(buCode: buCode, tenantCode: tenantCode, prodId: prodId,productUom:productUom,unitOfMeasure:unitOfMeasure,price:price),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;

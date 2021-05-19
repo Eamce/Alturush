@@ -21,8 +21,6 @@ class _LoadCart extends State<LoadCart> {
   final db = RapidA();
   final oCcy = new NumberFormat("#,##0.00", "en_US");
   List loadCartData;
-  List loadEdit;
-  List getTenantLimit;
   List lGetAmountPerTenant;
   List loadSubtotal;
   var isLoading = true;
@@ -43,51 +41,151 @@ class _LoadCart extends State<LoadCart> {
   int drinkId,drinkUom;
   int friesId,friesUom;
   int sideId,sideUom;
+  int grandTotal = 0;
 
   var boolFlavorId = false;
   var boolDrinkId = false;
   var boolFriesId = false;
   var boolSideId = false;
-  var grandTotal = 0.0;
+
+
+  List loadIMainItems;
+  List loadChoices;
+  List loadFlavors;
+  List loadAddons;
+  List loadTotalData;
 
   Future loadCart() async {
-
     var res = await db.loadCartData();
     if (!mounted) return;
     setState(() {
       isLoading = false;
       loadCartData = res['user_details'];
-      grandTotal = 0;
-      loadCartData.forEach((element) {
-        grandTotal = grandTotal + (double.parse(element['cart_qty'].toString()) * double.parse(element['total'].toString()));
-      });
+      loadIMainItems = loadCartData;
+      // print(loadCartData[1]['choices'].length);
+
     });
   }
 
-  // Future loadSubTotal() async{
-  //   var res = await db.loadSubTotal();
-  //   if (!mounted) return;
-  //   setState(() {
-  //     isLoading1 = false;
-  //     loadSubtotal = res['user_details'];
-  //
-  //     if(loadSubtotal[0]['d_subtotal']==null){
-  //       subTotal = 0;
-  //     }else{
-  //       subTotal = double.parse(loadSubtotal[0]['d_subtotal'].toString());
-  //     }
-  //   });
-  // }
+  Future loadTotal() async{
+    var res = await db.loadSubTotal();
+    if (!mounted) return;
+    setState(() {
+      isLoading = false;
+      loadTotalData = res['user_details'];
+      grandTotal = int.parse(loadTotalData[0]['grand_total'].toString());
+    });
+  }
 
-//  Future trapTenantLimit() async{
-//    var res = await db.trapTenantLimit();
-//    if (!mounted) return;
-//    setState(() {
-////      isLoading = false;
-//      getTenantLimit = res['user_details'];
-//    });
-//  }
+  viewAddon(BuildContext context,mainItemIndex) {
+    print(mainItemIndex);
+    showModalBottomSheet(
+        isScrollControlled: true,
+        isDismissible: true,
+        context: context,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(topRight:  Radius.circular(10),topLeft:  Radius.circular(10)),
+        ),
+        builder: (ctx) {
+          return Container(
+            height: MediaQuery.of(context).size.height  * 0.4,
+            child:Container(
+              child: Scrollbar(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children:[
 
+                    // loadFlavors
+                    // loadAddons
+                    SizedBox(height:15.0),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(25.0, 0.0, 20.0, 0.0),
+                      child: Text("Add ons",style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold),),
+                    ),
+                    ListView.builder(
+                      physics: BouncingScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: loadIMainItems == null ? 0 : loadIMainItems.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        var f = index;
+                        if(f  == mainItemIndex){
+                         if(loadCartData[mainItemIndex]['choices'].length > 0){
+                           return Padding(
+                             padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 5.0),
+                             child:Container(
+                               child: Row(
+                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                 children:[
+                                   Expanded(child: Text(' + ${loadIMainItems[mainItemIndex]['choices'][0]['product_name']} - Php ${loadIMainItems[mainItemIndex]['choices'][0]['addon_price']}',style: TextStyle(fontSize: 18.0,),maxLines: 6, overflow: TextOverflow.ellipsis,)),
+                                ],
+                               ),
+                             ),
+//                          child: Text('$f. ${lGetAmountPerTenant[index]['d_bu_name']} - ${lGetAmountPerTenant[index]['d_tenant']}  ₱${oCcy.format(double.parse(lGetAmountPerTenant[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
+                           );
+                         }
+                         return SizedBox(
+
+                         );
+                        }
+                        return SizedBox();
+                      },
+                    ),
+                    //addon
+                    ListView.builder(
+                      physics: BouncingScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: loadCartData[mainItemIndex]['flavors'] == null ? 0 : loadCartData[mainItemIndex]['addons'].length,
+                      itemBuilder: (BuildContext context, int index) {
+                          if(loadCartData[mainItemIndex]['addons'].length > 0){
+                            return Padding(
+                              padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 5.0),
+                              child:Container(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children:[
+                                    Expanded(child: Text(' + ${loadIMainItems[mainItemIndex]['addons'][index]['product_name']} - Php ${loadIMainItems[mainItemIndex]['addons'][index]['addon_price']}',style: TextStyle(fontSize: 18.0,),maxLines: 6, overflow: TextOverflow.ellipsis,)),
+                                  ],
+                                ),
+                              ),
+//                          child: Text('$f. ${lGetAmountPerTenant[index]['d_bu_name']} - ${lGetAmountPerTenant[index]['d_tenant']}  ₱${oCcy.format(double.parse(lGetAmountPerTenant[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
+                            );
+                          }
+                          return SizedBox(
+                        );
+                      },
+                    ),
+
+
+                    ListView.builder(
+                      physics: BouncingScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: loadCartData[mainItemIndex]['flavors'] == null ? 0 : loadCartData[mainItemIndex]['flavors'].length,
+                      itemBuilder: (BuildContext context, int index) {
+                        if(loadCartData[mainItemIndex]['flavors'].length > 0){
+                          return Padding(
+                            padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 5.0),
+                            child:Container(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children:[
+                                  Expanded(child: Text(' + ${loadIMainItems[mainItemIndex]['flavors'][0]['flavor']} - Php ${loadIMainItems[mainItemIndex]['flavors'][0]['addon_price']}',style: TextStyle(fontSize: 18.0,),maxLines: 6, overflow: TextOverflow.ellipsis,)),
+                                ],
+                              ),
+                            ),
+//                          child: Text('$f. ${lGetAmountPerTenant[index]['d_bu_name']} - ${lGetAmountPerTenant[index]['d_tenant']}  ₱${oCcy.format(double.parse(lGetAmountPerTenant[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
+                          );
+                        }
+                        return SizedBox(
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+  }
   void displayBottomSheet(BuildContext context) async{
     var res = await db.getAmountPerTenant();
     if (!mounted) return;
@@ -143,566 +241,6 @@ class _LoadCart extends State<LoadCart> {
            ),
           );
         });
-  }
-
-  // viewAddon(cartId) async{
-  //
-  // }
-
-  // void viewAddon(BuildContext context,cartId) async{
-  //   List viewAddonList;
-  //   var res = await db.viewAddon(cartId);
-  //   if (!mounted) return;
-  //   setState(() {
-  //     viewAddonList = res['user_details'];
-  //   });
-  //
-  //   showModalBottomSheet(
-  //       isScrollControlled: true,
-  //       isDismissible: true,
-  //       context: context,
-  //       shape: RoundedRectangleBorder(
-  //         borderRadius: BorderRadius.only(topRight:  Radius.circular(10),topLeft:  Radius.circular(10)),
-  //       ),
-  //       builder: (ctx) {
-  //         return Container(
-  //           height: MediaQuery.of(context).size.height/1.5,
-  //           child: Scrollbar(
-  //             child: Column(
-  //               crossAxisAlignment: CrossAxisAlignment.start,
-  //               children: [
-  //                 Padding(
-  //                   padding: EdgeInsets.fromLTRB(25.0, 20.0, 20.0, 20.0),
-  //                   child:Text("Category",style: TextStyle(fontSize: 25.0,fontWeight: FontWeight.bold),),
-  //                 ),
-  //
-  //                 Expanded(
-  //                   child: ListView(
-  //                     children: [
-  //                       Column(
-  //                         crossAxisAlignment: CrossAxisAlignment.start,
-  //                         children:[
-  //                           ListView.builder(
-  //                               physics: BouncingScrollPhysics(),
-  //                               shrinkWrap: true,
-  //                               itemCount: categoryData.length,
-  //                               itemBuilder: (BuildContext context, int index) {
-  //                                 return Container(
-  //                                   height: 120.0,
-  //                                   width: 30.0,
-  //                                   child: Card(
-  //                                     color: Colors.white,
-  //                                     child: Column(
-  //                                       mainAxisAlignment: MainAxisAlignment.center,
-  //                                       children: <Widget>[
-  //                                         ListTile(
-  //                                           leading:Container(
-  //                                             width: 60.0,
-  //                                             height: 60.0,
-  //                                             decoration: new BoxDecoration(
-  //                                               image: new DecorationImage(
-  //                                                 image: new NetworkImage(categoryData[index]['image']),
-  //                                                 fit: BoxFit.cover,
-  //                                               ),
-  //                                               borderRadius: new BorderRadius.all(new Radius.circular(50.0)),
-  //                                               border: new Border.all(
-  //                                                 color: Colors.black54,
-  //                                                 width: 0.5,
-  //                                               ),
-  //                                             ),
-  //                                           ),
-  //                                           title: Text(categoryData[index]['category'].toString(),style: GoogleFonts.openSans(color: Colors.black54,fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 22.0),),
-  //                                         ),
-  //                                       ],
-  //                                     ),
-  //                                     elevation: 0,
-  //                                     margin: EdgeInsets.all(3),
-  //                                   ),
-  //                                 );
-  //                               }),
-  //                         ],
-  //                       ),
-  //                     ],
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-  //           ),
-  //         );
-  //       });
-  // }
-
-  List loadItemData;
-  Future loadItem(productId,prodUom) async{
-    var res = await db.getItemDataCi(productId,prodUom);
-    if (!mounted) return;
-    setState(() {
-      loadItemData = res['user_details'];
-    });
-  }
-
-  List loadFlavorData;
-  Future loadFlavor(prodId) async{
-    var res = await db.loadFlavor(prodId);
-    if (!mounted) return;
-    setState(() {
-      loadFlavorData = res['user_details'];
-    });
-  }
-
-  List loadDrinksData;
-  Future loadDrinks(prodId) async{
-    var res = await db.loadDrinks(prodId);
-    if (!mounted) return;
-    setState(() {
-      loadDrinksData = res['user_details'];
-    });
-  }
-
-  List loadFriesData;
-  Future loadFries(prodId) async{
-    var res = await db.loadFries(prodId);
-    if (!mounted) return;
-    setState((){
-      loadFriesData = res['user_details'];
-    });
-  }
-
-  List loadSideData;
-  Future  loadSide(prodId) async{
-    var res = await db.loadSide(prodId);
-    if (!mounted) return;
-    setState((){
-      loadSideData = res['user_details'];
-    });
-  }
-
-  Future displayAddon(BuildContext context,productName,productId,prodUom) async{
-    loadItem(productId,prodUom);
-
-//    loadFlavor(productId);
-//    loadDrinks(productId);
-//    loadFries(productId);
-//    loadSide(productId);
-
-//     if(boolFlavorId == true){
-//       loadFlavor(productId);
-//     }
-//     if(boolDrinkId == true){
-//       loadDrinks(productId);
-//     }
-//     if(boolFriesId == true){
-//       loadFries(productId);
-//     }
-//     if(boolSideId == true){
-//       loadSide(productId);
-//     }
-
-    var res = await db.getAmountPerTenant();
-    if (!mounted) return;
-    setState(() {
-      isLoading = false;
-      lGetAmountPerTenant = res['user_details'];
-    });
-    setState(() {
-    showModalBottomSheet(
-        isScrollControlled: true,
-        isDismissible: true,
-        context: context,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(topRight:  Radius.circular(10),topLeft:  Radius.circular(10)),
-        ),
-        builder: (BuildContext  context,) {
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-                return Container(
-                  height: MediaQuery.of(context).size.height * 0.8,
-                  child: Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: 10.0),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(25.0, 0.0, 20.0, 0.0),
-                          child: Text(productName, style: TextStyle(
-                              fontSize: 18.0, fontWeight: FontWeight.bold),),
-                        ),
-                        Expanded(
-                          child: Scrollbar(
-                            child: ListView.builder(
-                              physics: BouncingScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: lGetAmountPerTenant == null ? 0 : lGetAmountPerTenant.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                return Padding(
-                                  padding: EdgeInsets.fromLTRB(
-                                      25.0, 15.0, 25.0, 5.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment
-                                        .spaceBetween,
-                                    children: [
-//                               Text('Total:₱${oCcy.format(int.parse(lGetAmountPerTenant[index]['total_price'].toString()))}',style: TextStyle(fontSize: 13.0,fontWeight: FontWeight.bold)),
-                                      Expanded(
-                                        child: ListView.builder(
-                                            physics: BouncingScrollPhysics(),
-                                            shrinkWrap: true,
-                                            itemCount: 1,
-                                            itemBuilder: (BuildContext context,
-                                                int index) {
-                                              if (loadItemData[index]['no_flavor'] !=
-                                                  null) {
-                                                boolFlavorId = true;
-                                                labelFlavor = "Flavor";
-                                                loadFlavor(productId);
-                                              }
-                                              if (loadItemData[index]['no_drinks'] !=
-                                                  null) {
-                                                boolDrinkId = true;
-                                                labelDrinks = "Select drinks";
-                                                loadDrinks(productId);
-                                              }
-                                              if (loadItemData[index]['no_fries'] !=
-                                                  null) {
-                                                boolFriesId = true;
-                                                labelFries = "Fries";
-                                                loadFries(productId);
-                                              }
-                                              if (loadItemData[index]['no_sides'] !=
-                                                  null) {
-                                                boolSideId = true;
-                                                labelSides = "Sides";
-                                                loadSide(productId);
-                                              }
-                                              if (loadItemData[index]['variation'] !=
-                                                  null) {
-//                                                checkAddon();
-                                              }
-                                              return Column(
-                                                crossAxisAlignment: CrossAxisAlignment
-                                                    .start,
-                                                children: [
-                                                  Padding(
-                                                    padding: EdgeInsets.fromLTRB(
-                                                        1.0, 0.0, 5.0, 5.0),
-                                                    child: new Text(labelFlavor,
-                                                      style: GoogleFonts.openSans(
-                                                          fontWeight: FontWeight
-                                                              .bold,
-                                                          fontStyle: FontStyle
-                                                              .normal,
-                                                          fontSize: 18.0),),
-                                                  ),
-                                                  Padding(
-                                                    padding: EdgeInsets.fromLTRB(
-                                                        0.0, 0.0, 5.0, 5.0),
-                                                    child: ListView.builder(
-                                                        physics: NeverScrollableScrollPhysics(),
-                                                        shrinkWrap: true,
-                                                        itemCount: loadFlavorData ==null? 0: loadFlavorData.length,
-                                                        itemBuilder: (
-                                                            BuildContext context,
-                                                            int index1) {
-                                                          return Column(
-                                                            crossAxisAlignment: CrossAxisAlignment
-                                                                .start,
-                                                            children: [
-                                                              Row(
-                                                                mainAxisAlignment: MainAxisAlignment
-                                                                    .spaceBetween,
-                                                                children: [
-                                                                  Flexible(
-                                                                    fit: FlexFit
-                                                                        .loose,
-                                                                    child: RadioListTile(
-                                                                      title: Text(loadFlavorData[index1]['add_on_flavors'], style: TextStyle(fontSize: 17,),),
-                                                                      value: index1,
-                                                                      groupValue: flavorGroupValue,
-                                                                      onChanged: (
-                                                                          newValue) {
-                                                                        setState(() {
-                                                                          flavorGroupValue =
-                                                                              newValue;
-                                                                          flavorId = int.parse(loadFlavorData[index1]['flavor_id']);
-                                                                        });
-                                                                      },
-                                                                    ),
-                                                                  ),
-                                                                  //   Padding(
-                                                                  //     padding: EdgeInsets.fromLTRB(10.0, 0.0, 15.0, 5.0),
-                                                                  //     child: Text(loadFlavorData[index]['add_on_flavors'],style: TextStyle(fontSize: 17,color: Colors.black54),),
-                                                                  //   ),
-                                                                  Padding(
-                                                                    padding: EdgeInsets
-                                                                        .fromLTRB(
-                                                                        1.0, 0.0,
-                                                                        5.0, 5.0),
-                                                                    child: Text('+ ₱ ${loadFlavorData[index1]['addon_price']}', style: TextStyle(fontSize: 17,),),
-                                                                  ),
-                                                                ],
-                                                              )
-                                                            ],
-                                                          );
-                                                        }
-                                                    ),
-                                                  ),
-
-                                                  Padding(
-                                                    padding: EdgeInsets.fromLTRB(1.0, 0.0, 5.0, 5.0),
-                                                    child: new Text(labelDrinks,
-                                                      style: GoogleFonts.openSans(fontWeight: FontWeight.bold, fontStyle: FontStyle.normal, fontSize: 18.0),),
-                                                  ),
-                                                  Padding(
-                                                    padding: EdgeInsets.fromLTRB(0.0, 0.0, 5.0, 5.0),
-                                                    child: ListView.builder(
-                                                        physics: NeverScrollableScrollPhysics(),
-                                                        shrinkWrap: true,
-                                                        itemCount: loadDrinksData == null ? 0 : loadDrinksData.length,
-                                                        itemBuilder: (BuildContext context,int index2) {
-                                                          return Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                            children: [
-                                                              Row(
-                                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                children: [
-                                                                  Flexible(
-                                                                    fit: FlexFit
-                                                                        .loose,
-                                                                    child: RadioListTile(
-                                                                      title: Text(
-                                                                        "${loadDrinksData[index2]['product_name']} (${loadDrinksData[index2]['unit_measure']})",
-                                                                        style: TextStyle(
-                                                                          fontSize: 17,),),
-                                                                      value: index2,
-                                                                      groupValue: drinksGroupValue,
-                                                                      onChanged: (
-                                                                          newValue) {
-                                                                        setState(() {
-                                                                          drinksGroupValue =
-                                                                              newValue;
-                                                                          drinkId = int.parse(loadDrinksData[index2]['drink_id']);
-                                                                          drinkUom = int.parse(loadDrinksData[index2]['uom_id']);
-                                                                        });
-                                                                      },
-                                                                    ),
-                                                                  ),
-                                                                  Padding(
-                                                                    padding: EdgeInsets
-                                                                        .fromLTRB(
-                                                                        1.0, 0.0,
-                                                                        5.0, 5.0),
-                                                                    child: Text(
-                                                                      '+ ₱ ${loadDrinksData[index2]['addon_price']}',
-                                                                      style: TextStyle(
-                                                                        fontSize: 17,),),
-                                                                  ),
-                                                                ],
-                                                              )
-                                                            ],
-                                                          );
-                                                        }
-                                                    ),
-                                                  ),
-
-                                                  Padding(
-                                                    padding: EdgeInsets.fromLTRB(
-                                                        1.0, 0.0, 5.0, 5.0),
-                                                    child: new Text(labelFries,
-                                                      style: GoogleFonts.openSans(
-                                                          fontWeight: FontWeight
-                                                              .bold,
-                                                          fontStyle: FontStyle
-                                                              .normal,
-                                                          fontSize: 18.0),),
-                                                  ),
-                                                  Padding(
-                                                    padding: EdgeInsets.fromLTRB(
-                                                        0.0, 0.0, 5.0, 5.0),
-                                                    child: ListView.builder(
-                                                        physics: NeverScrollableScrollPhysics(),
-                                                        shrinkWrap: true,
-                                                        itemCount: loadFriesData ==
-                                                            null ? 0 : loadFriesData
-                                                            .length,
-                                                        itemBuilder: (
-                                                            BuildContext context,
-                                                            int index3) {
-                                                          return Column(
-                                                            crossAxisAlignment: CrossAxisAlignment
-                                                                .start,
-                                                            children: [
-                                                              Row(
-                                                                mainAxisAlignment: MainAxisAlignment
-                                                                    .spaceBetween,
-                                                                children: [
-                                                                  Flexible(
-                                                                    fit: FlexFit
-                                                                        .loose,
-                                                                    child: RadioListTile(
-                                                                      title: Text(
-                                                                        '${loadFriesData[index3]['product_name']} ${loadFriesData[index3]['unit_measure']}',
-                                                                        style: TextStyle(
-                                                                          fontSize: 17,),),
-                                                                      value: index3,
-                                                                      groupValue: friesGroupValue,
-                                                                      onChanged: (
-                                                                          newValue) {
-                                                                        setState(() {
-                                                                          friesGroupValue =
-                                                                              newValue;
-                                                                          friesId =
-                                                                              int
-                                                                                  .parse(
-                                                                                  loadFriesData[index3]['fries_id']);
-                                                                          friesUom =
-                                                                              int
-                                                                                  .parse(
-                                                                                  loadFriesData[index3]['uom_id']);
-                                                                        });
-                                                                      },
-                                                                    ),
-                                                                  ),
-                                                                  Padding(
-                                                                    padding: EdgeInsets
-                                                                        .fromLTRB(
-                                                                        1.0, 0.0,
-                                                                        5.0, 5.0),
-                                                                    child: Text(
-                                                                      '+ ₱ ${loadFriesData[index3]['addon_price']}',
-                                                                      style: TextStyle(
-                                                                        fontSize: 17,),),
-                                                                  ),
-                                                                ],
-                                                              )
-                                                            ],
-                                                          );
-                                                        }
-                                                    ),
-                                                  ),
-
-                                                  Padding(
-                                                    padding: EdgeInsets.fromLTRB(
-                                                        1.0, 0.0, 5.0, 5.0),
-                                                    child: new Text(labelSides,
-                                                      style: GoogleFonts.openSans(
-                                                          fontWeight: FontWeight
-                                                              .bold,
-                                                          fontStyle: FontStyle
-                                                              .normal,
-                                                          fontSize: 18.0),),
-                                                  ),
-                                                  Padding(
-                                                    padding: EdgeInsets.fromLTRB(
-                                                        0.0, 0.0, 5.0, 5.0),
-                                                    child: ListView.builder(
-                                                        physics: NeverScrollableScrollPhysics(),
-                                                        shrinkWrap: true,
-                                                        itemCount: loadSideData ==
-                                                            null ? 0 : loadSideData
-                                                            .length,
-                                                        itemBuilder: (
-                                                            BuildContext context,
-                                                            int index4) {
-                                                          return Column(
-                                                            crossAxisAlignment: CrossAxisAlignment
-                                                                .start,
-                                                            children: [
-                                                              Row(
-                                                                mainAxisAlignment: MainAxisAlignment
-                                                                    .spaceBetween,
-                                                                children: [
-                                                                  Flexible(
-                                                                    fit: FlexFit
-                                                                        .loose,
-                                                                    child: RadioListTile(
-                                                                      title: Text(
-                                                                        '${loadSideData[index4]['product_name']} ${loadSideData[index4]['unit_measure']}',
-                                                                        style: TextStyle(
-                                                                          fontSize: 17,),),
-                                                                      value: index4,
-                                                                      groupValue: sidesGroupValue,
-                                                                      onChanged: (
-                                                                          newValue) {
-                                                                        setState(() {
-                                                                          friesGroupValue =
-                                                                              newValue;
-                                                                          sideId =
-                                                                              int
-                                                                                  .parse(
-                                                                                  loadSideData[index4]['side_id']);
-                                                                          sideUom =
-                                                                              int
-                                                                                  .parse(
-                                                                                  loadSideData[index4]['uom_id']);
-                                                                        });
-                                                                      },
-                                                                    ),
-                                                                  ),
-
-                                                                  Padding(
-                                                                    padding: EdgeInsets
-                                                                        .fromLTRB(
-                                                                        1.0, 0.0,
-                                                                        5.0, 5.0),
-                                                                    child: Text(
-                                                                      '+ ₱ ${loadSideData[index4]['addon_price']}',
-                                                                      style: TextStyle(
-                                                                        fontSize: 17,),),
-                                                                  ),
-                                                                ],
-                                                              )
-                                                            ],
-                                                          );
-                                                        }
-                                                    ),
-                                                  ),
-
-                                                ],
-                                              );
-                                            }
-                                        ),
-                                      ),
-
-                                    ],
-                                  ),
-//                          child: Text('$f. ${lGetAmountPerTenant[index]['d_bu_name']} - ${lGetAmountPerTenant[index]['d_tenant']}  ₱${oCcy.format(double.parse(lGetAmountPerTenant[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
-
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 30.0, vertical: 20.0),
-                          child: SleekButton(
-                            onTap: () {
-
-                            },
-                            style: SleekButtonStyle.flat(
-                              color: Colors.deepOrange,
-                              inverted: false,
-                              rounded: false,
-                              size: SleekButtonSize.big,
-                              context: context,
-                            ),
-                            child: Center(
-                              child: Text("Update", style: TextStyle(
-                                  fontStyle: FontStyle.normal,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13.0)),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-            );
-          }
-        );
-    });
   }
 
   void selectType(BuildContext context) async{
@@ -855,13 +393,14 @@ class _LoadCart extends State<LoadCart> {
 //  StreamController _event =StreamController<int>.broadcast();
   updateCartQty(id,qty) async{
     await db.updateCartQty(id,qty);
-    loadCart();
+    loadTotal();
   }
 
   @override
   void initState() {
     super.initState();
     loadCart();
+    loadTotal();
   }
 
   @override
@@ -966,7 +505,7 @@ class _LoadCart extends State<LoadCart> {
                       child: Scrollbar(
                         child: ListView.builder(
 //                            shrinkWrap: true,
-                            itemCount:loadCartData == null ? 0 : loadCartData.length,
+                            itemCount:loadIMainItems == null ? 0 : loadIMainItems.length,
                             itemBuilder: (BuildContext context, int index) {
                               return Container(
                                 height: 150.0,
@@ -987,7 +526,7 @@ class _LoadCart extends State<LoadCart> {
                                                 decoration: new BoxDecoration(
                                                   shape: BoxShape.circle,
                                                   image: new DecorationImage(
-                                                    image: new NetworkImage(loadCartData[index]['prod_image']),
+                                                    image: new NetworkImage(loadCartData[index]['main_item']['image']),
                                                     fit: BoxFit.scaleDown,
                                                   ),
                                                 )),
@@ -998,28 +537,28 @@ class _LoadCart extends State<LoadCart> {
                                               children: <Widget>[
                                                 Padding(
                                                     padding: EdgeInsets.fromLTRB(15, 10, 5, 5),
-                                                    child:Text('${loadCartData[index]['prod_name']}', overflow: TextOverflow.clip,
+                                                    child:Text('${loadCartData[index]['main_item']['product_name']}', overflow: TextOverflow.clip,
                                                       style: GoogleFonts.openSans(
                                                           fontStyle:
                                                           FontStyle.normal,
                                                           fontSize: 13.0),
                                                     ),
                                                 ),
-                                                Padding(
-                                                  padding: EdgeInsets.fromLTRB(15, 0, 5, 5),
-                                                  child: new Text('${loadCartData[index]['bu_name']} - ${loadCartData[index]['tenant_name']}', overflow: TextOverflow.clip,
-                                                    style: GoogleFonts.openSans(
-                                                        fontStyle:
-                                                        FontStyle.normal,
-                                                        fontSize: 13.0),
-                                                  ),
-                                                ),
+                                                // Padding(
+                                                //   padding: EdgeInsets.fromLTRB(15, 0, 5, 5),
+                                                //   child: new Text('${loadCartData[index]['main_item']['bu_name']} - ${loadCartData[index]['main_item']['tenant_name']}', overflow: TextOverflow.clip,
+                                                //     style: GoogleFonts.openSans(
+                                                //         fontStyle:
+                                                //         FontStyle.normal,
+                                                //         fontSize: 13.0),
+                                                //   ),
+                                                // ),
                                                 Row(
                                                   children: <Widget>[
                                                     Padding(
                                                       padding: EdgeInsets.fromLTRB(15, 0, 5, 0),
                                                       child: new Text(
-                                                        "₱ ${loadCartData[index]['total'].toString()}",
+                                                        "₱ ${loadCartData[index]['main_item']['total_price'].toString()}",
                                                         style: TextStyle(
                                                           fontWeight:
                                                           FontWeight.bold,
@@ -1042,7 +581,7 @@ class _LoadCart extends State<LoadCart> {
                                                             if(username == null){
                                                               await Navigator.of(context).push(_signIn());
                                                             }else{
-                                                              removeFromCart(loadCartData[index]['d_id']);
+                                                              removeFromCart(loadCartData[index]['main_item']['id']);
                                                             }
 
                                                           },
@@ -1073,17 +612,15 @@ class _LoadCart extends State<LoadCart> {
                                                               await Navigator.of(context).push(_signIn());
                                                             }else{
                                                               setState(() {
-                                                                var x = loadCartData[index]['cart_qty'];
+                                                                var x = loadCartData[index]['main_item']['quantity'];
                                                                 int d = int.parse(x.toString());
-                                                                loadCartData[index]['cart_qty'] = d-=1;  //code ni boss rene
+                                                                loadCartData[index]['main_item']['quantity'] = d-=1;  //code ni boss rene
                                                                 if(d<1){
-                                                                  loadCartData[index]['cart_qty']=1;
+                                                                  loadCartData[index]['main_item']['quantity']=1;
                                                                 }
                                                               });
-                                                              updateCartQty(loadCartData[index]['d_id'].toString(),loadCartData[index]['cart_qty'].toString());
+                                                              updateCartQty(loadCartData[index]['main_item']['id'].toString(),loadCartData[index]['main_item']['quantity'].toString());
                                                             }
-
-
                                                           },
                                                         ),
                                                       ),
@@ -1091,7 +628,7 @@ class _LoadCart extends State<LoadCart> {
 
                                                     Padding(
                                                       padding:EdgeInsets.fromLTRB(1, 5, 5, 5),
-                                                      child:Text(loadCartData[index]['cart_qty'].toString()),
+                                                      child:Text(loadCartData[index]['main_item']['quantity'].toString()),
                                                     ),
                                                     Padding(
                                                       padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
@@ -1111,11 +648,11 @@ class _LoadCart extends State<LoadCart> {
                                                                 await Navigator.of(context).push(_signIn());
                                                               }else{
                                                                 setState(() {
-                                                                  var x = loadCartData[index]['cart_qty'];
+                                                                  var x = loadCartData[index]['main_item']['quantity'];
                                                                   int d = int.parse(x.toString());
-                                                                  loadCartData[index]['cart_qty'] = d+=1;   //code ni boss rene
+                                                                  loadCartData[index]['main_item']['quantity'] = d+=1;   //code ni boss rene
                                                                 });
-                                                                updateCartQty(loadCartData[index]['d_id'].toString(),loadCartData[index]['cart_qty'].toString());
+                                                                updateCartQty(loadCartData[index]['main_item']['id'].toString(),loadCartData[index]['main_item']['quantity'].toString());
                                                               }
                                                           },
                                                         ),
@@ -1132,8 +669,8 @@ class _LoadCart extends State<LoadCart> {
                                                           ),
                                                           child: Text('view more'),
                                                           onPressed: ()async {
-                                                              // viewAddon(context,loadCartData[index]['d_id']);
-                                                              // print(loadCartData[index]['d_id']);
+                                                              viewAddon(context, index);
+                                                              // print(loadCartData[index]['main_item']['d_id']);
                                                             },
                                                         ),
                                                       ),
@@ -1156,8 +693,7 @@ class _LoadCart extends State<LoadCart> {
                     ),
                   ),
                   Visibility(
-                     visible: loadCartData.isEmpty ? false : true,
-//                      visible:true,
+                     visible: grandTotal < 0 ? false : true,
                       replacement: Padding(
                       padding: EdgeInsets.symmetric(vertical: screenHeight / 3.0),
                       child: Center(
@@ -1168,18 +704,18 @@ class _LoadCart extends State<LoadCart> {
                                     width: 100,
                                     child: SvgPicture.asset("assets/svg/empty-cart.svg"),
                                   ),
-                              ],
+                               ],
                             ),
-                      ),
-                    ),
+                          ),
+                       ),
                         child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
                           child: Row(
                             children: <Widget>[
                               Container(
-                                width:  MediaQuery.of(context).size.width / 5.5,
+                                width: MediaQuery.of(context).size.width / 5.5,
                                 child: SleekButton(
-                                      onTap: () async{
+                                       onTap: () async{
                                         SharedPreferences prefs = await SharedPreferences.getInstance();
                                         String status = prefs.getString('s_status');
                                         status != null
@@ -1223,7 +759,7 @@ class _LoadCart extends State<LoadCart> {
                                     context: context,
                                   ),
                                   child: Center(
-                                    child: Text("₱ ${oCcy.format(grandTotal)} Next", style:TextStyle(fontStyle: FontStyle.normal, fontWeight: FontWeight.bold, fontSize: 13.0),
+                                    child: Text("₱ ${oCcy.format (grandTotal)} Next", style:TextStyle(fontStyle: FontStyle.normal, fontWeight: FontWeight.bold, fontSize: 13.0),
                                     ),
                                   ),
                                 ),

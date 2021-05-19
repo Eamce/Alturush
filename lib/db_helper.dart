@@ -29,7 +29,7 @@ class RapidA {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Map dataUser;
     var client = http.Client();
-    final response = await client.post(Uri.parse("$server/loadCartData_r"),body:{
+    final response = await client.post(Uri.parse("$server/loadCartDataNew_r"),body:{
       'cusId':prefs.getString('s_customerId'),
     });
     dataUser = jsonDecode(response.body);
@@ -455,6 +455,35 @@ class RapidA {
     client.close();
   }
 
+  Future addToCartNew(prodId,uomId,_counter,uomPrice,choiceUomId,choiceId,choicePrice,flavorId ,flavorPrice,selectedSideOnPrice,selectedSideItems ,selectedSideItemsUom) async{
+    // print(prodId);
+    // print(uomId);
+    // print(_counter);
+    // print(uomPrice);
+    // print(selectedSideItems);
+    // print(choicePrice);
+
+    var client = http.Client();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userID = prefs.getString('s_customerId');
+    await client.post(Uri.parse("$server/addToCartNew_r"),body:{
+      'userID':userID,
+      'prodId':prodId,
+      'uomId':uomId.toString(),
+      'uomPrice':uomPrice,
+      'choiceUomId':choiceUomId.toString(),
+      'choiceId':choiceId.toString(),
+      'choicePrice':choicePrice.toString(),
+      'flavorId':flavorId.toString(),
+      'flavorPrice':flavorPrice.toString(),
+      '_counter':_counter.toString(),
+      'selectedSideOnPrice':selectedSideOnPrice.toString(),
+      'selectedSideItems':selectedSideItems.toString(),
+      'selectedSideItemsUom':selectedSideItemsUom.toString()
+    });
+    client.close();
+  }
+
   Future selectSuffixCi() async{
     var client = http.Client();
     Map dataUser;
@@ -527,17 +556,18 @@ class RapidA {
     });
     client.close();
   }
-  //
-  // Future loadSubTotal() async{
-  //   Map dataUser;
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   var userID = prefs.getString('s_customerId');
-  //   final response = await http.post("$server/getSubtotal_r",body:{
-  //     'customerId':userID
-  //   });
-  //   dataUser = jsonDecode(response.body);
-  //   return dataUser;
-  // }
+
+  Future loadSubTotal() async{
+    var client = http.Client();
+    Map dataUser;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final response =  await client.post(Uri.parse("$server/loadSubTotalnew_r"),body:{
+      'customerId':prefs.getString('s_customerId').toString(),
+    });
+    dataUser = jsonDecode(response.body);
+    client.close();
+    return dataUser;
+  }
 
   Future loadRiderPage(ticketNo) async{
     var client = http.Client();

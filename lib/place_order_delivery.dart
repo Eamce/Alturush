@@ -236,20 +236,20 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
   }
 
   List loadCartData;
-  Future getSubTotal() async{
-    var res = await db.loadCartData();
-    if (!mounted) return;
-    setState(() {
-      grandTotal = 0;
-      subtotal = 0;
-      isLoading = false;
-      loadCartData = res['user_details'];
-      loadCartData.forEach((element) {
-        subtotal = subtotal+(double.parse(element['cart_qty'].toString()) * double.parse(element['total'].toString()));
-      });
-      grandTotal = subtotal + deliveryCharge;
-    });
-  }
+  // Future getSubTotal() async{
+  //   var res = await db.loadCartData();
+  //   if (!mounted) return;
+  //   setState(() {
+  //     grandTotal = 0;
+  //     subtotal = 0;
+  //     isLoading = false;
+  //     loadCartData = res['user_details'];
+  //     loadCartData.forEach((element) {
+  //       subtotal = subtotal+(double.parse(element['cart_qty'].toString()) * double.parse(element['total'].toString()));
+  //     });
+  //     grandTotal = subtotal + deliveryCharge;
+  //   });
+  // }
 
   Future getBuSegregate() async{
     var res = await db.getBuSegregate();
@@ -266,18 +266,19 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
     if (!mounted) return;
     setState(() {
       getTenant = res['user_details'];
-      for(var q=0;q<getTenant.length;q++){
-
-        if(getTenant[q]['total'] < minimumAmount){
-          subTotalTenant.add('false');
-          }
-        else{
-          subTotalTenant.add('true');
-        }
-
-        //print(getTenant[q]['total']);
-        // print(minimumAmount);
-      }
+      print(getTenant);
+      // for(var q=0;q<getTenant.length;q++){
+      //
+      //   if(getTenant[q]['total'] < minimumAmount){
+      //     subTotalTenant.add('false');
+      //     }
+      //   else{
+      //     subTotalTenant.add('true');
+      //   }
+      //
+      //   //print(getTenant[q]['total']);
+      //   // print(minimumAmount);
+      // }
 
     });
   }
@@ -636,11 +637,11 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
   //     },
   //   );
   // }
-
-  Future toRefresh() async{
-    getOrderData();
-    getSubTotal();
-  }
+  //
+  // Future toRefresh() async{
+  //   getOrderData();
+  //   // getSubTotal();
+  // }
 
    submitPlaceOrder() async{
      FocusScope.of(context).requestFocus(FocusNode());
@@ -795,12 +796,13 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
     selectedDiscountType.clear();
     super.initState();
     getPlaceOrderData();
-    getOrderData();
-    getSubTotal();
+    // getOrderData();
+    // getSubTotal();
     // getAllowedLoc();
     getBuSegregate();
     getTenantSegregate();
     //trapTenantLimit();
+    isLoading = false;
   }
 
 
@@ -851,456 +853,335 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                 child:Form(
                   key: _formKey,
                   child: Scrollbar(
-                    child: RefreshIndicator(
-                      onRefresh: toRefresh,
-                      child: ListView(
-                        padding: EdgeInsets.zero,
-                        children: <Widget>[
-                          Visibility(
-                            visible: true,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(25, 20, 200, 5),
-                                  child: OutlineButton(
-                                    borderSide: BorderSide(color: Colors.deepOrangeAccent),
-                                    highlightedBorderColor: Colors.deepOrangeAccent,
-                                    highlightColor: Colors.transparent,
-                                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
-                                    onPressed: () async{
-                                      FocusScope.of(context).requestFocus(FocusNode());
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      children: <Widget>[
+                        Visibility(
+                          visible: true,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(25, 20, 200, 5),
+                                child: OutlineButton(
+                                  borderSide: BorderSide(color: Colors.deepOrangeAccent),
+                                  highlightedBorderColor: Colors.deepOrangeAccent,
+                                  highlightColor: Colors.transparent,
+                                  shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                                  onPressed: () async{
+                                    FocusScope.of(context).requestFocus(FocusNode());
 
-                                      SharedPreferences prefs = await SharedPreferences.getInstance();
-                                      String username = prefs.getString('s_customerId');
-                                      if(username == null){
-                                        Navigator.of(context).push(_signIn());
-                                      }else{
-                                        displayAddresses(context);
-                                      }
-                                    },
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Icon(
-                                          Icons.location_on,
-                                          color: Colors.deepOrangeAccent,
-                                        ),
-                                        Text("Select address",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 15.0),),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(35, 3, 5, 5),
-                                  child: new Text("Name", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
-                                ),
-                                Padding(
-                                  padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
-                                  child: InkWell(
-                                    onTap: (){
-                                      FocusScope.of(context).requestFocus(FocusNode());
-// //                                    placeOrderBrg.clear();
-//                                       selectTown();
-                                    },
-                                    child: IgnorePointer(
-                                      child: new TextFormField(
-                                        textInputAction: TextInputAction.done,
-                                        cursorColor: Colors.deepOrange,
-                                        controller: userName,
-                                        validator: (value) {
-                                          if (value.isEmpty) {
-                                            return 'Please enter some value';
-                                          }
-                                          return null;
-                                        },
-                                        decoration: InputDecoration(
-                                          contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
-                                          focusedBorder:OutlineInputBorder(
-                                            borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
-                                          ),
-                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(35, 3, 5, 5),
-                                  child: new Text("Town *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
-                                ),
-                                Padding(
-                                  padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
-                                  child: InkWell(
-                                    onTap: (){
-                                      FocusScope.of(context).requestFocus(FocusNode());
-// //                                    placeOrderBrg.clear();
-//                                       selectTown();
-                                    },
-                                    child: IgnorePointer(
-                                      child: new TextFormField(
-                                        textInputAction: TextInputAction.done,
-                                        cursorColor: Colors.deepOrange,
-                                        controller: placeOrderTown,
-                                        validator: (value) {
-                                          if (value.isEmpty) {
-                                            return 'Please enter some value';
-                                          }
-                                          return null;
-                                        },
-                                        decoration: InputDecoration(
-                                          contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
-                                          focusedBorder:OutlineInputBorder(
-                                            borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
-                                          ),
-                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
-                                  child: new Text("Barangay *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
-                                ),
-                                Padding(
-                                  padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
-                                  child: InkWell(
-                                    onTap: (){
-                                      FocusScope.of(context).requestFocus(FocusNode());
-                                      // placeOrderTown.text.isEmpty ? print('no town selected') : selectBarrio();
-                                    },
-                                    child: IgnorePointer(
-                                      child: new TextFormField(
-                                        textInputAction: TextInputAction.done,
-                                        cursorColor: Colors.deepOrange,
-                                        controller: placeOrderBrg,
-                                        validator: (value) {
-                                          if (value.isEmpty) {
-                                            return 'Please enter some value';
-                                          }
-                                          return null;
-                                        },
-                                        decoration: InputDecoration(
-                                          contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
-                                          focusedBorder:OutlineInputBorder(
-                                            borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
-                                          ),
-                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
-                                  child: new Text("Phone Number *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
-                                ),
-                                Padding(
-                                  padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                                    String username = prefs.getString('s_customerId');
+                                    if(username == null){
+                                      Navigator.of(context).push(_signIn());
+                                    }else{
+                                      displayAddresses(context);
+                                    }
+                                  },
                                   child: Row(
-                                    children: <Widget>[
-                                      SizedBox(
-                                        width: 2.0,
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Icon(
+                                        Icons.location_on,
+                                        color: Colors.deepOrangeAccent,
                                       ),
-                                      Flexible(
-                                        child: new TextFormField(
-                                          maxLength: 11,
-                                          keyboardType: TextInputType.number,
-                                          inputFormatters: [FilteringTextInputFormatter.deny(new RegExp('[.-]'))],
-                                          cursorColor: Colors.deepOrange,
-                                          controller: placeContactNo,
-                                          validator: (value) {
-                                            if (value.isEmpty) {
-                                              return 'Please enter some value';
-                                            }
-                                            return null;
-                                          },
-                                          decoration: InputDecoration(
-                                            counterText: "",
-                                            contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
-                                            focusedBorder:OutlineInputBorder(
-                                              borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
-                                            ),
-                                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
-                                          ),
-//                                        focusNode: textSecondFocusNode,
-                                        ),
-                                      ),
+                                      Text("Select address",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 15.0),),
                                     ],
                                   ),
                                 ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
-                                  child: new Text("Street *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
-                                ),
-                                Padding(
-                                  padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
-                                  child: new TextFormField(
-                                    textInputAction: TextInputAction.done,
-                                    cursorColor: Colors.deepOrange,
-                                    controller: street,
-                                    validator: (value) {
-                                      if (value.isEmpty) {
-                                        return 'Please enter some value';
-                                      }
-                                      return null;
-                                    },
-                                    decoration: InputDecoration(
-                                      contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
-                                      focusedBorder:OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(35, 3, 5, 5),
+                                child: new Text("Name", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                              ),
+                              Padding(
+                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                child: InkWell(
+                                  onTap: (){
+                                    FocusScope.of(context).requestFocus(FocusNode());
+// //                                    placeOrderBrg.clear();
+//                                       selectTown();
+                                  },
+                                  child: IgnorePointer(
+                                    child: new TextFormField(
+                                      textInputAction: TextInputAction.done,
+                                      cursorColor: Colors.deepOrange,
+                                      controller: userName,
+                                      validator: (value) {
+                                        if (value.isEmpty) {
+                                          return 'Please enter some value';
+                                        }
+                                        return null;
+                                      },
+                                      decoration: InputDecoration(
+                                        contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
+                                        focusedBorder:OutlineInputBorder(
+                                          borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
+                                        ),
+                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
                                       ),
-                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
                                     ),
                                   ),
                                 ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
-                                  child: new Text("House number(optional)", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
-                                ),
-                                Padding(
-                                  padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
-                                  child: new TextFormField(
-                                    textInputAction: TextInputAction.done,
-                                    cursorColor: Colors.deepOrange.withOpacity(0.8),
-                                    controller: houseNo,
-                                    keyboardType: TextInputType.number,
-                                    decoration: InputDecoration(
-                                      contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
-                                      focusedBorder:OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(35, 3, 5, 5),
+                                child: new Text("Town *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                              ),
+                              Padding(
+                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                child: InkWell(
+                                  onTap: (){
+                                    FocusScope.of(context).requestFocus(FocusNode());
+// //                                    placeOrderBrg.clear();
+//                                       selectTown();
+                                  },
+                                  child: IgnorePointer(
+                                    child: new TextFormField(
+                                      textInputAction: TextInputAction.done,
+                                      cursorColor: Colors.deepOrange,
+                                      controller: placeOrderTown,
+                                      validator: (value) {
+                                        if (value.isEmpty) {
+                                          return 'Please enter some value';
+                                        }
+                                        return null;
+                                      },
+                                      decoration: InputDecoration(
+                                        contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
+                                        focusedBorder:OutlineInputBorder(
+                                          borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
+                                        ),
+                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
                                       ),
-                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
                                     ),
                                   ),
                                 ),
+                              ),
 
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
-                                  child: new Text("Delivery date *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
+                                child: new Text("Barangay *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                              ),
+                              Padding(
+                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                child: InkWell(
+                                  onTap: (){
+                                    FocusScope.of(context).requestFocus(FocusNode());
+                                    // placeOrderTown.text.isEmpty ? print('no town selected') : selectBarrio();
+                                  },
+                                  child: IgnorePointer(
+                                    child: new TextFormField(
+                                      textInputAction: TextInputAction.done,
+                                      cursorColor: Colors.deepOrange,
+                                      controller: placeOrderBrg,
+                                      validator: (value) {
+                                        if (value.isEmpty) {
+                                          return 'Please enter some value';
+                                        }
+                                        return null;
+                                      },
+                                      decoration: InputDecoration(
+                                        contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
+                                        focusedBorder:OutlineInputBorder(
+                                          borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
+                                        ),
+                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                                Padding(
-                                  padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
-                                  child: InkWell(
-                                    onTap: (){
-                                      getTrueTime();
-                                      FocusScope.of(context).requestFocus(FocusNode());
-                                      showDialog<void>(
-                                        context: context,
+                              ),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
+                                child: new Text("Phone Number *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                              ),
+                              Padding(
+                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    SizedBox(
+                                      width: 2.0,
+                                    ),
+                                    Flexible(
+                                      child: new TextFormField(
+                                        maxLength: 11,
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: [FilteringTextInputFormatter.deny(new RegExp('[.-]'))],
+                                        cursorColor: Colors.deepOrange,
+                                        controller: placeContactNo,
+                                        validator: (value) {
+                                          if (value.isEmpty) {
+                                            return 'Please enter some value';
+                                          }
+                                          return null;
+                                        },
+                                        decoration: InputDecoration(
+                                          counterText: "",
+                                          contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
+                                          focusedBorder:OutlineInputBorder(
+                                            borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
+                                          ),
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
+                                        ),
+//                                        focusNode: textSecondFocusNode,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
+                                child: new Text("Street *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                              ),
+                              Padding(
+                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                child: new TextFormField(
+                                  textInputAction: TextInputAction.done,
+                                  cursorColor: Colors.deepOrange,
+                                  controller: street,
+                                  validator: (value) {
+                                    if (value.isEmpty) {
+                                      return 'Please enter some value';
+                                    }
+                                    return null;
+                                  },
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
+                                    focusedBorder:OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
+                                    ),
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
+                                child: new Text("House number(optional)", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                              ),
+                              Padding(
+                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                child: new TextFormField(
+                                  textInputAction: TextInputAction.done,
+                                  cursorColor: Colors.deepOrange.withOpacity(0.8),
+                                  controller: houseNo,
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
+                                    focusedBorder:OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
+                                    ),
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
+                                  ),
+                                ),
+                              ),
+
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
+                                child: new Text("Delivery date *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                              ),
+                              Padding(
+                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
+                                child: InkWell(
+                                  onTap: (){
+                                    getTrueTime();
+                                    FocusScope.of(context).requestFocus(FocusNode());
+                                    showDialog<void>(
+                                      context: context,
 //                                        barrierDismissible: false, // user must tap button!
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.all(Radius.circular(8.0))
-                                            ),
-                                            title: Text("Set date for this delivery",style: TextStyle(fontSize: 20.0),),
-                                            contentPadding:EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
-                                            content: Container(
-                                              height:290.0, // Change as per your requirement
-                                              width: 360.0, // Change as per your requirement
-                                              child: Scrollbar(
-                                                child:ListView.builder(
-                                                  physics: BouncingScrollPhysics(),
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(Radius.circular(8.0))
+                                          ),
+                                          title: Text("Set date for this delivery",style: TextStyle(fontSize: 20.0),),
+                                          contentPadding:EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
+                                          content: Container(
+                                            height:290.0, // Change as per your requirement
+                                            width: 360.0, // Change as per your requirement
+                                            child: Scrollbar(
+                                              child:ListView.builder(
+                                                physics: BouncingScrollPhysics(),
 //                                                  shrinkWrap: true,
-                                                  itemCount: 5,
-                                                  itemBuilder: (BuildContext context, int index) {
-                                                    String tom = "";
-                                                    int n = 0;
-                                                    n = index;
-                                                    if(n==0){
-                                                      tom = "(Today)";
-                                                    }
-                                                    var d1 = DateTime.parse(trueTime[0]['date_today']);
-                                                    var d2 = new DateTime(d1.year, d1.month, d1.day + n);
-                                                    final DateFormat formatter = DateFormat('yyyy-MM-dd');
-                                                    final String formatted = formatter.format(d2);
-                                                    return InkWell(
-                                                      onTap: (){
-                                                        deliveryDate.text =formatted;
-                                                        Navigator.of(context).pop();
-                                                        if(index == 0){
-                                                          setState(() {
+                                                itemCount: 5,
+                                                itemBuilder: (BuildContext context, int index) {
+                                                  String tom = "";
+                                                  int n = 0;
+                                                  n = index;
+                                                  if(n==0){
+                                                    tom = "(Today)";
+                                                  }
+                                                  var d1 = DateTime.parse(trueTime[0]['date_today']);
+                                                  var d2 = new DateTime(d1.year, d1.month, d1.day + n);
+                                                  final DateFormat formatter = DateFormat('yyyy-MM-dd');
+                                                  final String formatted = formatter.format(d2);
+                                                  return InkWell(
+                                                    onTap: (){
+                                                      deliveryDate.text =formatted;
+                                                      Navigator.of(context).pop();
+                                                      if(index == 0){
+                                                        setState(() {
 
-                                                            _today = true;
-                                                            timeCount = DateTime.parse(trueTime[0]['date_today']+" "+trueTime[0]['hour_today']).difference(DateTime.parse(trueTime[0]['date_today']+" "+"19:30")).inHours;
-                                                            timeCount = timeCount.abs();
-                                                            _globalTime = DateTime.parse(trueTime[0]['date_today']+" "+trueTime[0]['hour_today']);
-                                                            _globalTime2 = _globalTime.hour;
-                                                          });
-                                                        }
-                                                       else{
-                                                         setState(() {
+                                                          _today = true;
+                                                          timeCount = DateTime.parse(trueTime[0]['date_today']+" "+trueTime[0]['hour_today']).difference(DateTime.parse(trueTime[0]['date_today']+" "+"19:30")).inHours;
+                                                          timeCount = timeCount.abs();
+                                                          _globalTime = DateTime.parse(trueTime[0]['date_today']+" "+trueTime[0]['hour_today']);
+                                                          _globalTime2 = _globalTime.hour;
+                                                        });
+                                                      }
+                                                     else{
+                                                       setState(() {
 
-                                                           _today = false;
-                                                           timeCount = 12;
-                                                           _globalTime = new DateTime.now();
-                                                           _globalTime2 = 07;
-                                                         });
-                                                        }
+                                                         _today = false;
+                                                         timeCount = 12;
+                                                         _globalTime = new DateTime.now();
+                                                         _globalTime2 = 07;
+                                                       });
+                                                      }
 
-                                                      },
-                                                        child: Column(
-                                                          children: [
-                                                            Row (
-                                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                children: <Widget>[
-                                                                  Padding(
-                                                                    padding: EdgeInsets.fromLTRB(30.0,20.0, 0.0,20.0),
-                                                                    child: Text('${formatted.toString()}',style: TextStyle(fontSize: 16.0),),
-                                                                  ),
-                                                                ]
-                                                            ),
-                                                          ],
-                                                        ),
-                                                    );
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                            actions: <Widget>[
-                                              TextButton(
-                                                child: Text(
-                                                  'Clear',
-                                                  style: TextStyle(
-                                                    color: Colors.deepOrange,
-                                                  ),
-                                                ),
-                                                onPressed: () {
-                                                  deliveryDate.clear();
-                                                  Navigator.of(context).pop();
+                                                    },
+                                                      child: Column(
+                                                        children: [
+                                                          Row (
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: <Widget>[
+                                                                Padding(
+                                                                  padding: EdgeInsets.fromLTRB(30.0,20.0, 0.0,20.0),
+                                                                  child: Text('${formatted.toString()}',style: TextStyle(fontSize: 16.0),),
+                                                                ),
+                                                              ]
+                                                          ),
+                                                        ],
+                                                      ),
+                                                  );
                                                 },
                                               ),
-                                            ],
-                                          );
-                                        },
-                                      );
-                                      },
-                                        child: IgnorePointer(
-                                          child: new TextFormField(
-                                            textInputAction: TextInputAction.done,
-                                            cursorColor: Colors.deepOrange,
-                                            controller: deliveryDate,
-                                            validator: (value) {
-                                              if (value.isEmpty) {
-                                                return 'Please enter some value';
-                                              }
-                                              return null;
-                                            },
-                                            decoration: InputDecoration(
-                                              contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
-                                              focusedBorder:OutlineInputBorder(
-                                                borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
-                                              ),
-                                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
                                             ),
                                           ),
-                                        ),
-                                      ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
-                                  child: new Text("Delivery time*", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
-                                ),
-                                Padding(
-                                  padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
-                                  child: InkWell(
-                                    onTap: (){
-                                        getTrueTime();
-                                        if(deliveryDate.text.isEmpty){
-                                          Fluttertoast.showToast(
-                                              msg: "Please select a pick-up date",
-                                              toastLength: Toast.LENGTH_SHORT,
-                                              gravity: ToastGravity.BOTTOM,
-                                              timeInSecForIosWeb: 2,
-                                              backgroundColor: Colors.black.withOpacity(0.7),
-                                              textColor: Colors.white,
-                                              fontSize: 16.0
-                                          );
-                                        }
-                                        else{
-                                          FocusScope.of(context).requestFocus(FocusNode());
-                                          showDialog<void>(
-                                            context: context,
-//                                          barrierDismissible: false, // user must tap button!
-                                            builder: (BuildContext context) {
-                                              return AlertDialog(
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.all(Radius.circular(8.0))
+                                          actions: <Widget>[
+                                            TextButton(
+                                              child: Text(
+                                                'Clear',
+                                                style: TextStyle(
+                                                  color: Colors.deepOrange,
                                                 ),
-                                                title: Text("Set time for this delivery",style: TextStyle(fontSize: 20.0),),
-                                                contentPadding:
-                                                EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
-                                                content: Container(
-                                                  height:290.0, // Change as per your requirement
-                                                  width: 360.0, // Change as per your requirement
-                                                  child: Scrollbar(
-                                                    child:  ListView.builder(
-                                                        physics: BouncingScrollPhysics(),
-                                                        shrinkWrap: true,
-                                                        itemCount:  timeCount,
-                                                        itemBuilder: (BuildContext context, int index1) {
-                                                          int t = index1;
-                                                          t++;
-//                                                              var d1 = DateTime.parse(trueTime[0]['date_today']);
-                                                          final now =  _globalTime;
-                                                          final dtFrom = DateTime(now.year, now.month, now.day, _globalTime2+t, 0+30, now.minute, now.second);
-                                                          // final dtTo = DateTime(now.year, now.month, now.day, 8+t, 0+30);
-                                                          final format = DateFormat.jm();  //"6:00 AM"
-                                                          String from = format.format(dtFrom);
-                                                          // String to = format.format(dtTo);
-                                                          return InkWell(
-                                                            onTap: (){
-                                                              deliveryTime.text = from;
-                                                              Navigator.of(context).pop();
-                                                            },
-                                                            child: Container(
-                                                              child: Column(
-                                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                                children: <Widget>[
-                                                                  Row (
-                                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                      children: <Widget>[
-                                                                        Padding(
-                                                                          padding: EdgeInsets.fromLTRB(30.0,20.0, 0.0,20.0),
-                                                                          child: Text('${from.toString()}',style: TextStyle(fontSize: 16.0),),
-                                                                        ),
-                                                                      ]
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          );
-                                                        }
-                                                    ),
-                                                  ),
-                                                ),
-                                                actions: <Widget>[
-                                                  TextButton(
-                                                    child: Text(
-                                                      'Clear',
-                                                      style: TextStyle(
-                                                        color: Colors.deepOrange,
-                                                      ),
-                                                    ),
-                                                    onPressed: () {
-                                                      deliveryTime.clear();
-                                                      Navigator.of(context).pop();
-                                                    },
-                                                  ),
-                                                ],
-                                              );
-                                            },
-                                          );
-                                        }
-
+                                              ),
+                                              onPressed: () {
+                                                deliveryDate.clear();
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
                                     },
-                                    child: IgnorePointer(
+                                      child: IgnorePointer(
                                         child: new TextFormField(
                                           textInputAction: TextInputAction.done,
                                           cursorColor: Colors.deepOrange,
-                                          controller: deliveryTime,
+                                          controller: deliveryDate,
                                           validator: (value) {
                                             if (value.isEmpty) {
                                               return 'Please enter some value';
@@ -1315,195 +1196,77 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
                                           ),
                                         ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
-                                  child: new Text("Avail Discount(Optional)", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
-                                ),
-
-                                Padding(
-                                  padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
-                                  child: InkWell(
-                                    onTap: () async{
-                                      FocusScope.of(context).requestFocus(FocusNode());
-                                      SharedPreferences prefs = await SharedPreferences.getInstance();
-                                      String username = prefs.getString('s_customerId');
-                                      if(username == null){
-                                        Navigator.of(context).push(_signIn());
-                                      }else{
-                                        await Navigator.of(context).push(_showDiscountPerson());
-                                        countDiscount();
+                              ),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
+                                child: new Text("Delivery time*", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                              ),
+                              Padding(
+                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                child: InkWell(
+                                  onTap: (){
+                                      getTrueTime();
+                                      if(deliveryDate.text.isEmpty){
+                                        Fluttertoast.showToast(
+                                            msg: "Please select a pick-up date",
+                                            toastLength: Toast.LENGTH_SHORT,
+                                            gravity: ToastGravity.BOTTOM,
+                                            timeInSecForIosWeb: 2,
+                                            backgroundColor: Colors.black.withOpacity(0.7),
+                                            textColor: Colors.white,
+                                            fontSize: 16.0
+                                        );
                                       }
-                                    },
-                                    child: IgnorePointer(
-                                      child: new TextFormField(
-                                        textInputAction: TextInputAction.done,
-                                        cursorColor: Colors.deepOrange,
-                                        controller: discount,
-                                        decoration: InputDecoration(
-                                          contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
-                                          focusedBorder:OutlineInputBorder(
-                                            borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
-                                          ),
-                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
-                                  child: new Text("Landmark*", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
-                                ),
-                                Padding(
-                                  padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
-                                  child: new TextFormField(
-                                    keyboardType: TextInputType.multiline,
-                                    textInputAction: TextInputAction.done,
-                                    cursorColor: Colors.deepOrange,
-                                    controller: placeRemarks,
-                                    validator: (value) {
-                                      if (value.isEmpty) {
-                                        return 'Please enter some value';
-                                      }
-                                      return null;
-                                    },
-                                    maxLines: 4,
-                                    decoration: InputDecoration(
-                                      hintText:"E.g Near at plaza/Be ware of dogs",
-                                      contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
-                                      focusedBorder:OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
-                                      ),
-                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
-                                  child: new Text("Special instruction*", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
-                                ),
-                                Padding(
-                                  padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
-                                  child: new TextFormField(
-                                    keyboardType: TextInputType.multiline,
-                                    textInputAction: TextInputAction.done,
-                                    cursorColor: Colors.deepOrange,
-                                    controller: specialInstruction,
-                                    validator: (value) {
-                                      if (value.isEmpty) {
-                                        return 'Please enter some value';
-                                      }
-                                      return null;
-                                    },
-                                    maxLines: 4,
-                                    decoration: InputDecoration(
-                                      hintText:"E.g Near at plaza/Be ware of dogs",
-                                      contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
-                                      focusedBorder:OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
-                                      ),
-                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
-                                    ),
-                                  ),
-                                ),
-
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
-                                  child: new Text("In case the product is out of stock", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
-                                ),
-                                _myRadioButton(
-                                  title: "Cancel the entire order",
-                                  value: 0,
-                                  onChanged: (newValue) => setState((){
-                                    groupValue = newValue;
-
-                                  }),
-                                ),
-
-                                _myRadioButton(
-                                  title: "Remove it from my order",
-                                  value: 1,
-                                  onChanged: (newValue) => setState((){
-                                    groupValue = newValue;
-
-                                  }),
-                                ),
-                                Padding(
-                                  padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
-                                  child:ExpansionTileCard(
-                                    elevation:0.0,
-                                    baseColor:Colors.transparent,
-                                    title: Text('Subtotal: ₱ ${oCcy.format(subtotal)}',style: TextStyle(color: Colors.deepOrange, fontWeight: FontWeight.bold)),
-                                    children: <Widget>[
-                                      Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Padding(
-                                            padding: EdgeInsets.fromLTRB(17.0,10.0, 0.0,10.0),
-                                            child: new Text("*tap to view your item(s)*", style: GoogleFonts.openSans(color: Colors.deepOrange, fontStyle: FontStyle.normal,fontSize: 12.0),),
-                                          ),
-                                        ],
-                                      ),
-
-                                      ListView.builder(
-                                          physics: BouncingScrollPhysics(),
-                                          shrinkWrap: true,
-                                          itemCount:  getBu == null ? 0 : getBu.length,
-                                          itemBuilder: (BuildContext context, int index0) {
-//                                            test = getBu[index0]['d_bu_name'];
-                                            int num = index0;
-                                            num++;
-                                            return Container(
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: <Widget>[
-                                                  Padding(
-                                                    padding: EdgeInsets.fromLTRB(17.0,10.0, 0.0,10.0),
-                                                    child: Text('$num. ${getBu[index0]['d_bu_name'].toString()}',style: TextStyle(color: Colors.deepOrange,fontWeight: FontWeight.bold ,fontSize: 15.0)),
-                                                  ),
-//                                              Padding(
-//                                                padding: EdgeInsets.fromLTRB(17.0,0.0, 0.0,10.0),
-//                                                child: Text('${getBu[index0]['d_tenant'].toString()}',style: TextStyle(fontSize: 15.0)),
-//                                              ),
-                                                  ListView.builder(
+                                      else{
+                                        FocusScope.of(context).requestFocus(FocusNode());
+                                        showDialog<void>(
+                                          context: context,
+//                                          barrierDismissible: false, // user must tap button!
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.all(Radius.circular(8.0))
+                                              ),
+                                              title: Text("Set time for this delivery",style: TextStyle(fontSize: 20.0),),
+                                              contentPadding:
+                                              EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
+                                              content: Container(
+                                                height:290.0, // Change as per your requirement
+                                                width: 360.0, // Change as per your requirement
+                                                child: Scrollbar(
+                                                  child:  ListView.builder(
                                                       physics: BouncingScrollPhysics(),
                                                       shrinkWrap: true,
-                                                      itemCount:  getTenant == null ? 0 : getTenant.length,
-                                                      itemBuilder: (BuildContext context, int index) {
-                                                        return Visibility(
-                                                          visible: getTenant[index]['bu_id'] != getBu[index0]['d_bu_id'] ? false : true,
+                                                      itemCount:  timeCount,
+                                                      itemBuilder: (BuildContext context, int index1) {
+                                                        int t = index1;
+                                                        t++;
+//                                                              var d1 = DateTime.parse(trueTime[0]['date_today']);
+                                                        final now =  _globalTime;
+                                                        final dtFrom = DateTime(now.year, now.month, now.day, _globalTime2+t, 0+30, now.minute, now.second);
+                                                        // final dtTo = DateTime(now.year, now.month, now.day, 8+t, 0+30);
+                                                        final format = DateFormat.jm();  //"6:00 AM"
+                                                        String from = format.format(dtFrom);
+                                                        // String to = format.format(dtTo);
+                                                        return InkWell(
+                                                          onTap: (){
+                                                            deliveryTime.text = from;
+                                                            Navigator.of(context).pop();
+                                                          },
                                                           child: Container(
                                                             child: Column(
                                                               crossAxisAlignment: CrossAxisAlignment.start,
                                                               children: <Widget>[
-                                                                Padding(
-                                                                  padding: EdgeInsets.fromLTRB(20.0,0.0, 20.0,1.0),
-                                                                  child: OutlineButton(
-                                                                    borderSide: BorderSide(color: Colors.transparent),
-                                                                    highlightedBorderColor: Colors.deepOrange,
-                                                                    highlightColor: Colors.transparent,
-//                                                                    child: Text('${getTenant[index]['d_tenantName']} ₱${oCcy.format(double.parse(getTenant[index]['d_subtotal']))}'),
-                                                                  child:Row(
+                                                                Row (
                                                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                    children: [
-                                                                      Text('${getTenant[index]['tenant_name']}'),
-                                                                      Text('₱${oCcy.format(int.parse(getTenant[index]['total'].toString()))}'),
-
-                                                                    ],
-                                                                  ),
-                                                                    color: Colors.grey.withOpacity(0.1),
-                                                                    shape: RoundedRectangleBorder(
-                                                                        borderRadius: BorderRadius.all(Radius.circular(5.0))),
-                                                                    onPressed: (){
-                                                                      displayBottomSheet(context,getTenant[index]['tenant_id'],getBu[index0]['d_bu_name'],getTenant[index]['tenant_name']);
-//                                                                 displayOrder(getTenant[index]['d_tenantId']);
-                                                                    },
-                                                                  ),
-//                                                                    child: Text(getTenant[index]['d_tenantId'] , style: TextStyle(fontStyle: FontStyle.normal,fontSize: 16.0),),
+                                                                    children: <Widget>[
+                                                                      Padding(
+                                                                        padding: EdgeInsets.fromLTRB(30.0,20.0, 0.0,20.0),
+                                                                        child: Text('${from.toString()}',style: TextStyle(fontSize: 16.0),),
+                                                                      ),
+                                                                    ]
                                                                 ),
                                                               ],
                                                             ),
@@ -1511,57 +1274,293 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                                         );
                                                       }
                                                   ),
-                                                ],
+                                                ),
                                               ),
+                                              actions: <Widget>[
+                                                TextButton(
+                                                  child: Text(
+                                                    'Clear',
+                                                    style: TextStyle(
+                                                      color: Colors.deepOrange,
+                                                    ),
+                                                  ),
+                                                  onPressed: () {
+                                                    deliveryTime.clear();
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                ),
+                                              ],
                                             );
+                                          },
+                                        );
+                                      }
+
+                                  },
+                                  child: IgnorePointer(
+                                      child: new TextFormField(
+                                        textInputAction: TextInputAction.done,
+                                        cursorColor: Colors.deepOrange,
+                                        controller: deliveryTime,
+                                        validator: (value) {
+                                          if (value.isEmpty) {
+                                            return 'Please enter some value';
                                           }
+                                          return null;
+                                        },
+                                        decoration: InputDecoration(
+                                          contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
+                                          focusedBorder:OutlineInputBorder(
+                                            borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
+                                          ),
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
+                                        ),
                                       ),
-                                    ],
                                   ),
                                 ),
-                                Padding(
-                                  padding:EdgeInsets.fromLTRB(49.0, 7.0, 5.0, 5.0),
-                                  child: new Text("Rider's fee: ₱ ${ oCcy.format(deliveryCharge)}", style: TextStyle(fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 15.0),),
-                                ),
-                                Divider(),
-                                Padding(
-                                  padding:EdgeInsets.fromLTRB(49.0, 7.0, 5.0, 5.0),
-                                  child: new Text("GRAND TOTAL: ₱ ${ oCcy.format(grandTotal).toString()}", style: TextStyle(color: Colors.deepOrange,fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 20.0),),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
-                                  child: new Text("Customer tender(ie.4,000.00)", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
-                                ),
-                                Padding(
-                                  padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
-                                  child: new TextFormField(
-                                    textInputAction: TextInputAction.done,
-                                    cursorColor: Colors.deepOrange,
-                                    controller: changeFor,
-                                    validator: (value) {
-                                      if (value.isEmpty) {
-                                        return 'Please enter some value';
-                                      }
-                                      return null;
-                                    },
-                                    keyboardType: TextInputType.number,
-                                    decoration: InputDecoration(
-                                      prefixIcon: Icon(Icons.insert_chart,color: Colors.grey,),
-                                      contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
-                                      focusedBorder:OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
+                              ),
+
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
+                                child: new Text("Avail Discount(Optional)", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                              ),
+
+                              Padding(
+                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                child: InkWell(
+                                  onTap: () async{
+                                    FocusScope.of(context).requestFocus(FocusNode());
+                                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                                    String username = prefs.getString('s_customerId');
+                                    if(username == null){
+                                      Navigator.of(context).push(_signIn());
+                                    }else{
+                                      await Navigator.of(context).push(_showDiscountPerson());
+                                      countDiscount();
+                                    }
+                                  },
+                                  child: IgnorePointer(
+                                    child: new TextFormField(
+                                      textInputAction: TextInputAction.done,
+                                      cursorColor: Colors.deepOrange,
+                                      controller: discount,
+                                      decoration: InputDecoration(
+                                        contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
+                                        focusedBorder:OutlineInputBorder(
+                                          borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
+                                        ),
+                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
                                       ),
-                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
                                     ),
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
+                                child: new Text("Landmark*", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                              ),
+                              Padding(
+                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                child: new TextFormField(
+                                  keyboardType: TextInputType.multiline,
+                                  textInputAction: TextInputAction.done,
+                                  cursorColor: Colors.deepOrange,
+                                  controller: placeRemarks,
+                                  validator: (value) {
+                                    if (value.isEmpty) {
+                                      return 'Please enter some value';
+                                    }
+                                    return null;
+                                  },
+                                  maxLines: 4,
+                                  decoration: InputDecoration(
+                                    hintText:"E.g Near at plaza/Be ware of dogs",
+                                    contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
+                                    focusedBorder:OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
+                                    ),
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
+                                child: new Text("Special instruction*", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                              ),
+                              Padding(
+                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                child: new TextFormField(
+                                  keyboardType: TextInputType.multiline,
+                                  textInputAction: TextInputAction.done,
+                                  cursorColor: Colors.deepOrange,
+                                  controller: specialInstruction,
+                                  validator: (value) {
+                                    if (value.isEmpty) {
+                                      return 'Please enter some value';
+                                    }
+                                    return null;
+                                  },
+                                  maxLines: 4,
+                                  decoration: InputDecoration(
+                                    hintText:"E.g Near at plaza/Be ware of dogs",
+                                    contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
+                                    focusedBorder:OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
+                                    ),
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
+                                  ),
+                                ),
+                              ),
+
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
+                                child: new Text("In case the product is out of stock", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                              ),
+                              _myRadioButton(
+                                title: "Cancel the entire order",
+                                value: 0,
+                                onChanged: (newValue) => setState((){
+                                  groupValue = newValue;
+
+                                }),
+                              ),
+
+                              _myRadioButton(
+                                title: "Remove it from my order",
+                                value: 1,
+                                onChanged: (newValue) => setState((){
+                                  groupValue = newValue;
+
+                                }),
+                              ),
+                              Padding(
+                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                child:ExpansionTileCard(
+                                  elevation:0.0,
+                                  baseColor:Colors.transparent,
+                                  title: Text('Subtotal: ₱ ${oCcy.format(subtotal)}',style: TextStyle(color: Colors.deepOrange, fontWeight: FontWeight.bold)),
+                                  children: <Widget>[
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Padding(
+                                          padding: EdgeInsets.fromLTRB(17.0,10.0, 0.0,10.0),
+                                          child: new Text("*tap to view your item(s)*", style: GoogleFonts.openSans(color: Colors.deepOrange, fontStyle: FontStyle.normal,fontSize: 12.0),),
+                                        ),
+                                      ],
+                                    ),
+
+                                    ListView.builder(
+                                        physics: BouncingScrollPhysics(),
+                                        shrinkWrap: true,
+                                        itemCount:  getBu == null ? 0 : getBu.length,
+                                        itemBuilder: (BuildContext context, int index0) {
+//                                            test = getBu[index0]['d_bu_name'];
+                                          int num = index0;
+                                          num++;
+                                          return Container(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                Padding(
+                                                  padding: EdgeInsets.fromLTRB(17.0,10.0, 0.0,10.0),
+                                                  child: Text('$num. ${getBu[index0]['d_bu_name'].toString()}',style: TextStyle(color: Colors.deepOrange,fontWeight: FontWeight.bold ,fontSize: 15.0)),
+                                                ),
+//                                              Padding(
+//                                                padding: EdgeInsets.fromLTRB(17.0,0.0, 0.0,10.0),
+//                                                child: Text('${getBu[index0]['d_tenant'].toString()}',style: TextStyle(fontSize: 15.0)),
+//                                              ),
+                                                ListView.builder(
+                                                    physics: BouncingScrollPhysics(),
+                                                    shrinkWrap: true,
+                                                    itemCount:  getTenant == null ? 0 : getTenant.length,
+                                                    itemBuilder: (BuildContext context, int index) {
+                                                      return Visibility(
+                                                        visible: getTenant[index]['bu_id'] != getBu[index0]['d_bu_id'] ? false : true,
+                                                        child: Container(
+                                                          child: Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: <Widget>[
+                                                              Padding(
+                                                                padding: EdgeInsets.fromLTRB(20.0,0.0, 20.0,1.0),
+                                                                child: OutlineButton(
+                                                                  borderSide: BorderSide(color: Colors.transparent),
+                                                                  highlightedBorderColor: Colors.deepOrange,
+                                                                  highlightColor: Colors.transparent,
+//                                                                    child: Text('${getTenant[index]['d_tenantName']} ₱${oCcy.format(double.parse(getTenant[index]['d_subtotal']))}'),
+                                                                child:Row(
+                                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                  children: [
+                                                                    Text('${getTenant[index]['tenant_name']}'),
+                                                                    Text('₱${oCcy.format(int.parse(getTenant[index]['total'].toString()))}'),
+
+                                                                  ],
+                                                                ),
+                                                                  color: Colors.grey.withOpacity(0.1),
+                                                                  shape: RoundedRectangleBorder(
+                                                                      borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                                                                  onPressed: (){
+                                                                    displayBottomSheet(context,getTenant[index]['tenant_id'],getBu[index0]['d_bu_name'],getTenant[index]['tenant_name']);
+//                                                                 displayOrder(getTenant[index]['d_tenantId']);
+                                                                  },
+                                                                ),
+//                                                                    child: Text(getTenant[index]['d_tenantId'] , style: TextStyle(fontStyle: FontStyle.normal,fontSize: 16.0),),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        }
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding:EdgeInsets.fromLTRB(49.0, 7.0, 5.0, 5.0),
+                                child: new Text("Rider's fee: ₱ ${ oCcy.format(deliveryCharge)}", style: TextStyle(fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 15.0),),
+                              ),
+                              Divider(),
+                              Padding(
+                                padding:EdgeInsets.fromLTRB(49.0, 7.0, 5.0, 5.0),
+                                child: new Text("GRAND TOTAL: ₱ ${ oCcy.format(grandTotal).toString()}", style: TextStyle(color: Colors.deepOrange,fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 20.0),),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
+                                child: new Text("Customer tender(ie.4,000.00)", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                              ),
+                              Padding(
+                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                child: new TextFormField(
+                                  textInputAction: TextInputAction.done,
+                                  cursorColor: Colors.deepOrange,
+                                  controller: changeFor,
+                                  validator: (value) {
+                                    if (value.isEmpty) {
+                                      return 'Please enter some value';
+                                    }
+                                    return null;
+                                  },
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    prefixIcon: Icon(Icons.insert_chart,color: Colors.grey,),
+                                    contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
+                                    focusedBorder:OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
+                                    ),
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
+                        ),
 
 
-                        ],
-                      ),
+                      ],
                     ),
                   ),
                 ),

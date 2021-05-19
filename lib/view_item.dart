@@ -14,8 +14,9 @@ class ViewItem extends StatefulWidget {
   final prodId;
   final productUom;
   final unitOfMeasure;
+  final price;
 
-  ViewItem({Key key, @required this.buCode, this.tenantCode,this.prodId,this.productUom, this.unitOfMeasure}) : super(key: key);
+  ViewItem({Key key, @required this.buCode, this.tenantCode,this.prodId,this.productUom, this.unitOfMeasure, this.price}) : super(key: key);
   @override
   _ViewItem createState() => _ViewItem();
 }
@@ -30,9 +31,10 @@ class _ViewItem extends State<ViewItem>{
   int _counter = 1;
 
   String uomId,uomPrice;
-  String choiceUomId,choiceId;
-  String flavorId;
+  String choiceUomId,choiceId,choicePrice;
+  String flavorId,flavorPrice;
 
+  List<String> selectedSideOnPrice = List();
   List<String> selectedSideItems = List();
   List<String> selectedSideItemsUom = List();
 
@@ -55,6 +57,10 @@ class _ViewItem extends State<ViewItem>{
     choicesDataVisible = true;
     uomDataVisible = true;
     flavorDataVisible = true;
+
+
+    uomId = widget.productUom;
+    uomPrice = widget.price;
     setState(() {
       isLoading = true;
     });
@@ -75,35 +81,46 @@ class _ViewItem extends State<ViewItem>{
       if(choicesData.toString() == '[[]]'){
         choicesDataVisible = false;
       }
-      if(uomData.toString() == '[[]]'){
-        uomDataVisible = false;
-      }
-      if(flavorData.toString() == '[[]]'){
-        flavorDataVisible = false;
-      }
-
-      for(int q = 0;q<choicesData.length;q++) {
-        if (choicesData[q]['default'] == '1') {
-          choiceDataGroupValue = q;
-          choiceUomId = choicesData[q]['sub_productid'];
-          choiceId = choicesData[q]['uom_id'];
-          break;
+      else{
+        for(int q = 0;q<choicesData.length;q++) {
+            if (choicesData[q]['default'] == '1') {
+                choiceDataGroupValue = q;
+                choiceUomId = choicesData[q]['uom_id'];
+                choiceId = choicesData[q]['sub_productid'];
+                choicePrice = choicesData[q]['addon_price'];
+                print(choiceId);
+                break;
+            }
         }
       }
 
-      for(int q = 0;q<uomData.length;q++) {
-          if (uomData[q]['default'] == '1') {
-            uomDataGroupValue = q;
-            uomId = uomData[q]['uom_id'];
-            break;
-          }
+      if(uomData.toString() == '[[]]' || uomData.length == 1){
+        uomDataVisible = false;
+      }
+      else{
+        for(int q = 0;q<uomData.length;q++) {
+            if (uomData[q]['default'] == '1') {
+              uomDataGroupValue = q;
+              uomId = uomData[q]['uom_id'];
+              break;
+            }
+        }
       }
 
-      for(int q = 0;q<flavorData.length;q++) {
-        if (flavorData[q]['default'] == '1') {
-          flavorDataGroupValue = q;
-          flavorId = flavorData[q]['flavor_id'];
-          break;
+
+      if(flavorData.toString() == '[[]]'){
+        flavorDataVisible = false;
+      }
+      else{
+        for(int q = 0;q<flavorData.length;q++) {
+            if (flavorData[q]['default'] == '1') {
+              flavorDataGroupValue = q;
+              flavorId = flavorData[q]['flavor_id'];
+              flavorPrice = flavorData[q]['price'];
+              print(flavorPrice);
+              break;
+            }
+          // print(q);
         }
       }
 
@@ -155,7 +172,20 @@ class _ViewItem extends State<ViewItem>{
           );
         },
       );
+
+      // print(widget.buCode);
+      // print(widget.prodId);
+      // print(widget.productUom);
+      //
+      // print(choiceUomId);
+      // print(choiceId);
+      // print(uomId);
+      // print(flavorId);
+      // print(selectedSideItems);
+      // print(selectedSideItemsUom);
+      // print(_counter);
       // await db.addToCartCiTest(widget.buCode,widget.tenantCode,widget.prodId,widget.productUom,flavorId,drinkId,drinkUom,friesId,friesUom,sideId,sideUom,selectedSideItems,selectedSideItemsUom,selectedDessertItems,selectedDessertItemsUom,boolFlavorId,boolDrinkId,boolFriesId,boolSideId,_counter);
+      await db.addToCartNew(widget.prodId,uomId,_counter,uomPrice,choiceUomId,choiceId,choicePrice,flavorId,flavorPrice,selectedSideOnPrice,selectedSideItems,selectedSideItemsUom);
     }
   }
 
@@ -296,13 +326,16 @@ class _ViewItem extends State<ViewItem>{
                                                          // selectedSideItems.clear();
                                                         // selectedSideItemsUom.clear();
                                                         if (value) {
+                                                          selectedSideOnPrice.add(addonData[index1]['addon_price']);
                                                           selectedSideItems.add(addonData[index1]['sub_productid']);
                                                           selectedSideItemsUom.add(addonData[index1]['uom_id']);
                                                         }
                                                         else{
+                                                          selectedSideOnPrice.remove(addonData[index1]['addon_price']);
                                                           selectedSideItems.remove(addonData[index1]['sub_productid']);
                                                           selectedSideItemsUom.remove(addonData[index1]['uom_id']);
                                                         }
+                                                        print(selectedSideItems);
                                                       });
                                                     },
                                                     controlAffinity: ListTileControlAffinity.leading,
@@ -360,6 +393,8 @@ class _ViewItem extends State<ViewItem>{
                                                               choiceDataGroupValue = newValue;
                                                               choiceUomId = choicesData[index2]['uom_id'];
                                                               choiceId = choicesData[index2]['sub_productid'];
+                                                              choicePrice = choicesData[index2]['addon_price'];
+                                                              print(choiceId);
                                                             });
                                                           },
                                                         ),
@@ -420,6 +455,7 @@ class _ViewItem extends State<ViewItem>{
                                                           onChanged: (newValue) {
                                                             setState((){
                                                               uomDataGroupValue = newValue;
+                                                              uomPrice = uomData[index3]['price'];
                                                               uomId = uomData[index3]['uom_id'];
                                                             });
                                                           },
@@ -483,6 +519,8 @@ class _ViewItem extends State<ViewItem>{
                                                             setState((){
                                                               flavorDataGroupValue = newValue;
                                                               flavorId = flavorData[index4]['flavor_id'];
+                                                              flavorPrice = flavorData[index4]['price'];
+                                                              print(flavorPrice);
                                                             });
                                                           },
                                                         ),
