@@ -34,7 +34,7 @@ class _SubmitPickUp extends State<SubmitPickUp>  {
   List getItemsData;
 
   _placeOrderPickUp() async{
-    await db.savePickup(widget.groupValue.toString(),widget.deliveryDateData,widget.deliveryTimeData,widget.getTenantData,widget.subtotal,'1250');
+    await db.savePickup(widget.deliveryDateData,widget.deliveryTimeData,widget.subtotal,'1250');
   }
   void displayBottomSheet(BuildContext context,tenantId,buName,tenantName) async{
     var res = await db.displayOrder(tenantId);

@@ -35,12 +35,11 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
   final deliveryTime = TextEditingController();
   final discount = TextEditingController();
   var subtotal = 0.0;
-  List getBu;
   List getTenant;
   List getItemsData;
   List displayAddOnsData;
   List placeOrder;
-  List getOrder;
+
   // List barrioData;
   // List getAllowLoc;
   // List getTenantLimit;
@@ -50,12 +49,11 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
   var townId,townName,barrioId,brgName,contact;
 
   double deliveryCharge = 0;
-  double grandTotal = 0;
+  double grandTotal = 0.0;
   double minimumAmount = 0.0;
 
   var timeCount;
   var _globalTime,_globalTime2;
-
   var _today;
   // String changeForFinal;
   final _formKey = GlobalKey<FormState>();
@@ -76,46 +74,17 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
       placeRemarks.text = placeOrder[0]['land_mark'];
       street.text = placeOrder[0]['street_purok'];
       // houseNo.text = placeOrder[0]['complete_address'];
+      deliveryCharge = double.parse(placeOrder[0]['d_charge_amt']);
+      grandTotal = deliveryCharge + subtotal;
       userName.text = placeOrder[0]['firstname']+" "+placeOrder[0]['lastname'];
       minimumAmount = double.parse(placeOrder[0]['minimum_order_amount']);
+      isLoading = false;
+      print(grandTotal);
     });
   }
 
   updateDefaultShipping(id,customerId) async{
     await db.updateDefaultShipping(id,customerId);
-  }
-
-  // Future getPlaceOrderData() async{
-  //   getTrueTime();
-  //   var res = await db.getPlaceOrderData();
-  //   var res1 = await db.checkAllowedPlace();
-  //   var res2 = await db.checkFee();
-  //   checkFee = res2['user_details'];
-  //   if (!mounted) return;
-  //   setState(() {
-  //      placeOrder = res['user_details'];
-  //      placeContactNo.text = placeOrder[0]['d_contact'];
-  //      placeOrderBrg.text = placeOrder[0]['d_brgName'];
-  //      deliveryCharge = double.parse(checkFee[0]['d_charge_amt']);
-  //      if(res1 == 'false'){
-  //        placeOrderTown.text = "";
-  //        placeOrderBrg.text = "";
-  //      }
-  //      else{
-  //        placeOrderTown.text = placeOrder[0]['d_townName'];
-  //        placeOrderBrg.text = placeOrder[0]['d_brgName'];
-  //        grandTotal = subtotal + deliveryCharge;
-  //        barrioId = int.parse(placeOrder[0]['d_brgId']);
-  //      }
-  //   });
-  // }
-
-  Future getOrderData() async{
-    var res = await db.getOrderData();
-    if (!mounted) return;
-    setState(() {
-      getOrder = res['user_details'];
-    });
   }
 
   Future countDiscount() async{
@@ -131,20 +100,17 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
     }
   }
 
-  // Future refresh() async{
-  //   getAllowedLoc();
-  //   getPlaceOrderData();
-  // }
-
-//   Future getAllowedLoc() async{
-//      var res = await db.getAllowedLoc();
-//      if (!mounted) return;
-//      setState(() {
-//        isLoading = false;
-//        getAllowLoc = res['user_details'];
-// //       print(getAllowLoc);
-//      });
-//   }
+  List loadTotalData;
+  void loadTotal() async{
+    subtotal = 0;
+    var res = await db.loadSubTotal();
+    if (!mounted) return;
+    setState(() {
+      isLoading = false;
+      loadTotalData = res['user_details'];
+      subtotal = double.parse(loadTotalData[0]['grand_total'].toString());
+    });
+  }
 
   void displayAddresses(BuildContext context) async{
     var res = await db.displayAddresses();
@@ -209,7 +175,6 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                           minimumAmount = double.parse(getItemsData[index]['minimum_order_amount']);
                           updateDefaultShipping(getItemsData[index]['id'],getItemsData[index]['d_customerId']);
                           Navigator.pop(context);
-
                         },
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 15.0),
@@ -235,29 +200,13 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
         });
   }
 
-  List loadCartData;
-  // Future getSubTotal() async{
-  //   var res = await db.loadCartData();
+  // Future getBuSegregate() async{
+  //   var res = await db.getBuSegregate();
   //   if (!mounted) return;
   //   setState(() {
-  //     grandTotal = 0;
-  //     subtotal = 0;
-  //     isLoading = false;
-  //     loadCartData = res['user_details'];
-  //     loadCartData.forEach((element) {
-  //       subtotal = subtotal+(double.parse(element['cart_qty'].toString()) * double.parse(element['total'].toString()));
-  //     });
-  //     grandTotal = subtotal + deliveryCharge;
+  //     getBu = res['user_details'];
   //   });
   // }
-
-  Future getBuSegregate() async{
-    var res = await db.getBuSegregate();
-    if (!mounted) return;
-    setState(() {
-      getBu = res['user_details'];
-    });
-  }
 
   List<String> subTotalTenant = [];
   Future getTenantSegregate() async{
@@ -266,72 +215,9 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
     if (!mounted) return;
     setState(() {
       getTenant = res['user_details'];
-      print(getTenant);
-      // for(var q=0;q<getTenant.length;q++){
-      //
-      //   if(getTenant[q]['total'] < minimumAmount){
-      //     subTotalTenant.add('false');
-      //     }
-      //   else{
-      //     subTotalTenant.add('true');
-      //   }
-      //
-      //   //print(getTenant[q]['total']);
-      //   // print(minimumAmount);
-      // }
-
+       print(getTenant);
     });
   }
-
-
-
-//   void displayAddOns(cartId) async{
-//     var res = await db.displayAddOns(cartId);
-//     if (!mounted) return;
-//     setState(() {
-//     });
-//
-//     showDialog<void>(
-//       context: context,
-//       barrierDismissible: false, // user must tap button!
-//       builder: (BuildContext context) {
-//         return AlertDialog(
-//           shape: RoundedRectangleBorder(
-//               borderRadius: BorderRadius.all(Radius.circular(8.0))
-//           ),
-//           contentPadding:
-//           EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
-//           content: Container(
-//             height:400.0, // Change as per your requirement
-//             width: 100.0, // Change as per your requirement
-//             child: ListView.builder(
-//               physics: BouncingScrollPhysics(),
-//               shrinkWrap: true,
-//               itemCount:4,
-//               itemBuilder: (BuildContext context, int index) {
-//                 var f = index;
-//                 f++;
-//                 return InkWell(
-//
-//                   child: Padding(
-//                     padding: EdgeInsets.fromLTRB(25.0, 15.0, 25.0, 15.0),
-//                     child:Row(
-//                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                       children: [
-// //                        Text('$f. ${displayAddOnsData[index]['drink_price']} ',style: TextStyle(fontSize: 13.0,fontWeight: FontWeight.bold)),
-//                         Text('$f. ${displayAddOnsData[index]['drink_name'].toString()} ',style: TextStyle(fontSize: 13.0,fontWeight: FontWeight.bold)),
-//                       ],
-//                     ),
-//     //                       child: Text('$f. ${lGetAmountPerTenant[index]['d_bu_name']} - ${lGetAmountPerTenant[index]['d_tenant']}  ₱${oCcy.format(double.parse(lGetAmountPerTenant[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
-//                   ),
-//                 );
-//               },
-//             ),
-//           ),
-//         );
-//       },
-//     );
-//   }
 
   void displayBottomSheet(BuildContext context,tenantId,buName,tenantName) async{
     var res = await db.displayOrder(tenantId);
@@ -465,185 +351,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
     );
   }
 
-  // void selectTown() async {
-  //   showDialog<void>(
-  //     context: context,
-  //     barrierDismissible: false, // user must tap button!
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         shape: RoundedRectangleBorder(
-  //             borderRadius: BorderRadius.all(Radius.circular(8.0))
-  //         ),
-  //         contentPadding:
-  //         EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
-  //         content: Container(
-  //           height:50.0, // Change as per your requirement
-  //           width: 10.0, // Change as per your requirement
-  //           child: Center(
-  //             child: CircularProgressIndicator(
-  //               valueColor:
-  //               new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
-  //             ),
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  //
-  //   var res = await db.getAllowedLoc();
-  //   if (!mounted) return;
-  //   setState(() {
-  //     isLoading = false;
-  //     getAllowLoc = res['user_details'];
-  //   });
-  //   Navigator.pop(context);
-  //   FocusScope.of(context).requestFocus(FocusNode());
-  //   showDialog<void>(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         shape: RoundedRectangleBorder(
-  //             borderRadius: BorderRadius.all(Radius.circular(8.0))
-  //         ),
-  //         contentPadding: EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
-  //         title: Text('Select town'),
-  //         content: Container(
-  //           height: 400.0, // Change as per your requirement
-  //           width: 300.0, // Change as per your requirement
-  //             child: Scrollbar(
-  //               child: ListView.builder(
-  //                 physics: BouncingScrollPhysics(),
-  //                 shrinkWrap: true,
-  //                 itemCount: getAllowLoc == null ? 0 : getAllowLoc.length,
-  //                 itemBuilder: (BuildContext context, int index) {
-  //                   return InkWell(
-  //                     onTap: () {
-  //                       setState(() {
-  //                         placeOrderBrg.clear();
-  //                         townId = int.parse(getAllowLoc[index]['d_towd_id']);
-  //                         placeOrderTown.text = getAllowLoc[index]['d_town'];
-  //                         deliveryCharge = double.parse(getAllowLoc[index]['d_charge_amt']);
-  //                         grandTotal = subtotal + deliveryCharge;
-  //                       });
-  //                       Navigator.of(context).pop();
-  //                     },
-  //                     child: ListTile(
-  //                       title: Text(getAllowLoc[index]['d_town']),
-  //                     ),
-  //                   );
-  //                 },
-  //               ),
-  //             ),
-  //         ),
-  //         actions: <Widget>[
-  //           FlatButton(
-  //             child: Text(
-  //               'Cancel',
-  //               style: TextStyle(
-  //                 color: Colors.grey.withOpacity(0.8),
-  //               ),
-  //             ),
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //             },
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
-
-  // void selectBarrio() async {
-  //   showDialog<void>(
-  //     context: context,
-  //     barrierDismissible: false, // user must tap button!
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         shape: RoundedRectangleBorder(
-  //             borderRadius: BorderRadius.all(Radius.circular(8.0))
-  //         ),
-  //         contentPadding:
-  //         EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
-  //         content: Container(
-  //           height:50.0, // Change as per your requirement
-  //           width: 10.0, // Change as per your requirement
-  //           child: Center(
-  //             child: CircularProgressIndicator(
-  //               valueColor:
-  //               new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
-  //             ),
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  //
-  //   var res = await db.getBarrioCi(townId);
-  //   if (!mounted) return;
-  //   setState(() {
-  //     barrioData = res['user_details'];
-  //   });
-  //   Navigator.pop(context);
-  //   FocusScope.of(context).requestFocus(FocusNode());
-  //   showDialog<void>(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         shape: RoundedRectangleBorder(
-  //             borderRadius: BorderRadius.all(Radius.circular(8.0))
-  //         ),
-  //         contentPadding: EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
-  //         title: Text('Select barangay'),
-  //         content: Container(
-  //           height: 400.0,
-  //           width: 300.0,
-  //           child: Scrollbar(
-  //             child: ListView.builder(
-  //               physics: BouncingScrollPhysics(),
-  //               shrinkWrap: true,
-  //               itemCount: barrioData == null ? 0 : barrioData.length,
-  //               itemBuilder: (BuildContext context, int index) {
-  //
-  //                 return InkWell(
-  //                   onTap: () {
-  //                     placeOrderBrg.text = barrioData[index]['brgy_name'];
-  //                     barrioId = int.parse(barrioData[index]['brgy_id']);
-  //
-  //                     Navigator.of(context).pop();
-  //                   },
-  //                   child: ListTile(
-  //                     title: Text(barrioData[index]['brgy_name']),
-  //                   ),
-  //                 );
-  //               },
-  //             ),
-  //           ),
-  //         ),
-  //         actions: <Widget>[
-  //           FlatButton(
-  //             child: Text(
-  //               'Cancel',
-  //               style: TextStyle(
-  //                 color: Colors.grey.withOpacity(0.8),
-  //               ),
-  //             ),
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //               placeOrderBrg.clear();
-  //             },
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
-  //
-  // Future toRefresh() async{
-  //   getOrderData();
-  //   // getSubTotal();
-  // }
-
-   submitPlaceOrder() async{
+  submitPlaceOrder() async{
      FocusScope.of(context).requestFocus(FocusNode());
      print(subTotalTenant);
       if(subTotalTenant.contains('false')){
@@ -795,14 +503,11 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
     side.clear();
     selectedDiscountType.clear();
     super.initState();
+
     getPlaceOrderData();
-    // getOrderData();
-    // getSubTotal();
-    // getAllowedLoc();
-    getBuSegregate();
     getTenantSegregate();
     //trapTenantLimit();
-    isLoading = false;
+
   }
 
 
@@ -1429,95 +1134,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                 value: 1,
                                 onChanged: (newValue) => setState((){
                                   groupValue = newValue;
-
                                 }),
-                              ),
-                              Padding(
-                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
-                                child:ExpansionTileCard(
-                                  elevation:0.0,
-                                  baseColor:Colors.transparent,
-                                  title: Text('Subtotal: ₱ ${oCcy.format(subtotal)}',style: TextStyle(color: Colors.deepOrange, fontWeight: FontWeight.bold)),
-                                  children: <Widget>[
-                                    Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Padding(
-                                          padding: EdgeInsets.fromLTRB(17.0,10.0, 0.0,10.0),
-                                          child: new Text("*tap to view your item(s)*", style: GoogleFonts.openSans(color: Colors.deepOrange, fontStyle: FontStyle.normal,fontSize: 12.0),),
-                                        ),
-                                      ],
-                                    ),
-
-                                    ListView.builder(
-                                        physics: BouncingScrollPhysics(),
-                                        shrinkWrap: true,
-                                        itemCount:  getBu == null ? 0 : getBu.length,
-                                        itemBuilder: (BuildContext context, int index0) {
-//                                            test = getBu[index0]['d_bu_name'];
-                                          int num = index0;
-                                          num++;
-                                          return Container(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                Padding(
-                                                  padding: EdgeInsets.fromLTRB(17.0,10.0, 0.0,10.0),
-                                                  child: Text('$num. ${getBu[index0]['d_bu_name'].toString()}',style: TextStyle(color: Colors.deepOrange,fontWeight: FontWeight.bold ,fontSize: 15.0)),
-                                                ),
-//                                              Padding(
-//                                                padding: EdgeInsets.fromLTRB(17.0,0.0, 0.0,10.0),
-//                                                child: Text('${getBu[index0]['d_tenant'].toString()}',style: TextStyle(fontSize: 15.0)),
-//                                              ),
-                                                ListView.builder(
-                                                    physics: BouncingScrollPhysics(),
-                                                    shrinkWrap: true,
-                                                    itemCount:  getTenant == null ? 0 : getTenant.length,
-                                                    itemBuilder: (BuildContext context, int index) {
-                                                      return Visibility(
-                                                        visible: getTenant[index]['bu_id'] != getBu[index0]['d_bu_id'] ? false : true,
-                                                        child: Container(
-                                                          child: Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                            children: <Widget>[
-                                                              Padding(
-                                                                padding: EdgeInsets.fromLTRB(20.0,0.0, 20.0,1.0),
-                                                                child: OutlineButton(
-                                                                  borderSide: BorderSide(color: Colors.transparent),
-                                                                  highlightedBorderColor: Colors.deepOrange,
-                                                                  highlightColor: Colors.transparent,
-//                                                                    child: Text('${getTenant[index]['d_tenantName']} ₱${oCcy.format(double.parse(getTenant[index]['d_subtotal']))}'),
-                                                                child:Row(
-                                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                  children: [
-                                                                    Text('${getTenant[index]['tenant_name']}'),
-                                                                    Text('₱${oCcy.format(int.parse(getTenant[index]['total'].toString()))}'),
-
-                                                                  ],
-                                                                ),
-                                                                  color: Colors.grey.withOpacity(0.1),
-                                                                  shape: RoundedRectangleBorder(
-                                                                      borderRadius: BorderRadius.all(Radius.circular(5.0))),
-                                                                  onPressed: (){
-                                                                    displayBottomSheet(context,getTenant[index]['tenant_id'],getBu[index0]['d_bu_name'],getTenant[index]['tenant_name']);
-//                                                                 displayOrder(getTenant[index]['d_tenantId']);
-                                                                  },
-                                                                ),
-//                                                                    child: Text(getTenant[index]['d_tenantId'] , style: TextStyle(fontStyle: FontStyle.normal,fontSize: 16.0),),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      );
-                                                    }
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        }
-                                    ),
-                                  ],
-                                ),
                               ),
                               Padding(
                                 padding:EdgeInsets.fromLTRB(49.0, 7.0, 5.0, 5.0),

@@ -61,7 +61,7 @@ dependencies:
 #  latlong2: ^0.8.0
 #  logging: ^1.0.1
   nice_button: ^0.1.7
-  flutter_facebook_auth: ^3.3.3+1
+#  flutter_facebook_auth: ^3.3.3+1
 #  firebase_auth:
 
 

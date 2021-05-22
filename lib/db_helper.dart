@@ -150,20 +150,26 @@ class RapidA {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var client = http.Client();
      await client.post(Uri.parse("$server/placeOrder_r"),body:{
-      'cusId':prefs.getString('s_customerId'),
-      'townId':townId,
-      'barrioId':barrioId,
-      'contact':contact,
-      'landmark':landmark,
-      'specialInstruction':specialInstruction,
-      'houseNo':houseNo,
-      'changeFor':changeFor,
-      'street':street,
-      'deliveryCharge':deliveryCharge,
-      'radioVal':groupValue,
-      'deliveryDate':deliveryDate,
-      'deliveryTime':deliveryTime,
-      'selectedDiscountType':selectedDiscountType.toString()
+      // 'cusId':prefs.getString('s_customerId'),
+      // 'townId':townId,
+      // 'barrioId':barrioId,
+      // 'contact':contact,
+      // 'landmark':landmark,
+      // 'specialInstruction':specialInstruction,
+      // 'houseNo':houseNo,
+      // 'changeFor':changeFor,
+      // 'street':street,
+      // 'deliveryCharge':deliveryCharge,
+      // 'radioVal':groupValue,
+      // 'deliveryDate':deliveryDate,
+      // 'deliveryTime':deliveryTime,
+      // 'selectedDiscountType':selectedDiscountType.toString(),
+       'cusId':prefs.getString('s_customerId'),
+       'deliveryDate':deliveryDate,
+       'deliveryTime':deliveryTime,
+       'selectedDiscountType':selectedDiscountType.toString(),
+       'deliveryCharge':deliveryCharge,
+       'changeFor':changeFor
     });
     client.close();
     print(client);
@@ -541,18 +547,21 @@ class RapidA {
     return dataUser;
   }
 
-  Future savePickup(groupValue,deliveryDateData,deliveryTimeData,getTenantData,subtotal,tender) async{
+  Future savePickup(deliveryDateData,deliveryTimeData,subtotal,tender) async{
+
+   // print(deliveryDateData);
+   // print(deliveryTimeData);
+   // print(subtotal);
+   // print(tender);
     var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
-     await client.post(Uri.parse("$server/savePickup_r"),body:{
-      'customerId':encrypt(prefs.getString('s_customerId').toString()),
-      'groupValue':encrypt(groupValue),
-      'deliveryDateData':encrypt(deliveryDateData.toString()),
-      'deliveryTimeData':encrypt(deliveryTimeData.toString()),
-      'getTenantData':encrypt(getTenantData.toString()),
-      'subtotal':encrypt(subtotal.toString()),
-      'tender':encrypt(tender.toString()),
-      'contactNo':encrypt(prefs.getString('s_contact').toString()),
+    await client.post(Uri.parse("$server/savePickup_r"),body:{
+       'customerId':encrypt(prefs.getString('s_customerId').toString()),
+       'deliveryDateData':deliveryDateData.toString(),
+       'deliveryTimeData':deliveryTimeData.toString(),
+       'subtotal':encrypt(subtotal.toString()),
+       'tender':encrypt(tender.toString()),
+       'selectedDiscountType':encrypt(selectedDiscountType.toString()),
     });
     client.close();
   }
@@ -907,18 +916,25 @@ class RapidA {
   }
 
   Future submitOrder(groupValue,deliveryDateData,deliveryTimeData,buData,totalData,convenienceData,placeRemarks) async{
+    // print(encrypt(groupValue.toString()));
+    // print(deliveryDateData);
+    // print(deliveryTimeData);
+    // print(buData);
+    // print(totalData);
+    // print(convenienceData);
+    // print(placeRemarks);
     var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var userID = prefs.getString('s_customerId');
     await client.post(Uri.parse("$server/gc_submitOrder_r"),body:{
-      'customerId':encrypt(userID),
-      'groupValue':encrypt(groupValue.toString()),
-      'deliveryDateData':encrypt(deliveryDateData.toString()),
-      'deliveryTimeData':encrypt(deliveryTimeData.toString()),
-      'buData':encrypt(buData.toString()),
-      'totalData':encrypt(totalData.toString()),
-      'convenienceData':encrypt(convenienceData.toString()),
-      'placeRemarks':encrypt(placeRemarks.toString())
+      'customerId':userID,
+      'groupValue':groupValue.toString(),
+      'deliveryDateData':deliveryDateData.toString(),
+      'deliveryTimeData':deliveryTimeData.toString(),
+      'buData':buData.toString(),
+      'totalData':totalData.toString(),
+      'convenienceData':convenienceData.toString(),
+      'placeRemarks':placeRemarks.toString()
     });
     client.close();
   }

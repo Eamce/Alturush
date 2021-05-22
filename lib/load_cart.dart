@@ -410,7 +410,7 @@ class _LoadCart extends State<LoadCart> {
 
 
   void removeFromCart(prodId) async{
-
+    print(prodId);
     showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -558,7 +558,7 @@ class _LoadCart extends State<LoadCart> {
                                                     Padding(
                                                       padding: EdgeInsets.fromLTRB(15, 0, 5, 0),
                                                       child: new Text(
-                                                        "₱ ${loadCartData[index]['main_item']['total_price'].toString()}",
+                                                        "₱ ${loadCartData[index]['main_item']['price'].toString()}",
                                                         style: TextStyle(
                                                           fontWeight:
                                                           FontWeight.bold,
@@ -570,7 +570,7 @@ class _LoadCart extends State<LoadCart> {
                                                   ],
                                                 ),
                                                 Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  mainAxisAlignment: MainAxisAlignment.start,
                                                   children: <Widget>[
                                                     Padding(
                                                       padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
@@ -661,13 +661,13 @@ class _LoadCart extends State<LoadCart> {
                                                     Padding(
                                                       padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
                                                       child:Container(
-                                                        width: 100.0,
+                                                        width: 50.0,
                                                         child: TextButton(
                                                           style: TextButton.styleFrom(
                                                             primary: Colors.blue,
                                                             onSurface: Colors.red,
                                                           ),
-                                                          child: Text('view more'),
+                                                          child: Text('more'),
                                                           onPressed: ()async {
                                                               viewAddon(context, index);
                                                               // print(loadCartData[index]['main_item']['d_id']);
@@ -693,7 +693,7 @@ class _LoadCart extends State<LoadCart> {
                     ),
                   ),
                   Visibility(
-                     visible: grandTotal < 0 ? false : true,
+                     visible: loadCartData.isEmpty ? false : true,
                       replacement: Padding(
                       padding: EdgeInsets.symmetric(vertical: screenHeight / 3.0),
                       child: Center(

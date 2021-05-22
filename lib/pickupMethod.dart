@@ -30,8 +30,6 @@ class _PlaceOrderPickUp extends State<PlaceOrderPickUp>    with SingleTickerProv
   List<String> deliveryTimeData = [];
 
   final oCcy = new NumberFormat("#,##0.00", "en_US");
-
-
   final discount = TextEditingController();
   var subtotal = 0.0;
   List getBu;
@@ -54,6 +52,19 @@ class _PlaceOrderPickUp extends State<PlaceOrderPickUp>    with SingleTickerProv
     }
   }
 
+  List loadTotalData;
+  void loadTotal() async{
+    subtotal = 0;
+    var res = await db.loadSubTotal();
+    if (!mounted) return;
+    setState((){
+      isLoading = false;
+      loadTotalData = res['user_details'];
+      subtotal = double.parse(loadTotalData[0]['grand_total'].toString());
+      print(subtotal);
+    });
+  }
+
   Future getOrderData() async{
     var res = await db.getOrderData();
     if (!mounted) return;
@@ -64,25 +75,13 @@ class _PlaceOrderPickUp extends State<PlaceOrderPickUp>    with SingleTickerProv
 
 
   List loadCartData;
-  Future getSubTotal() async{
-    var res = await db.loadCartData();
-    if (!mounted) return;
-    setState(() {
-      isLoading = false;
-      loadCartData = res['user_details'];
-      subtotal = 0;
-      loadCartData.forEach((element) {
-        subtotal = subtotal + (double.parse(element['cart_qty'].toString()) * double.parse(element['total'].toString()));
-      });
-      // print(subtotal.toString());
-    });
-  }
 
   Future getBuSegregate() async{
     var res = await db.getBuSegregate();
     if (!mounted) return;
     setState(() {
       getBu = res['user_details'];
+      print(getBu);
     });
   }
 
@@ -92,6 +91,7 @@ class _PlaceOrderPickUp extends State<PlaceOrderPickUp>    with SingleTickerProv
     if (!mounted) return;
     setState(() {
       getTenant = res['user_details'];
+      print(getTenant);
       isLoading = false;
       lt=getTenant.length;
       for(int q=0;q<lt;q++){
@@ -246,7 +246,6 @@ class _PlaceOrderPickUp extends State<PlaceOrderPickUp>    with SingleTickerProv
 
   Future toRefresh() async{
     getOrderData();
-    getSubTotal();
     getTenantSegregate();
   }
 
@@ -265,17 +264,16 @@ class _PlaceOrderPickUp extends State<PlaceOrderPickUp>    with SingleTickerProv
     super.initState();
     selectedDiscountType.clear();
     getOrderData();
-    getSubTotal();
     getBuSegregate();
     getTrueTime();
     getTenantSegregate();
+    loadTotal();
   }
 
 
   @override
   void dispose() {
     super.dispose();
-
   }
 
   @override
@@ -327,7 +325,6 @@ class _PlaceOrderPickUp extends State<PlaceOrderPickUp>    with SingleTickerProv
                                       itemCount:  getBu == null ? 0 : getBu.length,
                                       itemBuilder: (BuildContext context, int index0) {
 //                                  test = getBu[index0]['d_bu_name'];
-
                                         var num = index0;
                                         num++;
                                         return Container(
@@ -349,6 +346,7 @@ class _PlaceOrderPickUp extends State<PlaceOrderPickUp>    with SingleTickerProv
                                                   shrinkWrap: true,
                                                   itemCount:  getTenant == null ? 0 : getTenant.length,
                                                   itemBuilder: (BuildContext context, int index) {
+                                                    print(getTenant);
                                                     _deliveryDate.add(new TextEditingController());
                                                     _deliveryTime.add(new TextEditingController());
                                                     return Visibility(
@@ -703,7 +701,6 @@ class _PlaceOrderPickUp extends State<PlaceOrderPickUp>    with SingleTickerProv
                                     value: 0,
                                     onChanged: (newValue) => setState((){
                                       groupValue = newValue;
-
                                     }),
                                   ),
 
@@ -712,7 +709,6 @@ class _PlaceOrderPickUp extends State<PlaceOrderPickUp>    with SingleTickerProv
                                     value: 1,
                                     onChanged: (newValue) => setState((){
                                       groupValue = newValue;
-
                                     }),
                                   ),
 
