@@ -319,18 +319,6 @@ class _SubmitPickUp extends State<SubmitPickUp>  {
                                           Text('₱${oCcy.format(int.parse(getTenant[index]['total'].toString()))}'),
                                         ],
                                       ),
-                                      color: Colors.transparent,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.all(Radius.circular(5.0))),
-                                      onPressed: () async{
-                                        SharedPreferences prefs = await SharedPreferences.getInstance();
-                                        String username = prefs.getString('s_customerId');
-                                        if(username == null){
-                                          Navigator.of(context).push(_signIn());
-                                        }else{
-                                          displayBottomSheet(context,getTenant[index]['tenant_id'],getBu[index0]['d_bu_name'],getTenant[index]['tenant_name']);
-                                        }
-                                      },
                                     ),
                                   ),
                                 ],

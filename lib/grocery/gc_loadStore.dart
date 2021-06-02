@@ -331,7 +331,6 @@ class _GcLoadStore extends State<GcLoadStore> {
     if (!mounted) return;
     setState(() {
       // offset =;
-
       getItemsByCategoriesListTemp = res['user_details'];
       for(int q = 0;q < getItemsByCategoriesListTemp.length; q++){
         getItemsByCategoriesList.add(getItemsByCategoriesListTemp[q]);
@@ -354,7 +353,7 @@ class _GcLoadStore extends State<GcLoadStore> {
   @override
   void initState() {
     super.initState();
-    print(widget.categoryNo);
+    print(widget.categoryName);
     categoryName = widget.categoryName;
     loadStore();
     getGcCounter();

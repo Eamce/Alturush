@@ -365,8 +365,7 @@ class _PlaceOrder extends State<PlaceOrder>    with SingleTickerProviderStateMix
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(8.0))
           ),
-          contentPadding:
-          EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
+          contentPadding: EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
           content: Container(
             height:50.0, // Change as per your requirement
             width: 10.0, // Change as per your requirement

@@ -386,23 +386,23 @@ class _SubmitOrder extends State<SubmitOrder>  {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             Divider(),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Text("Item(s)",style: GoogleFonts.openSans(fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 20.0),),
-//                                Text("Amount",style: GoogleFonts.openSans(fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 20.0),),
-                              ],
-                            ),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(17.0,10.0, 0.0,10.0),
-                                  child: new Text("*click tenant to view your item(s)*", style: GoogleFonts.openSans(color: Colors.deepOrange, fontStyle: FontStyle.normal,fontSize: 14.0),),
-                                ),
-
-                              ],
-                            ),
+//                             Row(
+//                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                               children: <Widget>[
+//                                 Text("Item(s)",style: GoogleFonts.openSans(fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 20.0),),
+// //                                Text("Amount",style: GoogleFonts.openSans(fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 20.0),),
+//                               ],
+//                             ),
+//                             Row(
+//                               crossAxisAlignment: CrossAxisAlignment.start,
+//                               children: <Widget>[
+//                                 Padding(
+//                                   padding: EdgeInsets.fromLTRB(17.0,10.0, 0.0,10.0),
+//                                   child: new Text("*click tenant to view your item(s)*", style: GoogleFonts.openSans(color: Colors.deepOrange, fontStyle: FontStyle.normal,fontSize: 14.0),),
+//                                 ),
+//
+//                               ],
+//                             ),
                             ListView.builder(
                                 physics: BouncingScrollPhysics(),
                                 shrinkWrap: true,
@@ -446,19 +446,6 @@ class _SubmitOrder extends State<SubmitOrder>  {
                                                               Text('₱${oCcy.format(int.parse(getTenant[index]['total'].toString()))}'),
                                                             ],
                                                           ),
-
-                                                          color: Colors.transparent,
-                                                          shape: RoundedRectangleBorder(
-                                                              borderRadius: BorderRadius.all(Radius.circular(5.0))),
-                                                          onPressed: () async{
-                                                            SharedPreferences prefs = await SharedPreferences.getInstance();
-                                                            String username = prefs.getString('s_customerId');
-                                                            if(username == null){
-                                                              Navigator.of(context).push(_signIn());
-                                                            }else{
-                                                              displayBottomSheet(context,getTenant[index]['tenant_id'],getBu[index0]['d_bu_name'],getTenant[index]['tenant_name']);
-                                                            }
-                                                          },
                                                         ),
                                                       ),
                                                     ],

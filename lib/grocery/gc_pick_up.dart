@@ -60,11 +60,21 @@ class _GcPickUp extends State<GcPickUp> {
   }
 
   getBill() async{
-    var res = await db.getBill();
+    var res = await db.getConFee();
+    isLoading = false;
+    if (!mounted) return;
+    setState(() {
+      getConFeeList = res['user_details'];
+      conFee = double.parse(getConFeeList[0]['pickup_charge']);
+      minimumAmount = double.parse(getConFeeList[0]['minimum_order_amount']);
+      // print(getConFeeList[0]['pickup_charge']);
+    });
+
+    var res1 = await db.getBill();
     if (!mounted) return;
     setState((){
       totalLoading = false;
-      getBillList = res['user_details'];
+      getBillList = res1['user_details'];
       bill = double.parse(getBillList[0]['d_subtotal']);
       grandTotal = bill+(conFee*lt);
     });
@@ -129,18 +139,18 @@ class _GcPickUp extends State<GcPickUp> {
       }
     });
   }
-
-  getConFee() async{
-    var res = await db.getConFee();
-    isLoading = false;
-    if (!mounted) return;
-    setState(() {
-      getConFeeList = res['user_details'];
-      conFee = double.parse(getConFeeList[0]['pickup_charge']);
-      minimumAmount = double.parse(getConFeeList[0]['minimum_order_amount']);
-      // print(getConFeeList[0]['pickup_charge']);
-    });
-  }
+  //
+  // getConFee() async{
+  //   var res = await db.getConFee();
+  //   isLoading = false;
+  //   if (!mounted) return;
+  //   setState(() {
+  //     getConFeeList = res['user_details'];
+  //     conFee = double.parse(getConFeeList[0]['pickup_charge']);
+  //     minimumAmount = double.parse(getConFeeList[0]['minimum_order_amount']);
+  //     // print(getConFeeList[0]['pickup_charge']);
+  //   });
+  // }
 
   Future countDiscount() async{
     if(selectedDiscountType.length == 0){
@@ -233,11 +243,11 @@ class _GcPickUp extends State<GcPickUp> {
   @override
   void initState(){
     super.initState();
-    getConFee();
+    // getConFee();
     getTrueTime();
     gcGroupByBu();
     getBill();
-    _modeOfPayment.text = "Cash on delivery";
+    _modeOfPayment.text = "Cash on pick-up";
   }
 
   @override

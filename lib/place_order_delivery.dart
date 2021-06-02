@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
 import 'db_helper.dart';
 import 'package:sleek_button/sleek_button.dart';
-import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'submit_order.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -39,7 +38,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
   List getItemsData;
   List displayAddOnsData;
   List placeOrder;
-
+  List getBu;
   // List barrioData;
   // List getAllowLoc;
   // List getTenantLimit;
@@ -60,10 +59,18 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
 
   Future getPlaceOrderData() async{
     getTrueTime();
-    var res = await db.getPlaceOrderData();
+    // loadTotal();
+    var res = await db.loadSubTotal();
     if (!mounted) return;
     setState(() {
-      placeOrder = res['user_details'];
+      loadTotalData = res['user_details'];
+      subtotal = double.parse(loadTotalData[0]['grand_total'].toString());
+    });
+
+    var res1 = await db.getPlaceOrderData();
+    if (!mounted) return;
+    setState(() {
+      placeOrder = res1['user_details'];
       // print(placeOrder);
       deliveryCharge = double.parse(placeOrder[0]['d_charge_amt']);
       townId = placeOrder[0]['d_townId'];
@@ -78,8 +85,9 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
       grandTotal = deliveryCharge + subtotal;
       userName.text = placeOrder[0]['firstname']+" "+placeOrder[0]['lastname'];
       minimumAmount = double.parse(placeOrder[0]['minimum_order_amount']);
+      getTenantSegregate();
       isLoading = false;
-      print(grandTotal);
+
     });
   }
 
@@ -101,12 +109,10 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
   }
 
   List loadTotalData;
-  void loadTotal() async{
-    subtotal = 0;
+  Future loadTotal() async{
     var res = await db.loadSubTotal();
     if (!mounted) return;
     setState(() {
-      isLoading = false;
       loadTotalData = res['user_details'];
       subtotal = double.parse(loadTotalData[0]['grand_total'].toString());
     });
@@ -200,22 +206,29 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
         });
   }
 
-  // Future getBuSegregate() async{
-  //   var res = await db.getBuSegregate();
-  //   if (!mounted) return;
-  //   setState(() {
-  //     getBu = res['user_details'];
-  //   });
-  // }
+  Future getBuSegregate() async{
+    var res = await db.getBuSegregate();
+    if (!mounted) return;
+    setState(() {
+      getBu = res['user_details'];
+    });
+  }
 
-  List<String> subTotalTenant = [];
+  List<bool> subTotalTenant = [];
   Future getTenantSegregate() async{
     subTotalTenant.clear();
     var res = await db.getTenantSegregate();
     if (!mounted) return;
     setState(() {
       getTenant = res['user_details'];
-       print(getTenant);
+
+     for(int q=0;q<getTenant.length;q++){
+       print(minimumAmount);
+       bool result = getTenant[q]['total'] < minimumAmount;
+       print(getTenant[q]['total']);
+       subTotalTenant.add(result);
+     }
+     print(subTotalTenant);
     });
   }
 
@@ -326,7 +339,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                   itemBuilder: (BuildContext context, int index) {
                     var f = index;
                     f++;
-                   return ListTile(
+                    return ListTile(
                       title: Text('$f. ${getItemsData[index]['d_prodName']} ₱${getItemsData[index]['d_price']} x ${getItemsData[index]['d_quantity']}',style: TextStyle(fontSize: 15.0)),
                     );
                   },
@@ -353,8 +366,8 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
 
   submitPlaceOrder() async{
      FocusScope.of(context).requestFocus(FocusNode());
-     print(subTotalTenant);
-      if(subTotalTenant.contains('false')){
+     print(subTotalTenant.contains(true));
+      if(subTotalTenant.contains(true)){
       return showDialog<void>(
         context: context,
         barrierDismissible: false, // user must tap button!
@@ -503,13 +516,14 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
     side.clear();
     selectedDiscountType.clear();
     super.initState();
-
     getPlaceOrderData();
-    getTenantSegregate();
-    //trapTenantLimit();
-
+    getBuSegregate();
+    print("hello");
+    print(selectedDiscountType);
+    // loadTotal();
+    // getTenantSegregate();
+    // trapTenantLimit();
   }
-
 
   @override
   void dispose() {
@@ -790,6 +804,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                 padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
                                 child: InkWell(
                                   onTap: (){
+                                    deliveryTime.clear();
                                     getTrueTime();
                                     FocusScope.of(context).requestFocus(FocusNode());
                                     showDialog<void>(
@@ -803,13 +818,13 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                           title: Text("Set date for this delivery",style: TextStyle(fontSize: 20.0),),
                                           contentPadding:EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
                                           content: Container(
-                                            height:290.0, // Change as per your requirement
+                                            height:230.0, // Change as per your requirement
                                             width: 360.0, // Change as per your requirement
                                             child: Scrollbar(
                                               child:ListView.builder(
                                                 physics: BouncingScrollPhysics(),
 //                                                  shrinkWrap: true,
-                                                itemCount: 5,
+                                                itemCount: 4,
                                                 itemBuilder: (BuildContext context, int index) {
                                                   String tom = "";
                                                   int n = 0;
@@ -823,32 +838,30 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                                   final String formatted = formatter.format(d2);
                                                   return InkWell(
                                                     onTap: (){
+
                                                       deliveryDate.text =formatted;
                                                       Navigator.of(context).pop();
                                                       if(index == 0){
                                                         setState(() {
-
                                                           _today = true;
                                                           timeCount = DateTime.parse(trueTime[0]['date_today']+" "+trueTime[0]['hour_today']).difference(DateTime.parse(trueTime[0]['date_today']+" "+"19:30")).inHours;
                                                           timeCount = timeCount.abs();
                                                           _globalTime = DateTime.parse(trueTime[0]['date_today']+" "+trueTime[0]['hour_today']);
                                                           _globalTime2 = _globalTime.hour;
                                                         });
-                                                      }
+                                                     }
                                                      else{
-                                                       setState(() {
-
+                                                       setState((){
                                                          _today = false;
                                                          timeCount = 12;
                                                          _globalTime = new DateTime.now();
                                                          _globalTime2 = 07;
                                                        });
                                                       }
-
                                                     },
                                                       child: Column(
-                                                        children: [
-                                                          Row (
+                                                        children:[
+                                                          Row(
                                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                               children: <Widget>[
                                                                 Padding(
@@ -938,7 +951,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                               contentPadding:
                                               EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
                                               content: Container(
-                                                height:290.0, // Change as per your requirement
+                                                height:230.0, // Change as per your requirement
                                                 width: 360.0, // Change as per your requirement
                                                 child: Scrollbar(
                                                   child:  ListView.builder(
@@ -1114,6 +1127,63 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
                                   ),
                                 ),
+                              ),
+
+                              ListView.builder(
+                                  physics: BouncingScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount:  getBu == null ? 0 : getBu.length,
+                                  itemBuilder: (BuildContext context, int index0) {
+                                    int num = index0;
+                                    num++;
+                                    return Container(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: EdgeInsets.fromLTRB(17.0,10.0, 0.0,10.0),
+                                            child: Text('$num. ${getBu[index0]['d_bu_name'].toString()}',style: TextStyle(color: Colors.deepOrange,fontWeight: FontWeight.bold ,fontSize: 15.0)),
+                                          ),
+//                                              Padding(
+//                                                padding: EdgeInsets.fromLTRB(17.0,0.0, 0.0,10.0),
+//                                                child: Text('${getBu[index0]['d_tenant'].toString()}',style: TextStyle(fontSize: 15.0)),
+//                                              ),
+                                          ListView.builder(
+                                              physics: BouncingScrollPhysics(),
+                                              shrinkWrap: true,
+                                              itemCount:  getTenant == null ? 0 : getTenant.length,
+                                              itemBuilder: (BuildContext context, int index) {
+                                                return Visibility(
+                                                  visible: getTenant[index]['bu_id'] != getBu[index0]['d_bu_id'] ? false : true,
+                                                  child: Container(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: <Widget>[
+                                                        Padding(
+                                                          padding: EdgeInsets.fromLTRB(15.0,0.0, 0.0,1.0),
+                                                          child: OutlineButton(
+                                                            borderSide: BorderSide(color: Colors.transparent),
+                                                            highlightedBorderColor: Colors.deepOrange,
+                                                            highlightColor: Colors.transparent,
+                                                            child:Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                Text('${getTenant[index]['tenant_name']}'),
+                                                                Text('₱${oCcy.format(int.parse(getTenant[index]['total'].toString()))}'),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
                               ),
 
                               Padding(

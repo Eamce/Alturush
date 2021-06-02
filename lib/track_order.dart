@@ -175,7 +175,9 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
     return WillPopScope(
       onWillPop: () async {
         Navigator.pop(context, () {
-          setState(() {});
+          setState(() {
+
+          });
         });
         return true;
       },
@@ -317,7 +319,7 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                                              // viewInside(listGetTicketNoFood[index]['d_ticket_id'],listGetTicketNoFood[index]['d_customerId']);
                                             },
                                             child: Container(
-                                              height: 93.0,
+                                              height: 100.0,
                                               child: Card(
                                                 // elevation: 0.0,
                                                 child: Column(

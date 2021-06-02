@@ -360,7 +360,7 @@ class RapidA {
     var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Map dataUser;
-    final response = await client.post(Uri.parse("$server/getAmountPertenant_r"),body:{
+    final response = await client.post(Uri.parse("$server/getTenant_r"),body:{
       'cusId':prefs.getString('s_customerId'),
     });
     dataUser = jsonDecode(response.body);
@@ -462,13 +462,6 @@ class RapidA {
   }
 
   Future addToCartNew(prodId,uomId,_counter,uomPrice,choiceUomId,choiceId,choicePrice,flavorId ,flavorPrice,selectedSideOnPrice,selectedSideItems ,selectedSideItemsUom) async{
-    // print(prodId);
-    // print(uomId);
-    // print(_counter);
-    // print(uomPrice);
-    // print(selectedSideItems);
-    // print(choicePrice);
-
     var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String userID = prefs.getString('s_customerId');
@@ -1241,6 +1234,19 @@ class RapidA {
     Map dataUser;
     final response = await client.post(Uri.parse("$server/viewTenantCategories_r"),body:{
       'tenantId':encrypt(tenantId)
+    });
+    dataUser = jsonDecode(response.body);
+    client.close();
+    return dataUser;
+  }
+
+  Future checkIfBf() async{
+    var client = http.Client();
+    Map dataUser;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var userID = prefs.getString('s_customerId');
+    final response = await client.post(Uri.parse("$server/checkIfBf_r"),body:{
+      'userID':encrypt(userID)
     });
     dataUser = jsonDecode(response.body);
     client.close();

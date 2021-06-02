@@ -129,12 +129,16 @@ class _GroceryMain extends State<GroceryMain> with SingleTickerProviderStateMixi
     });
   }
 
+  selectGcCategory1() async{
+
+  }
   void selectGcCategory(BuildContext context,logo,businessUnit,bUnitCode) async{
     List categoryData;
     var res = await db.getGcCategories();
     if (!mounted) return;
     setState(() {
       categoryData = res['user_details'];
+      print(categoryData);
     });
     showModalBottomSheet(
         isScrollControlled: true,
@@ -181,7 +185,7 @@ class _GroceryMain extends State<GroceryMain> with SingleTickerProviderStateMixi
                                         child: Column(
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: <Widget>[
-                                            ListTile(
+                                             ListTile(
                                               leading:Container(
                                                 width: 60.0,
                                                 height: 60.0,
@@ -222,6 +226,7 @@ class _GroceryMain extends State<GroceryMain> with SingleTickerProviderStateMixi
   @override
   void initState() {
     super.initState();
+    selectGcCategory1();
     futureLoadQuotes();
     loadProfile();
     loadBu();

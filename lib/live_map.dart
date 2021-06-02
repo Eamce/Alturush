@@ -7,6 +7,7 @@ import 'db_helper.dart';
 // import "package:latlong/latlong.dart" as latLng;
 import 'package:geolocator/geolocator.dart';
 import 'package:arush/chat/chat.dart';
+import 'package:sleek_button/sleek_button.dart';
 
 class ViewOrderStatus extends StatefulWidget {
   final ticketNo;
@@ -157,7 +158,7 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
           IconButton(
               icon: Icon(Icons.chat_bubble, color: Colors.black54),
               onPressed: () {
-                Navigator.of(context).push(chartRoute());
+                Navigator.of(context).push(chartRoute(firstName,lastName));
               }
           ),
         ],
@@ -186,6 +187,16 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
                       Padding(
                         padding: EdgeInsets.fromLTRB(15, 10, 5, 5),
                         child: new Text('Vehicle: $motorBrand $motorDesc', overflow: TextOverflow.clip, style: GoogleFonts.openSans(fontStyle: FontStyle.normal, fontSize: 18.0),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(15, 10, 5, 5),
+                        child: new Text('Rider fee: $motorBrand $motorDesc', overflow: TextOverflow.clip, style: GoogleFonts.openSans(fontStyle: FontStyle.normal, fontSize: 18.0),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(15, 10, 5, 5),
+                        child: new Text('Total: $motorBrand $motorDesc', overflow: TextOverflow.clip, style: GoogleFonts.openSans(fontStyle: FontStyle.normal, fontSize: 18.0),
                         ),
                       ),
                      ],
@@ -232,6 +243,8 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
               ),
             ),
           ),
+
+
 
           // Container(
           //   height: height/2,
@@ -359,9 +372,9 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
   }
 }
 
-Route chartRoute() {
+Route chartRoute(firstName,lastName) {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => Chat(),
+    pageBuilder: (context, animation, secondaryAnimation) => Chat(firstName:firstName,lastName:lastName),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1.0, 0.0);
       var end = Offset.zero;

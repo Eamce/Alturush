@@ -20,7 +20,7 @@ class LoadCart extends StatefulWidget {
 class _LoadCart extends State<LoadCart> {
   final db = RapidA();
   final oCcy = new NumberFormat("#,##0.00", "en_US");
-  List loadCartData;
+  List loadCartData = [];
   List lGetAmountPerTenant;
   List loadSubtotal;
   var isLoading = true;
@@ -226,8 +226,8 @@ class _LoadCart extends State<LoadCart> {
                            child: Row(
                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                              children: [
-                               Text('$f. ${lGetAmountPerTenant[index]['loc_bu_name']} - ${lGetAmountPerTenant[index]['loc_tenant_name']} ',style: TextStyle(fontSize: 13.0,fontWeight: FontWeight.bold)),
-                               Text('₱${oCcy.format(int.parse(lGetAmountPerTenant[index]['total_price'].toString()))}',style: TextStyle(fontSize: 13.0,fontWeight: FontWeight.bold)),
+                               Text('$f. ${lGetAmountPerTenant[index]['tenant_name']} ',style: TextStyle(fontSize: 13.0,fontWeight: FontWeight.bold)),
+                               Text('₱${oCcy.format(int.parse(lGetAmountPerTenant[index]['total'].toString()))}',style: TextStyle(fontSize: 13.0,fontWeight: FontWeight.bold)),
                              ],
                            ),
                          ),
@@ -389,6 +389,63 @@ class _LoadCart extends State<LoadCart> {
   }
 
 
+bool ignorePointer = false;
+ Future checkIfBf() async{
+   var res = await db.checkIfBf();
+   if (!mounted) return;
+   setState(() {
+     isLoading = false;
+     lGetAmountPerTenant = res['user_details'];
+     print(lGetAmountPerTenant);
+   });
+   if(lGetAmountPerTenant[0]['isavail'] == false){
+     ignorePointer = true;
+     showDialog<void>(
+       context: context,
+       builder: (BuildContext context) {
+         return  AlertDialog(
+           shape: RoundedRectangleBorder(
+               borderRadius: BorderRadius.all(Radius.circular(8.0))
+           ),
+           contentPadding: EdgeInsets.symmetric(horizontal:0.0, vertical: 20.0),
+           title: Center(
+             child: Container(
+               height: 100,
+               width: 100,
+               child: SvgPicture.asset("assets/svg/fried.svg"),
+             ),
+           ),
+           content: SingleChildScrollView(
+             child: ListBody(
+               children: <Widget>[
+                 Padding(
+                   padding:EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
+                   child:Center(
+                      child:Text("Some items can only be cook and deliver in specific time, please remove them to proceed.",textAlign: TextAlign.justify, maxLines: 3,style:TextStyle(fontSize: 18.0),),
+                   ),
+                 ),
+               ],
+             ),
+           ),
+           actions: <Widget>[
+             TextButton(
+               child: Text('Close',style: TextStyle(
+                 color: Colors.deepOrange,
+               ),),
+               onPressed: () async{
+                 Navigator.of(context).pop();
+               },
+             ),
+           ],
+         );
+       },
+     );
+   }
+   else{
+     ignorePointer = false;
+   }
+ }
+
 
 //  StreamController _event =StreamController<int>.broadcast();
   updateCartQty(id,qty) async{
@@ -401,6 +458,7 @@ class _LoadCart extends State<LoadCart> {
     super.initState();
     loadCart();
     loadTotal();
+    checkIfBf();
   }
 
   @override
@@ -447,6 +505,7 @@ class _LoadCart extends State<LoadCart> {
                   Navigator.of(context).pop();
                   await db.removeItemFromCart(prodId);
                   loadCart();
+                  checkIfBf();
                 }
             ),
           ],
@@ -535,28 +594,28 @@ class _LoadCart extends State<LoadCart> {
                                             child:Column(
                                               crossAxisAlignment:CrossAxisAlignment.start,
                                               children: <Widget>[
-                                                Padding(
-                                                    padding: EdgeInsets.fromLTRB(15, 10, 5, 5),
-                                                    child:Text('${loadCartData[index]['main_item']['product_name']}', overflow: TextOverflow.clip,
-                                                      style: GoogleFonts.openSans(
-                                                          fontStyle:
-                                                          FontStyle.normal,
-                                                          fontSize: 13.0),
-                                                    ),
+                                                SingleChildScrollView(
+                                                  scrollDirection: Axis.horizontal,
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.start,
+                                                    children: <Widget>[
+                                                      Padding(
+                                                        padding: EdgeInsets.fromLTRB(0, 10, 5, 5),
+                                                        child: Text('${loadCartData[index]['main_item']['product_name']}',
+                                                          style: GoogleFonts.openSans(
+                                                              fontStyle:
+                                                              FontStyle.normal,
+                                                              fontSize: 11.0),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
-                                                // Padding(
-                                                //   padding: EdgeInsets.fromLTRB(15, 0, 5, 5),
-                                                //   child: new Text('${loadCartData[index]['main_item']['bu_name']} - ${loadCartData[index]['main_item']['tenant_name']}', overflow: TextOverflow.clip,
-                                                //     style: GoogleFonts.openSans(
-                                                //         fontStyle:
-                                                //         FontStyle.normal,
-                                                //         fontSize: 13.0),
-                                                //   ),
-                                                // ),
+
                                                 Row(
                                                   children: <Widget>[
                                                     Padding(
-                                                      padding: EdgeInsets.fromLTRB(15, 0, 5, 0),
+                                                      padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
                                                       child: new Text(
                                                         "₱ ${loadCartData[index]['main_item']['price'].toString()}",
                                                         style: TextStyle(
@@ -583,7 +642,6 @@ class _LoadCart extends State<LoadCart> {
                                                             }else{
                                                               removeFromCart(loadCartData[index]['main_item']['id']);
                                                             }
-
                                                           },
                                                           elevation: 1.0,
 //                                                            fillColor: Colors.transparent,
@@ -741,25 +799,33 @@ class _LoadCart extends State<LoadCart> {
                                 width: 2.0,
                               ),
                               Flexible(
-                                child: SleekButton(
-                                  onTap: () async {
-                                    SharedPreferences prefs = await SharedPreferences.getInstance();
-                                    String username = prefs.getString('s_customerId');
-                                    if(username == null){
-                                      await Navigator.of(context).push(_signIn());
-                                    }else{
-                                      selectType(context);
-                                    }
-                                  },
-                                  style: SleekButtonStyle.flat(
-                                    color: Colors.deepOrange,
-                                    inverted: false,
-                                    rounded: false,
-                                    size: SleekButtonSize.big,
-                                    context: context,
-                                  ),
-                                  child: Center(
-                                    child: Text("₱ ${oCcy.format (grandTotal)} Next", style:TextStyle(fontStyle: FontStyle.normal, fontWeight: FontWeight.bold, fontSize: 13.0),
+                                child: IgnorePointer(
+                                  ignoring: ignorePointer,
+                                  child: SleekButton(
+                                    onTap: () async {
+                                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                                      String username = prefs.getString('s_customerId');
+                                      if(username == null){
+                                        await Navigator.of(context).push(_signIn());
+                                      }else{
+                                        if(lGetAmountPerTenant[0]['isavail']==false){
+                                          checkIfBf();
+                                        }else{
+                                          selectType(context);
+                                        }
+
+                                      }
+                                    },
+                                    style: SleekButtonStyle.flat(
+                                      color: Colors.deepOrange,
+                                      inverted: false,
+                                      rounded: false,
+                                      size: SleekButtonSize.big,
+                                      context: context,
+                                    ),
+                                    child: Center(
+                                      child: Text("₱ ${oCcy.format (grandTotal)} Next", style:TextStyle(fontStyle: FontStyle.normal, fontWeight: FontWeight.bold, fontSize: 13.0),
+                                      ),
                                     ),
                                   ),
                                 ),

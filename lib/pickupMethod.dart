@@ -387,6 +387,7 @@ class _PlaceOrderPickUp extends State<PlaceOrderPickUp>    with SingleTickerProv
                                                               padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
                                                               child: InkWell(
                                                                 onTap: (){
+                                                                  _deliveryTime.clear();
                                                                   FocusScope.of(context).requestFocus(FocusNode());
                                                                   showDialog<void>(
                                                                     context: context,
@@ -398,12 +399,12 @@ class _PlaceOrderPickUp extends State<PlaceOrderPickUp>    with SingleTickerProv
                                                                         title: Text("Set date for this delivery",style: TextStyle(fontSize: 20.0),),
                                                                         contentPadding:EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
                                                                         content: Container(
-                                                                          height:290.0, // Change as per your requirement
+                                                                          height:230.0, // Change as per your requirement
                                                                           width: 360.0, // Change as per your requirement
                                                                           child: Scrollbar(
                                                                             child:ListView.builder(
                                                                               physics: BouncingScrollPhysics(),
-                                                                              itemCount: 5,
+                                                                              itemCount: 4,
                                                                               itemBuilder: (BuildContext context, int index1) {
                                                                                 int n = 0;
                                                                                 n = index1;
@@ -503,6 +504,7 @@ class _PlaceOrderPickUp extends State<PlaceOrderPickUp>    with SingleTickerProv
                                                               padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
                                                               child: InkWell(
                                                                 onTap: (){
+
                                                                   getTrueTime();
                                                                   if(_deliveryDate[index].text.isEmpty){
                                                                     Fluttertoast.showToast(
@@ -528,7 +530,7 @@ class _PlaceOrderPickUp extends State<PlaceOrderPickUp>    with SingleTickerProv
                                                                           contentPadding:
                                                                           EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
                                                                           content: Container(
-                                                                            height:290.0, // Change as per your requirement
+                                                                            height:230.0, // Change as per your requirement
                                                                             width: 360.0, // Change as per your requirement
                                                                             child: Scrollbar(
                                                                               child:  ListView.builder(

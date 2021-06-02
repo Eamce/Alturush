@@ -162,6 +162,19 @@ class _DiscountManager extends State<DiscountManager> {
                         );
                       }
                   ),
+                  TextButton(
+                    child: Text(
+                      'Tap here to upload new ID',
+                      style: TextStyle(
+                        color: Colors.deepOrange,
+                      ),
+                    ),
+                    onPressed: () async{
+                      await Navigator.of(context).push(addIds());
+                      checkIfHasId();
+                      loadId();
+                    },
+                  ),
                 ],
               ),
             ),

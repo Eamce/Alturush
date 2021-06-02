@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Chat extends StatefulWidget {
+  final firstName;
+  final lastName;
+
+  Chat({Key key, @required this.firstName,this.lastName}) : super(key: key);
   @override
   _Chat createState() => _Chat();
 }
@@ -33,7 +37,7 @@ class _Chat extends State<Chat> {
           icon: Icon(Icons.arrow_back, color: Colors.black,size: 23,),
           onPressed: () => Navigator.of(context).maybePop(),
         ),
-        title: Text("Kevin john",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
+        title: Text("${widget.firstName}  ${widget.lastName}" ,style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
       ),
       body: isLoading
           ? Center(

@@ -209,6 +209,7 @@ class _ViewItem extends State<ViewItem>{
   @override
   void initState(){
     super.initState();
+    side.clear();
     loadStore();
   }
 

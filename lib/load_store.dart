@@ -78,7 +78,6 @@ class _LoadStore extends State<LoadStore> {
       cartLoading = false;
       listCounter = res['user_details'];
       cartCount = listCounter[0]['num'];
-      print(cartCount);
     });
   }
 
@@ -98,7 +97,6 @@ class _LoadStore extends State<LoadStore> {
     }else{
       loadStore();
     }
-
     checkEmptyStore();
     categoryName = widget.categoryName;
   }
@@ -234,6 +232,7 @@ class _LoadStore extends State<LoadStore> {
     setState(() {
       getItemsByCategoriesList = res['user_details'];
       cat = true;
+      print(getItemsByCategoriesList);
     });
   }
 
