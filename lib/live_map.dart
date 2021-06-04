@@ -132,6 +132,7 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
   void initState() {
     getUserLocation();
     loadRiderPage();
+    print(widget.ticketNo);
     super.initState();
   }
   @override
@@ -207,8 +208,8 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
-                          width: width/2.4,
-                          height: height/4,
+                          width: width / 2.4,
+                          height: height / 4,
                           decoration: new BoxDecoration(
                             image: new DecorationImage(
                               image: new NetworkImage(riderPhoto),
