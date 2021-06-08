@@ -483,6 +483,7 @@ class RapidA {
     client.close();
   }
 
+
   Future selectSuffixCi() async{
     var client = http.Client();
     Map dataUser;
@@ -1247,6 +1248,18 @@ class RapidA {
     var userID = prefs.getString('s_customerId');
     final response = await client.post(Uri.parse("$server/checkIfBf_r"),body:{
       'userID':encrypt(userID)
+    });
+    dataUser = jsonDecode(response.body);
+    client.close();
+    return dataUser;
+  }
+
+  Future getTotalFee(ticketID) async{
+    var client = http.Client();
+    Map dataUser;
+
+    final response = await client.post(Uri.parse("$server/checkIfBf_r"),body:{
+
     });
     dataUser = jsonDecode(response.body);
     client.close();

@@ -19,6 +19,7 @@ class ViewOrderStatus extends StatefulWidget {
 class _ViewOrderStatus extends State<ViewOrderStatus>{
   final db = RapidA();
   List riderList;
+  List loadTotalData = [];
   Position position;
   var lat;
   var long;
@@ -112,6 +113,15 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
 //
 //   }
 
+  void getTotalFee() async{
+    var res = await db.getTotalFee(widget.ticketNo);
+    if (!mounted) return;
+    setState(() {
+      loadTotalData = res['user_details'];
+      print(loadTotalData);
+    });
+  }
+
   void getUserLocation() async{
     try {
       Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation);
@@ -132,6 +142,7 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
   void initState() {
     getUserLocation();
     loadRiderPage();
+    getTotalFee();
     print(widget.ticketNo);
     super.initState();
   }
