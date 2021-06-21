@@ -44,6 +44,7 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
       motorDesc = riderList[0]['rm_color'];
       riderPhoto = riderList[0]['r_picture'];
       riderVehiclePhoto = riderList[0]['rm_picture'];
+
     });
   }
 
@@ -118,32 +119,31 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
     if (!mounted) return;
     setState(() {
       loadTotalData = res['user_details'];
-      print(loadTotalData);
+      _isGettingLocation = false;
     });
   }
 
-  void getUserLocation() async{
-    try {
-      Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation);
-      position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation);
-      if (!mounted) return;
-      setState(() {
-        lat = position.latitude;
-        long = position.longitude;
-        _isGettingLocation = false;
-      });
-    } on PlatformException catch (e) {
-      print(e);
-//      return null;
-    }
-  }
+//  void getUserLocation() async{
+//    try {
+//      Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation);
+//      position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation);
+//      if (!mounted) return;
+//      setState(() {
+//        lat = position.latitude;
+//        long = position.longitude;
+//        _isGettingLocation = false;
+//      });
+//    } on PlatformException catch (e) {
+//      print(e);
+////      return null;
+//    }
+//  }
 
   @override
   void initState() {
-    getUserLocation();
+//    getUserLocation();
     loadRiderPage();
     getTotalFee();
-    print(widget.ticketNo);
     super.initState();
   }
   @override
@@ -203,12 +203,12 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
                       ),
                       Padding(
                         padding: EdgeInsets.fromLTRB(15, 10, 5, 5),
-                        child: new Text('Rider fee: $motorBrand $motorDesc', overflow: TextOverflow.clip, style: GoogleFonts.openSans(fontStyle: FontStyle.normal, fontSize: 18.0),
+                        child: new Text('Rider fee: ${loadTotalData[0]['delivery_charge']}', overflow: TextOverflow.clip, style: GoogleFonts.openSans(fontStyle: FontStyle.normal, fontSize: 18.0),
                         ),
                       ),
                       Padding(
                         padding: EdgeInsets.fromLTRB(15, 10, 5, 5),
-                        child: new Text('Total: $motorBrand $motorDesc', overflow: TextOverflow.clip, style: GoogleFonts.openSans(fontStyle: FontStyle.normal, fontSize: 18.0),
+                        child: new Text('Total: ${loadTotalData[0]['amount']}', overflow: TextOverflow.clip, style: GoogleFonts.openSans(fontStyle: FontStyle.normal, fontSize: 18.0),
                         ),
                       ),
                      ],

@@ -16,9 +16,10 @@ class RapidA {
     return _instance;
   }
 
-  // String server = "https://app1.alturush.com";
-  String server = "http://172.16.46.130/rapida";
-  // String server = "http://203.177.223.59:8006/";
+  //  String server = "https://app1.alturush.com";
+  //  String server = "http://172.16.46.130/rapida";
+//    String server = "http://192.168.1.2:3333/rapida";
+    String server = "http://203.177.223.59:8006/";
 
   final key = Key.fromUtf8('SoAxVBnw8PYHzHHTFBQdG0MFCLNdmGFf'); //32 chars
   final iv = IV.fromUtf8('T1g994xo2UAqG81M'); //16 chars
@@ -1255,11 +1256,12 @@ class RapidA {
   }
 
   Future getTotalFee(ticketID) async{
+    print(ticketID);
     var client = http.Client();
     Map dataUser;
 
-    final response = await client.post(Uri.parse("$server/checkIfBf_r"),body:{
-
+    final response = await client.post(Uri.parse("$server/getTotalFee_r"),body:{
+          'ticketID':ticketID.toString()
     });
     dataUser = jsonDecode(response.body);
     client.close();
