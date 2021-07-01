@@ -698,7 +698,7 @@ class _LoadStore extends State<LoadStore> {
               ),
             ),
             Padding(
-              padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
+              padding:EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
               child: Row(
                 children: <Widget>[
                   SleekButton(
@@ -706,7 +706,7 @@ class _LoadStore extends State<LoadStore> {
                       //viewCartTenants();
                       displayCategory(context);
                     },
-                    style: SleekButtonStyle.flat(
+                    style: SleekButtonStyle.outlined(
                       color: Colors.deepOrange,
                       inverted: false,
                       rounded: false,
@@ -714,10 +714,7 @@ class _LoadStore extends State<LoadStore> {
                       context: context,
                     ),
                     child: Center(
-                      child: Icon(
-                        Icons.apps,
-                        size: 17.0,
-                      ),
+                      child:Text("Categories",style: TextStyle(fontSize: 14.0),)
                     ),
                   ),
                   SizedBox(

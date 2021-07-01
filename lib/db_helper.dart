@@ -16,10 +16,10 @@ class RapidA {
     return _instance;
   }
 
-  //  String server = "https://app1.alturush.com";
-  //  String server = "http://172.16.46.130/rapida";
-//    String server = "http://192.168.1.2:3333/rapida";
-    String server = "http://203.177.223.59:8006/";
+//  String server = "https://app1.alturush.com";
+    String server = "http://172.16.46.130/rapida";
+//  String server = "http://192.168.1.2:3333/rapida";
+//  String server = "http://203.177.223.59:8006/";
 
   final key = Key.fromUtf8('SoAxVBnw8PYHzHHTFBQdG0MFCLNdmGFf'); //32 chars
   final iv = IV.fromUtf8('T1g994xo2UAqG81M'); //16 chars
@@ -212,7 +212,7 @@ class RapidA {
     var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Map dataUser;
-    final response = await client.post(Uri.parse("$server/getBu_r"),body:{
+    final response = await client.post(Uri.parse("$server/getBu_r1"),body:{
       'cusId':prefs.getString('s_customerId')
     });
     dataUser = jsonDecode(response.body);
@@ -544,10 +544,10 @@ class RapidA {
 
   Future savePickup(deliveryDateData,deliveryTimeData,subtotal,tender) async{
 
-   // print(deliveryDateData);
-   // print(deliveryTimeData);
-   // print(subtotal);
-   // print(tender);
+   print(deliveryDateData);
+   print(deliveryTimeData);
+   print(subtotal);
+   print(tender);
     var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await client.post(Uri.parse("$server/savePickup_r"),body:{
@@ -636,8 +636,6 @@ class RapidA {
     client.close();
     return dataUser;
   }
-
-//  Future listenCartSubtotal() async{
 //    String userID;
 //    SharedPreferences prefs = await SharedPreferences.getInstance();
 //    String status = prefs.getString('s_status');
@@ -650,6 +648,8 @@ class RapidA {
 //    final response = await http.post("$server/getSubtotal_r",body:{
 //      'customerId':userID
 //    });
+
+//  Future listenCartSubtotal() async{
 //    dataUser = jsonDecode(response.body);
 //    return dataUser;
 //  }
@@ -773,6 +773,14 @@ class RapidA {
   }
 
   Future addToCartGc(buCode,prodId,itemCode,uomSymbol,uomId,_counter) async{
+    print(buCode);
+    print(prodId);
+    print(itemCode);
+    print(uomSymbol);
+    print(uomId);
+    print(_counter);
+
+
     var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var userID = prefs.getString('s_customerId');
@@ -815,6 +823,7 @@ class RapidA {
     Map dataUser;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var userID = prefs.getString('s_customerId');
+    print(userID);
     final response = await client.post(Uri.parse("$server/loadGcSubTotal_r"),body:{
       'customerId':userID
     });

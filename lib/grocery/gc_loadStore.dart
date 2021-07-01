@@ -214,7 +214,7 @@ class _GcLoadStore extends State<GcLoadStore> {
     setState(() {
 //      cartLoading = false;
       loadSubtotal = res['user_details'];
-      if(loadSubtotal[0]['d_subtotal']==null){
+      if(loadSubtotal[0]['d_subtotal'].toString().isEmpty){
         subTotal = 0;
       }else{
         subTotal = loadSubtotal[0]['d_subtotal'].toString();
@@ -674,14 +674,14 @@ class _GcLoadStore extends State<GcLoadStore> {
               ),
             ),
             Padding(
-              padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
+              padding:EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
               child: Row(
                 children: <Widget>[
                   SleekButton(
                     onTap:(){
                       selectGcCategory(context);
                     },
-                    style: SleekButtonStyle.flat(
+                    style: SleekButtonStyle.outlined(
                       color: Colors.green,
                       inverted: false,
                       rounded: false,
@@ -689,9 +689,8 @@ class _GcLoadStore extends State<GcLoadStore> {
                       context: context,
                     ),
                     child: Center(
-                      child: Icon(
-                        Icons.apps,
-                        size: 17.0,
+                      child: Center(
+                          child:Text("Categories",style: TextStyle(fontSize: 14.0),)
                       ),
                     ),
                   ),

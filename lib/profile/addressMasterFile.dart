@@ -18,14 +18,13 @@ class _AddressMasterFile extends State<AddressMasterFile> {
   bool exist = false;
   // bool exist = true;
 
-
   Future loadAddress() async{
    var res = await db.loadAddress();
     if (!mounted) return;
     setState(() {
       isLoading = false;
       loadIdList = res['user_details'];
-
+      print(loadIdList);
     });
   }
 

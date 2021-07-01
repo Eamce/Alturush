@@ -1144,10 +1144,6 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                             padding: EdgeInsets.fromLTRB(17.0,10.0, 0.0,10.0),
                                             child: Text('$num. ${getBu[index0]['d_bu_name'].toString()}',style: TextStyle(color: Colors.deepOrange,fontWeight: FontWeight.bold ,fontSize: 15.0)),
                                           ),
-//                                              Padding(
-//                                                padding: EdgeInsets.fromLTRB(17.0,0.0, 0.0,10.0),
-//                                                child: Text('${getBu[index0]['d_tenant'].toString()}',style: TextStyle(fontSize: 15.0)),
-//                                              ),
                                           ListView.builder(
                                               physics: BouncingScrollPhysics(),
                                               shrinkWrap: true,
@@ -1160,16 +1156,17 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                                       crossAxisAlignment: CrossAxisAlignment.start,
                                                       children: <Widget>[
                                                         Padding(
-                                                          padding: EdgeInsets.fromLTRB(15.0,0.0, 0.0,1.0),
-                                                          child: OutlineButton(
-                                                            borderSide: BorderSide(color: Colors.transparent),
-                                                            highlightedBorderColor: Colors.deepOrange,
-                                                            highlightColor: Colors.transparent,
+                                                          padding: EdgeInsets.fromLTRB(25.0,0.0, 25.0,1.0),
+                                                          child: OutlinedButton(
+                                                            onPressed: null,
+                                                            style: TextButton.styleFrom(
+                                                              shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                                                            ),
                                                             child:Row(
                                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                               children: [
-                                                                Text('${getTenant[index]['tenant_name']}'),
-                                                                Text('₱${oCcy.format(int.parse(getTenant[index]['total'].toString()))}'),
+                                                                Text('${getTenant[index]['tenant_name']}',style: TextStyle(color: Colors.black),),
+                                                                Text('₱${oCcy.format(int.parse(getTenant[index]['total'].toString()))}',style: TextStyle(color: Colors.black),),
                                                               ],
                                                             ),
                                                           ),

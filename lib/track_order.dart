@@ -26,6 +26,7 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
     setState(() {
       listGetTicketNoFood = res['user_details'];
       isLoading = false;
+      print(listGetTicketNoFood);
     });
   }
 
@@ -105,38 +106,7 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                           //                       child: Text('$f. ${lGetAmountPerTenant[index]['d_bu_name']} - ${lGetAmountPerTenant[index]['d_tenant']}  ₱${oCcy.format(double.parse(lGetAmountPerTenant[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
                         ),
                       ),
-                      InkWell(
-                        onTap: (){
-                          Navigator.of(context).pop();
-                          //wish list
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 20.0),
-                          child:Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text("Your wish list",style: TextStyle(fontSize: 15.0,fontWeight: FontWeight.bold)),
-                            ],
-                          ),
-                          //                       child: Text('$f. ${lGetAmountPerTenant[index]['d_bu_name']} - ${lGetAmountPerTenant[index]['d_tenant']}  ₱${oCcy.format(double.parse(lGetAmountPerTenant[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: (){
-                          Navigator.of(context).pop();
-                          //acct setting
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 20.0),
-                          child:Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text("Account settings",style: TextStyle(fontSize: 15.0,fontWeight: FontWeight.bold)),
-                            ],
-                          ),
-                          //                       child: Text('$f. ${lGetAmountPerTenant[index]['d_bu_name']} - ${lGetAmountPerTenant[index]['d_tenant']}  ₱${oCcy.format(double.parse(lGetAmountPerTenant[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
-                        ),
-                      ),
+
                     ],
                   );
                 },
@@ -248,27 +218,6 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                                                 ),
                                               ],
                                             ),
-                                            // Padding(
-                                            //     padding: EdgeInsets.only(top: 90.0, right: 90.0),
-                                            //     child: new Row(
-                                            //       mainAxisAlignment:
-                                            //       MainAxisAlignment.center,
-                                            //       children: <Widget>[
-                                            //         GestureDetector(
-                                            //             onTap: () {
-                                            //
-                                            //             },
-                                            //             child: new CircleAvatar(
-                                            //               backgroundColor: Colors.deepOrange,
-                                            //               radius: 20.0,
-                                            //               child: new Icon(
-                                            //                 Icons.camera_alt,
-                                            //                 color: Colors.white,
-                                            //               ),
-                                            //             )
-                                            //         ),
-                                            //       ],
-                                            //     )),
                                           ]),
                                     ),
                                     Padding(

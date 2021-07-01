@@ -54,6 +54,7 @@ class _LoadCart extends State<LoadCart> {
   List loadFlavors;
   List loadAddons;
   List loadTotalData;
+  List getBu;
 
   Future loadCart() async {
     var res = await db.loadCartData();
@@ -62,11 +63,16 @@ class _LoadCart extends State<LoadCart> {
       isLoading = false;
       loadCartData = res['user_details'];
       loadIMainItems = loadCartData;
-      // print(loadCartData[1]['choices'].length);
-
     });
   }
 
+  Future getBuSegregate() async{
+    var res = await db.getBuSegregate();
+    if (!mounted) return;
+    setState(() {
+      getBu = res['user_details'];
+    });
+  }
   Future loadTotal() async{
     var res = await db.loadSubTotal();
     if (!mounted) return;
@@ -78,7 +84,6 @@ class _LoadCart extends State<LoadCart> {
   }
 
   viewAddon(BuildContext context,mainItemIndex) {
-    print(mainItemIndex);
     showModalBottomSheet(
         isScrollControlled: true,
         isDismissible: true,
@@ -226,7 +231,7 @@ class _LoadCart extends State<LoadCart> {
                            child: Row(
                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                              children: [
-                               Text('$f. ${lGetAmountPerTenant[index]['tenant_name']} ',style: TextStyle(fontSize: 13.0,fontWeight: FontWeight.bold)),
+                               Text('$f. ${lGetAmountPerTenant[index]['bu_name']} ${lGetAmountPerTenant[index]['tenant_name']} ',style: TextStyle(fontSize: 13.0,fontWeight: FontWeight.bold)),
                                Text('₱${oCcy.format(int.parse(lGetAmountPerTenant[index]['total'].toString()))}',style: TextStyle(fontSize: 13.0,fontWeight: FontWeight.bold)),
                              ],
                            ),
@@ -396,7 +401,6 @@ bool ignorePointer = false;
    setState(() {
      isLoading = false;
      lGetAmountPerTenant = res['user_details'];
-     print(lGetAmountPerTenant);
    });
    if(lGetAmountPerTenant[0]['isavail'] == false){
      ignorePointer = true;
@@ -458,6 +462,7 @@ bool ignorePointer = false;
     super.initState();
     loadCart();
     loadTotal();
+    getBuSegregate();
     checkIfBf();
   }
 
@@ -466,9 +471,7 @@ bool ignorePointer = false;
     super.dispose();
   }
 
-
   void removeFromCart(prodId) async{
-    print(prodId);
     showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -505,6 +508,7 @@ bool ignorePointer = false;
                   Navigator.of(context).pop();
                   await db.removeItemFromCart(prodId);
                   loadCart();
+                  getBuSegregate();
                   checkIfBf();
                 }
             ),
@@ -563,190 +567,212 @@ bool ignorePointer = false;
                       onRefresh: loadCart,
                       child: Scrollbar(
                         child: ListView.builder(
-//                            shrinkWrap: true,
-                            itemCount:loadIMainItems == null ? 0 : loadIMainItems.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return Container(
-                                height: 150.0,
-                                width: 30.0,
-                                child: Card(
-                                  color: Colors.transparent,
-                                  child: Column(
+                          itemCount:  getBu == null ? 0 : getBu.length,
+                          itemBuilder: (BuildContext context, int index0) {
+
+                            return Container(
+                                child:Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                    children: [
-                                      Row(
-                                        children: <Widget>[
-                                          Padding(
-                                            padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: EdgeInsets.fromLTRB(17.0,25.0, 0.0,0.0),
+                                        child: Text('${getBu[index0]['d_bu_name'].toString()} ${getBu[index0]['d_tenant_name'].toString()}',style: TextStyle(color: Colors.black54,fontWeight: FontWeight.bold ,fontSize: 17.0)),
+                                      ),
+                                       ListView.builder(
+                                           physics: BouncingScrollPhysics(),
+                                           shrinkWrap: true,
+                                          itemCount:loadIMainItems == null ? 0 : loadIMainItems.length,
+                                          itemBuilder: (BuildContext context, int index) {
+                                            return Visibility(
+                                              visible: loadCartData[index]['main_item']['tenant_id'] != getBu[index0]['d_tenant_id'] ? false : true,
                                               child: Container(
-                                                width: 80.0,
-                                                height: 60.0,
-                                                decoration: new BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  image: new DecorationImage(
-                                                    image: new NetworkImage(loadCartData[index]['main_item']['image']),
-                                                    fit: BoxFit.scaleDown,
-                                                  ),
-                                                )),
-                                          ),
-                                          Container(
-                                            child:Column(
-                                              crossAxisAlignment:CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                SingleChildScrollView(
-                                                  scrollDirection: Axis.horizontal,
-                                                  child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment.start,
-                                                    children: <Widget>[
-                                                      Padding(
-                                                        padding: EdgeInsets.fromLTRB(0, 10, 5, 5),
-                                                        child: Text('${loadCartData[index]['main_item']['product_name']}',
-                                                          style: GoogleFonts.openSans(
-                                                              fontStyle:
-                                                              FontStyle.normal,
-                                                              fontSize: 11.0),
-                                                        ),
-                                                      ),
+                                                height: 150.0,
+                                                width: 30.0,
+                                                child: Card(
+                                                  color: Colors.transparent,
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                    children: [
+                                                      Divider(),
+                                                      Row(
+                                                        children: <Widget>[
+                                                          Padding(
+                                                            padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
+                                                            child: Container(
+                                                                width: 80.0,
+                                                                height: 60.0,
+                                                                decoration: new BoxDecoration(
+                                                                  shape: BoxShape.circle,
+                                                                  image: new DecorationImage(
+                                                                    image: new NetworkImage(loadCartData[index]['main_item']['image']),
+                                                                    fit: BoxFit.scaleDown,
+                                                                  ),
+                                                                )),
+                                                          ),
+                                                          Container(
+                                                            child:Column(
+                                                              crossAxisAlignment:CrossAxisAlignment.start,
+                                                              children: <Widget>[
+                                                                SingleChildScrollView(
+                                                                  scrollDirection: Axis.horizontal,
+                                                                  child: Row(
+                                                                    mainAxisAlignment: MainAxisAlignment.start,
+                                                                    children: <Widget>[
+                                                                      Padding(
+                                                                        padding: EdgeInsets.fromLTRB(0, 10, 5, 5),
+                                                                        child: Text('${loadCartData[index]['main_item']['product_name']}',
+                                                                          style: GoogleFonts.openSans(
+                                                                              fontStyle:
+                                                                              FontStyle.normal,
+                                                                              fontSize: 11.0),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+
+                                                                Row(
+                                                                  children: <Widget>[
+                                                                    Padding(
+                                                                      padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                                                                      child: new Text(
+                                                                        "₱ ${loadCartData[index]['main_item']['price'].toString()}",
+                                                                        style: TextStyle(
+                                                                          fontWeight:
+                                                                          FontWeight.bold,
+                                                                          fontSize: 15,
+                                                                          color: Colors.deepOrange,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                Row(
+                                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                                  children: <Widget>[
+                                                                    Padding(
+                                                                        padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                                                        child:RawMaterialButton(
+                                                                          onPressed: () async{
+                                                                            SharedPreferences prefs = await SharedPreferences.getInstance();
+                                                                            String username = prefs.getString('s_customerId');
+                                                                            if(username == null){
+                                                                              await Navigator.of(context).push(_signIn());
+                                                                            }else{
+                                                                              removeFromCart(loadCartData[index]['main_item']['id']);
+                                                                            }
+                                                                          },
+                                                                          elevation: 1.0,
+//                                                            fillColor: Colors.transparent,
+                                                                          child: Icon(
+                                                                            Icons.delete_outline,
+                                                                            size: 25.0,
+                                                                          ),
+//                                                          padding: EdgeInsets.all(15.0),
+                                                                          shape: CircleBorder(),
+                                                                        )
+                                                                    ),
+                                                                    Padding(
+                                                                      padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                                                      child:Container(
+                                                                        width: 50.0,
+                                                                        child: TextButton(
+                                                                          style: TextButton.styleFrom(
+                                                                            primary: Colors.blue,
+                                                                            onSurface: Colors.red,
+                                                                          ),
+                                                                          child: Text('-'),
+                                                                          onPressed: () async{
+                                                                            SharedPreferences prefs = await SharedPreferences.getInstance();
+                                                                            String username = prefs.getString('s_customerId');
+                                                                            if(username == null){
+                                                                              await Navigator.of(context).push(_signIn());
+                                                                            }else{
+                                                                              setState(() {
+                                                                                var x = loadCartData[index]['main_item']['quantity'];
+                                                                                int d = int.parse(x.toString());
+                                                                                loadCartData[index]['main_item']['quantity'] = d-=1;  //code ni boss rene
+                                                                                if(d<1){
+                                                                                  loadCartData[index]['main_item']['quantity']=1;
+                                                                                }
+                                                                              });
+                                                                              updateCartQty(loadCartData[index]['main_item']['id'].toString(),loadCartData[index]['main_item']['quantity'].toString());
+                                                                            }
+                                                                          },
+                                                                        ),
+                                                                      ),
+                                                                    ),
+
+                                                                    Padding(
+                                                                      padding:EdgeInsets.fromLTRB(1, 5, 5, 5),
+                                                                      child:Text(loadCartData[index]['main_item']['quantity'].toString()),
+                                                                    ),
+                                                                    Padding(
+                                                                      padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                                                      child:Container(
+                                                                        width: 50.0,
+                                                                        child: TextButton(
+                                                                          style: TextButton.styleFrom(
+                                                                            primary: Colors.blue,
+                                                                            onSurface: Colors.red,
+                                                                          ),
+                                                                          child: Text('+'),
+//                                                          color: Colors.deepOrange,
+                                                                          onPressed: ()async {
+                                                                            SharedPreferences prefs = await SharedPreferences.getInstance();
+                                                                            String username = prefs.getString('s_customerId');
+                                                                            if(username == null){
+                                                                              await Navigator.of(context).push(_signIn());
+                                                                            }else{
+                                                                              setState(() {
+                                                                                var x = loadCartData[index]['main_item']['quantity'];
+                                                                                int d = int.parse(x.toString());
+                                                                                loadCartData[index]['main_item']['quantity'] = d+=1;   //code ni boss rene
+                                                                              });
+                                                                              updateCartQty(loadCartData[index]['main_item']['id'].toString(),loadCartData[index]['main_item']['quantity'].toString());
+                                                                            }
+                                                                          },
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    Padding(
+                                                                      padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                                                      child:Container(
+                                                                        width: 50.0,
+                                                                        child: TextButton(
+                                                                          style: TextButton.styleFrom(
+                                                                            primary: Colors.blue,
+                                                                            onSurface: Colors.red,
+                                                                          ),
+                                                                          child: Text('more',style: TextStyle(color: Colors.black54),),
+                                                                          onPressed: ()async {
+                                                                            viewAddon(context, index);
+                                                                          },
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                )
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      )
                                                     ],
                                                   ),
+                                                  elevation: 0,
+                                                  margin: EdgeInsets.all(3),
                                                 ),
+                                              ),
+                                            );
+                                          }),
+                                    ]
+                                )
+                            );
+                          }
 
-                                                Row(
-                                                  children: <Widget>[
-                                                    Padding(
-                                                      padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
-                                                      child: new Text(
-                                                        "₱ ${loadCartData[index]['main_item']['price'].toString()}",
-                                                        style: TextStyle(
-                                                          fontWeight:
-                                                          FontWeight.bold,
-                                                          fontSize: 15,
-                                                          color: Colors.deepOrange,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Row(
-                                                  mainAxisAlignment: MainAxisAlignment.start,
-                                                  children: <Widget>[
-                                                    Padding(
-                                                      padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                                        child:RawMaterialButton(
-                                                          onPressed: () async{
-                                                            SharedPreferences prefs = await SharedPreferences.getInstance();
-                                                            String username = prefs.getString('s_customerId');
-                                                            if(username == null){
-                                                              await Navigator.of(context).push(_signIn());
-                                                            }else{
-                                                              removeFromCart(loadCartData[index]['main_item']['id']);
-                                                            }
-                                                          },
-                                                          elevation: 1.0,
-//                                                            fillColor: Colors.transparent,
-                                                          child: Icon(
-                                                            Icons.delete_outline,
-                                                            size: 25.0,
-                                                          ),
-//                                                          padding: EdgeInsets.all(15.0),
-                                                          shape: CircleBorder(),
-                                                        )
-                                                    ),
-                                                    Padding(
-                                                      padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                                      child:Container(
-                                                        width: 50.0,
-                                                        child: TextButton(
-                                                          style: TextButton.styleFrom(
-                                                            primary: Colors.blue,
-                                                            onSurface: Colors.red,
-                                                          ),
-                                                          child: Text('-'),
-                                                          onPressed: () async{
-                                                            SharedPreferences prefs = await SharedPreferences.getInstance();
-                                                            String username = prefs.getString('s_customerId');
-                                                            if(username == null){
-                                                              await Navigator.of(context).push(_signIn());
-                                                            }else{
-                                                              setState(() {
-                                                                var x = loadCartData[index]['main_item']['quantity'];
-                                                                int d = int.parse(x.toString());
-                                                                loadCartData[index]['main_item']['quantity'] = d-=1;  //code ni boss rene
-                                                                if(d<1){
-                                                                  loadCartData[index]['main_item']['quantity']=1;
-                                                                }
-                                                              });
-                                                              updateCartQty(loadCartData[index]['main_item']['id'].toString(),loadCartData[index]['main_item']['quantity'].toString());
-                                                            }
-                                                          },
-                                                        ),
-                                                      ),
-                                                    ),
-
-                                                    Padding(
-                                                      padding:EdgeInsets.fromLTRB(1, 5, 5, 5),
-                                                      child:Text(loadCartData[index]['main_item']['quantity'].toString()),
-                                                    ),
-                                                    Padding(
-                                                      padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                                      child:Container(
-                                                        width: 50.0,
-                                                        child: TextButton(
-                                                          style: TextButton.styleFrom(
-                                                            primary: Colors.blue,
-                                                            onSurface: Colors.red,
-                                                          ),
-                                                          child: Text('+'),
-//                                                          color: Colors.deepOrange,
-                                                          onPressed: ()async {
-                                                              SharedPreferences prefs = await SharedPreferences.getInstance();
-                                                              String username = prefs.getString('s_customerId');
-                                                              if(username == null){
-                                                                await Navigator.of(context).push(_signIn());
-                                                              }else{
-                                                                setState(() {
-                                                                  var x = loadCartData[index]['main_item']['quantity'];
-                                                                  int d = int.parse(x.toString());
-                                                                  loadCartData[index]['main_item']['quantity'] = d+=1;   //code ni boss rene
-                                                                });
-                                                                updateCartQty(loadCartData[index]['main_item']['id'].toString(),loadCartData[index]['main_item']['quantity'].toString());
-                                                              }
-                                                          },
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Padding(
-                                                      padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                                      child:Container(
-                                                        width: 50.0,
-                                                        child: TextButton(
-                                                          style: TextButton.styleFrom(
-                                                            primary: Colors.blue,
-                                                            onSurface: Colors.red,
-                                                          ),
-                                                          child: Text('more'),
-                                                          onPressed: ()async {
-                                                              viewAddon(context, index);
-                                                              // print(loadCartData[index]['main_item']['d_id']);
-                                                            },
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    ],
-                                  ),
-                                  elevation: 0,
-                                  margin: EdgeInsets.all(3),
-                                ),
-                              );
-                            }),
+                        ),
                       ),
                     ),
                   ),

@@ -298,11 +298,11 @@ class _ToDeliver extends State<ToDeliverFood> {
                     visible: visible,
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 5.0),
-                      child: OutlineButton(
-                        borderSide: BorderSide(color: Colors.deepOrange),
-                        highlightedBorderColor: Colors.deepOrange,
-                        highlightColor: Colors.transparent,
-                        shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                      child: OutlinedButton(
+                        style: TextButton.styleFrom(
+                          primary: Colors.black, // foreground
+                          shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                        ),
                         onPressed: () {
                           checkIfOnGoing();
                         },
@@ -406,11 +406,11 @@ class _ToDeliver extends State<ToDeliverFood> {
                                                                 loadItems[index]['canceled_status'] == '1'?
                                                                 Padding(
                                                                   padding: EdgeInsets.fromLTRB(15, 0, 5, 0),
-                                                                  child: OutlineButton(
-                                                                    borderSide: BorderSide(color: Colors.deepOrange),
-                                                                    highlightedBorderColor: Colors.deepOrange,
-                                                                    highlightColor: Colors.transparent,
-                                                                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                                                                  child: OutlinedButton(
+                                                                    style: TextButton.styleFrom(
+                                                                      primary: Colors.black, // foreground
+                                                                      shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                                                                    ),
                                                                     onPressed: null,
                                                                     child: Text("Cancelled"),
                                                                   ),
@@ -418,21 +418,21 @@ class _ToDeliver extends State<ToDeliverFood> {
                                                                 loadItems[index]['ifexists'] == 'true'?
                                                                   Padding(
                                                                     padding: EdgeInsets.fromLTRB(15, 0, 5, 0),
-                                                                    child: OutlineButton(
-                                                                      borderSide: BorderSide(color: Colors.deepOrange),
-                                                                      highlightedBorderColor: Colors.deepOrange,
-                                                                      highlightColor: Colors.transparent,
-                                                                      shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                                                                    child: OutlinedButton(
+                                                                      style: TextButton.styleFrom(
+                                                                        primary: Colors.black, // foreground
+                                                                        shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                                                                      ),
                                                                       onPressed: null,
                                                                       child: Text("Rider is tagged"),
                                                                     ),
                                                                   ):Padding(
                                                                     padding: EdgeInsets.fromLTRB(15, 0, 5, 0),
-                                                                    child: OutlineButton(
-                                                                      borderSide: BorderSide(color: Colors.deepOrange),
-                                                                      highlightedBorderColor: Colors.deepOrange,
-                                                                      highlightColor: Colors.transparent,
-                                                                      shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                                                                    child: OutlinedButton(
+                                                                      style: TextButton.styleFrom(
+                                                                        primary: Colors.black, // foreground
+                                                                        shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                                                                      ),
                                                                       onPressed: (){
                                                                         cancelOrder(loadItems[index]['toms_id'],loadItems[index]['ticketId']);
                                                                       },
@@ -456,7 +456,7 @@ class _ToDeliver extends State<ToDeliverFood> {
                                       );
                                     }
                                     );
-                              // return ListView(
+                                    // return ListView(
                               //   children: [
                               //     for (Map document in snapshot.data)
                               //       Container(
@@ -593,7 +593,7 @@ class _ToDeliver extends State<ToDeliverFood> {
                             return Text('Loading...');
                           },
                         ),
-                        // child: ListView.builder(
+                                 // child: ListView.builder(
                         //     itemCount:loadItems == null ? 0 : loadItems.length,
                         //     itemBuilder: (BuildContext context, int index) {
                         //       return GestureDetector(
@@ -734,7 +734,7 @@ class _ToDeliver extends State<ToDeliverFood> {
                       ),
                     ),
                   ),
-                  // Divider(
+                    // Divider(
                   //   color: Colors.black,
                   // ),
 //                  Padding(

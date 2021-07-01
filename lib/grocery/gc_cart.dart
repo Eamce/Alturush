@@ -20,7 +20,7 @@ class _GcLoadCart extends State<GcLoadCart> {
   final db = RapidA();
   final oCcy = new NumberFormat("#,##0.00", "en_US");
   List loadCartData;
-  List loadSubtotal;
+  List loadSubtotal = [];
   var isLoading = true;
   var isLoading1 = true;
 

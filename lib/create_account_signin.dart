@@ -344,7 +344,7 @@ class _CreateAccountSignIn extends State<CreateAccountSignIn> with SingleTickerP
             ),
           ),
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               child: Text(
                 'Proceed',
                 style: TextStyle(
@@ -440,23 +440,44 @@ class _CreateAccountSignIn extends State<CreateAccountSignIn> with SingleTickerP
     String alert;
     String warning;
     setState(() {
-      if (username.text.isEmpty) {
+
+      if(username.text.isEmpty) {
         warning = "Notice!";
         alert = "Username is empty.";
         alertDialog(alert, warning);
         FocusScope.of(context).requestFocus(FocusNode());
-      }else if(firstName.text.length < 2){
+      }
+      else if(username.text[0]==' '){
+        warning = "Notice!";
+        alert = "Please enter a valid username";
+        alertDialog(alert, warning);
+        FocusScope.of(context).requestFocus(FocusNode());
+      }
+      else if(firstName.text.length < 2){
         warning = "Notice!";
         alert = "Please enter a valid first name";
         alertDialog(alert, warning);
         FocusScope.of(context).requestFocus(FocusNode());
       }
-      else if (firstName.text.isEmpty) {
+      else if(firstName.text[0]==' '){
+        warning = "Notice!";
+        alert = "Please enter a valid firstname";
+        alertDialog(alert, warning);
+        FocusScope.of(context).requestFocus(FocusNode());
+      }
+      else if (firstName.text.isEmpty ) {
         warning = "Notice!";
         alert = "First name is empty.";
         alertDialog(alert, warning);
         FocusScope.of(context).requestFocus(FocusNode());
-      } else if (lastName.text.isEmpty) {
+      }
+      else if(lastName.text[0]==' '){
+        warning = "Notice!";
+        alert = "Please enter a valid lastname";
+        alertDialog(alert, warning);
+        FocusScope.of(context).requestFocus(FocusNode());
+      }
+      else if (lastName.text.isEmpty) {
         warning = "Notice!";
         alert = "Last name is empty.";
         alertDialog(alert, warning);

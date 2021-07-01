@@ -32,7 +32,7 @@ class _ViewItem extends State<ViewItem>{
 
   String uomId,uomPrice;
   String choiceUomId,choiceId,choicePrice;
-  String flavorId,flavorPrice;
+  String flavorId,flavorPrice,uniOfMeasure;
 
   List<String> selectedSideOnPrice = List();
   List<String> selectedSideItems = List();
@@ -57,7 +57,6 @@ class _ViewItem extends State<ViewItem>{
     choicesDataVisible = true;
     uomDataVisible = true;
     flavorDataVisible = true;
-
 
     uomId = widget.productUom;
     uomPrice = widget.price;
@@ -209,6 +208,7 @@ class _ViewItem extends State<ViewItem>{
   @override
   void initState(){
     super.initState();
+    uniOfMeasure = widget.unitOfMeasure;
     side.clear();
     loadStore();
   }
@@ -267,16 +267,12 @@ class _ViewItem extends State<ViewItem>{
                                   padding:EdgeInsets.fromLTRB(20.0, 0.0, 5.0, 5.0),
                                   child: Row(
                                     children:[
-                                      Text("From",style: TextStyle(fontSize: 17,color: Colors.black,),),
-                                      SizedBox(width: 10.0),
-                                      Text('₱ ${loadItemData[index]['price'].toString()}', style: TextStyle(fontSize: 17,color: Colors.deepOrange,),),
+
+                                      Text('₱ $uomPrice', style: TextStyle(fontSize: 20,color: Colors.deepOrange,),),
                                     ],
                                   ),
                                 ),
-                                widget.unitOfMeasure != null ? Padding(
-                                  padding: EdgeInsets.fromLTRB(20.0, 0.0, 5.0, 5.0),
-                                  child: new Text('Size : ${widget.unitOfMeasure}', style: GoogleFonts.openSans(fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 17.0),),
-                                ):Container(),
+
                                 Padding(
                                   padding: EdgeInsets.fromLTRB(20.0, 0.0, 5.0, 5.0),
                                   child: new Text(loadItemData[index]['product_name'].toString(), style: GoogleFonts.openSans(fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 17.0),),
