@@ -392,7 +392,7 @@ class _AddNewAddress extends State<AddNewAddress> {
           icon: Icon(Icons.arrow_back, color: Colors.black,size: 23,),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text("Add new billing address",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
+        title: Text("Add new delivery address",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

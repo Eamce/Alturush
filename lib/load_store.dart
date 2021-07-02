@@ -9,7 +9,6 @@ import 'create_account_signin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'track_order.dart';
 import 'package:intl/intl.dart';
-import 'package:badges/badges.dart';
 import 'dart:async';
 import 'package:loading_gifs/loading_gifs.dart';
 import 'package:sleek_button/sleek_button.dart';

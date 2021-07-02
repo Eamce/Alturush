@@ -30,7 +30,6 @@ dependencies:
 #  cupertino_icons: ^0.1.3
 #  google_sign_in: ^4.4.0
   http: ^0.13.3
-  badges: 1.1.0
   google_fonts: ^2.0.0
   sleek_button: ^0.2.0
   flutter_signin_button: ^2.0.0

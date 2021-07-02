@@ -99,7 +99,6 @@ class _LoadCart extends State<LoadCart> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children:[
-
                     // loadFlavors
                     // loadAddons
                     SizedBox(height:15.0),
@@ -114,7 +113,7 @@ class _LoadCart extends State<LoadCart> {
                       itemBuilder: (BuildContext context, int index) {
                         var f = index;
                         if(f  == mainItemIndex){
-                         if(loadCartData[mainItemIndex]['choices'].length > 0){
+                         if(loadIMainItems[mainItemIndex]['choices'].length > 0){
                            return Padding(
                              padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 5.0),
                              child:Container(
@@ -508,6 +507,7 @@ bool ignorePointer = false;
                   Navigator.of(context).pop();
                   await db.removeItemFromCart(prodId);
                   loadCart();
+                  loadTotal();
                   getBuSegregate();
                   checkIfBf();
                 }
@@ -581,7 +581,7 @@ bool ignorePointer = false;
                                        ListView.builder(
                                            physics: BouncingScrollPhysics(),
                                            shrinkWrap: true,
-                                          itemCount:loadIMainItems == null ? 0 : loadIMainItems.length,
+                                          itemCount:loadCartData == null ? 0 : loadCartData.length,
                                           itemBuilder: (BuildContext context, int index) {
                                             return Visibility(
                                               visible: loadCartData[index]['main_item']['tenant_id'] != getBu[index0]['d_tenant_id'] ? false : true,
@@ -718,7 +718,6 @@ bool ignorePointer = false;
                                                                             onSurface: Colors.red,
                                                                           ),
                                                                           child: Text('+'),
-//                                                          color: Colors.deepOrange,
                                                                           onPressed: ()async {
                                                                             SharedPreferences prefs = await SharedPreferences.getInstance();
                                                                             String username = prefs.getString('s_customerId');
@@ -736,19 +735,23 @@ bool ignorePointer = false;
                                                                         ),
                                                                       ),
                                                                     ),
-                                                                    Padding(
-                                                                      padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                                                      child:Container(
-                                                                        width: 50.0,
-                                                                        child: TextButton(
-                                                                          style: TextButton.styleFrom(
-                                                                            primary: Colors.blue,
-                                                                            onSurface: Colors.red,
+                                                                    Visibility(
+                                                                      visible: loadCartData[index]['main_item']['addon_length'] <= 0? false : true,
+                                                                      child: Padding(
+                                                                        padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                                                        child:Container(
+                                                                          width: 70.0,
+                                                                          child: OutlinedButton(
+                                                                            style: TextButton.styleFrom(
+                                                                              primary: Colors.red,
+                                                                              onSurface: Colors.red,
+                                                                              shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                                                                            ),
+                                                                            child:Text('${loadCartData[index]['main_item']['addon_length'].toString()} more',style: TextStyle(fontSize: 10.0),),
+                                                                            onPressed: ()async {
+                                                                              viewAddon(context, index);
+                                                                            },
                                                                           ),
-                                                                          child: Text('more',style: TextStyle(color: Colors.black54),),
-                                                                          onPressed: ()async {
-                                                                            viewAddon(context, index);
-                                                                          },
                                                                         ),
                                                                       ),
                                                                     ),

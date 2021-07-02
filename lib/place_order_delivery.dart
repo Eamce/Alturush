@@ -582,11 +582,10 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                             children: <Widget>[
                               Padding(
                                 padding: EdgeInsets.fromLTRB(25, 20, 200, 5),
-                                child: OutlineButton(
-                                  borderSide: BorderSide(color: Colors.deepOrangeAccent),
-                                  highlightedBorderColor: Colors.deepOrangeAccent,
-                                  highlightColor: Colors.transparent,
-                                  shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                                child: OutlinedButton(
+                                  style: TextButton.styleFrom(
+                                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                                  ),
                                   onPressed: () async{
                                     FocusScope.of(context).requestFocus(FocusNode());
 
@@ -611,11 +610,11 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.fromLTRB(35, 3, 5, 5),
+                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
                                 child: new Text("Name", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                               ),
                               Padding(
-                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                padding:EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
                                 child: InkWell(
                                   onTap: (){
                                     FocusScope.of(context).requestFocus(FocusNode());
@@ -645,11 +644,11 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.fromLTRB(35, 3, 5, 5),
+                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
                                 child: new Text("Town *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                               ),
                               Padding(
-                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                padding:EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
                                 child: InkWell(
                                   onTap: (){
                                     FocusScope.of(context).requestFocus(FocusNode());
@@ -684,7 +683,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                 child: new Text("Barangay *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                               ),
                               Padding(
-                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                padding:EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
                                 child: InkWell(
                                   onTap: (){
                                     FocusScope.of(context).requestFocus(FocusNode());
@@ -717,7 +716,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                 child: new Text("Phone Number *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                               ),
                               Padding(
-                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                padding:EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
                                 child: Row(
                                   children: <Widget>[
                                     SizedBox(
@@ -755,7 +754,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                 child: new Text("Street *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                               ),
                               Padding(
-                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                padding:EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
                                 child: new TextFormField(
                                   textInputAction: TextInputAction.done,
                                   cursorColor: Colors.deepOrange,
@@ -780,7 +779,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                 child: new Text("House number(optional)", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                               ),
                               Padding(
-                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                padding:EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
                                 child: new TextFormField(
                                   textInputAction: TextInputAction.done,
                                   cursorColor: Colors.deepOrange.withOpacity(0.8),
@@ -801,7 +800,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                 child: new Text("Delivery date *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                               ),
                               Padding(
-                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
+                                padding:EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
                                 child: InkWell(
                                   onTap: (){
                                     deliveryTime.clear();
@@ -922,7 +921,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                 child: new Text("Delivery time*", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                               ),
                               Padding(
-                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                padding:EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
                                 child: InkWell(
                                   onTap: (){
                                       getTrueTime();
@@ -1043,7 +1042,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                               ),
 
                               Padding(
-                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                padding:EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
                                 child: InkWell(
                                   onTap: () async{
                                     FocusScope.of(context).requestFocus(FocusNode());
@@ -1077,7 +1076,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                 child: new Text("Landmark*", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                               ),
                               Padding(
-                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                padding:EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
                                 child: new TextFormField(
                                   keyboardType: TextInputType.multiline,
                                   textInputAction: TextInputAction.done,
@@ -1105,7 +1104,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                 child: new Text("Special instruction*", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                               ),
                               Padding(
-                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                padding:EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
                                 child: new TextFormField(
                                   keyboardType: TextInputType.multiline,
                                   textInputAction: TextInputAction.done,
