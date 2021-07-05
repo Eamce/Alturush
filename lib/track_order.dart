@@ -275,7 +275,7 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: <Widget>[
                                                     Padding(
-                                                      padding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 1.0),
+                                                      padding: EdgeInsets.fromLTRB(5.0, 10.0, 10.0, 5.0),
                                                       child: Row(
                                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                         children:<Widget>[
@@ -287,8 +287,8 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                                                               ],
                                                           ),
                                                           Container(
-                                                            height: screenHeight/11,
-                                                            width: screenWidth/11,
+                                                            height: screenHeight/15,
+                                                            width: screenWidth/15,
                                                             child: SvgPicture.asset(type),
                                                           ),
                                                         ],

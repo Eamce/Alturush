@@ -301,6 +301,17 @@ class RapidA {
     return dataUser;
   }
 
+  Future lookItemsSegregate(ticketNo) async{
+    var client = http.Client();
+    Map dataUser;
+    final response = await client.post(Uri.parse("$server/lookItems_segregate_r"),body:{
+      'ticketNo':encrypt(ticketNo)
+    });
+    dataUser = jsonDecode(response.body);
+    client.close();
+    return dataUser;
+  }
+
   Future lookItemsGood(ticketNo) async{
     var client = http.Client();
     Map dataUser;

@@ -130,7 +130,7 @@ class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
 
   @override
   void initState() {
-    // initPlatformState();
+    initPlatformState();
     super.initState();
   }
   @override

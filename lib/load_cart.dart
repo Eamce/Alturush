@@ -579,8 +579,8 @@ bool ignorePointer = false;
                                         child: Text('${getBu[index0]['d_bu_name'].toString()} ${getBu[index0]['d_tenant_name'].toString()}',style: TextStyle(color: Colors.black54,fontWeight: FontWeight.bold ,fontSize: 17.0)),
                                       ),
                                        ListView.builder(
-                                           physics: BouncingScrollPhysics(),
-                                           shrinkWrap: true,
+                                          physics:  NeverScrollableScrollPhysics (), //
+                                          shrinkWrap: true,
                                           itemCount:loadCartData == null ? 0 : loadCartData.length,
                                           itemBuilder: (BuildContext context, int index) {
                                             return Visibility(
@@ -614,22 +614,19 @@ bool ignorePointer = false;
                                                             child:Column(
                                                               crossAxisAlignment:CrossAxisAlignment.start,
                                                               children: <Widget>[
-                                                                SingleChildScrollView(
-                                                                  scrollDirection: Axis.horizontal,
-                                                                  child: Row(
-                                                                    mainAxisAlignment: MainAxisAlignment.start,
-                                                                    children: <Widget>[
-                                                                      Padding(
-                                                                        padding: EdgeInsets.fromLTRB(0, 10, 5, 5),
-                                                                        child: Text('${loadCartData[index]['main_item']['product_name']}',
-                                                                          style: GoogleFonts.openSans(
-                                                                              fontStyle:
-                                                                              FontStyle.normal,
-                                                                              fontSize: 11.0),
-                                                                        ),
+                                                                Row(
+                                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                                  children: <Widget>[
+                                                                    Padding(
+                                                                      padding: EdgeInsets.fromLTRB(0, 10, 5, 5),
+                                                                      child: Text('${loadCartData[index]['main_item']['product_name']}',
+                                                                        style: GoogleFonts.openSans(
+                                                                            fontStyle:
+                                                                            FontStyle.normal,
+                                                                            fontSize: 11.0),
                                                                       ),
-                                                                    ],
-                                                                  ),
+                                                                    ),
+                                                                  ],
                                                                 ),
 
                                                                 Row(
