@@ -230,8 +230,8 @@ class _LoadCart extends State<LoadCart> {
                            child: Row(
                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                              children: [
-                               Text('$f. ${lGetAmountPerTenant[index]['bu_name']} ${lGetAmountPerTenant[index]['tenant_name']} ',style: TextStyle(fontSize: 13.0,fontWeight: FontWeight.bold)),
-                               Text('₱${oCcy.format(int.parse(lGetAmountPerTenant[index]['total'].toString()))}',style: TextStyle(fontSize: 13.0,fontWeight: FontWeight.bold)),
+                               Text('$f. ${lGetAmountPerTenant[index]['bu_name']} ${lGetAmountPerTenant[index]['tenant_name']} ',style: TextStyle(fontSize: 15.0,fontWeight: FontWeight.bold)),
+                               Text('₱${oCcy.format(int.parse(lGetAmountPerTenant[index]['total'].toString()))}',style: TextStyle(fontSize: 15.0,fontWeight: FontWeight.bold)),
                              ],
                            ),
                          ),

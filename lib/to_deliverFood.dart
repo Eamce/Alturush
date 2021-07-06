@@ -25,7 +25,7 @@ class _ToDeliver extends State<ToDeliverFood> {
   final oCcy = new NumberFormat("#,##0.00", "en_US");
   var isLoading = true;
   List loadItems,lookItemsSegregateList;
-  List loadTotal;
+  List loadTotal,lGetAmountPerTenant;
 
 
   cancelOrder(tomsId,ticketId) async{
@@ -77,7 +77,7 @@ class _ToDeliver extends State<ToDeliverFood> {
     );
   }
   // var delCharge;
-  var grandTotal = '0';
+  var grandTotal = 0;
   Future getTotal() async{
     var res = await db.getTotal(widget.ticketNo);
     if (!mounted) return;
@@ -85,7 +85,6 @@ class _ToDeliver extends State<ToDeliverFood> {
       // grandTotal = 0.0;
       loadTotal = res['user_details'];
       grandTotal = loadTotal[0]['total_price'];
-      print(grandTotal);
     });
   }
 
@@ -113,60 +112,152 @@ class _ToDeliver extends State<ToDeliverFood> {
   }
 
   void displayBottomSheet(BuildContext context) async{
-//     var res = await db.getAmountPerTenant();
-//     if (!mounted) return;
-//     setState(() {
-//       isLoading = false;
-//       lGetAmountPerTenant = res['user_details'];
-//     });
-//     showModalBottomSheet(
-//         isScrollControlled: true,
-//         isDismissible: true,
-//         context: context,
-//         shape: RoundedRectangleBorder(
-//           borderRadius: BorderRadius.only(topRight:  Radius.circular(10),topLeft:  Radius.circular(10)),
-//         ),
-//         builder: (ctx) {
-//           return Container(
-//             height: MediaQuery.of(context).size.height  * 0.4,
-//             child:Container(
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children:[
-//                   SizedBox(height:10.0),
-//                   Padding(
-//                     padding: EdgeInsets.fromLTRB(25.0, 0.0, 20.0, 0.0),
-//                     child:Text("Your stores",style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold),),
-//                   ),
-//                   Scrollbar(
-//                     child: ListView.builder(
+    var res = await db.lookItemsSegregate(widget.ticketNo);
+    if (!mounted) return;
+    setState(() {
+      isLoading = false;
+      lGetAmountPerTenant = res['user_details'];
+    });
+    showModalBottomSheet(
+        isScrollControlled: true,
+        isDismissible: true,
+        context: context,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(topRight:  Radius.circular(10),topLeft:  Radius.circular(10)),
+        ),
+        builder: (ctx) {
+          return Container(
+            height: MediaQuery.of(context).size.height  * 0.4,
+            child:Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children:[
+                SizedBox(height:10.0),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(25.0, 0.0, 20.0, 0.0),
+                  child:Text("Your stores",style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold),),
+                ),
+                Scrollbar(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: lGetAmountPerTenant == null ? 0 : lGetAmountPerTenant.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      var f = index;
+                      f++;
+                      return Padding(
+                        padding: EdgeInsets.fromLTRB(25.0, 15.0, 25.0, 5.0),
+                        child:Container(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('$f. ${lGetAmountPerTenant[index]['bu_name']} ${lGetAmountPerTenant[index]['tenant_name']} ',style: TextStyle(fontSize: 15.0,fontWeight: FontWeight.bold)),
+                              Text('₱${oCcy.format(int.parse(lGetAmountPerTenant[index]['sumpertenats'].toString()))}',style: TextStyle(fontSize: 15.0,fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ),
+//                          child: Text('$f. ${lGetAmountPerTenant[index]['d_bu_name']} - ${lGetAmountPerTenant[index]['d_tenant']}  ₱${oCcy.format(double.parse(lGetAmountPerTenant[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  viewAddon(BuildContext context,mainItemIndex) {
+    showModalBottomSheet(
+        isScrollControlled: true,
+        isDismissible: true,
+        context: context,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(topRight:  Radius.circular(10),topLeft:  Radius.circular(10)),
+        ),
+        builder: (ctx) {
+          return Container(
+            height: MediaQuery.of(context).size.height  * 0.4,
+            child:Container(
+              child: Scrollbar(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children:[
+                    // loadFlavors
+                    // loadAddons
+                    SizedBox(height:15.0),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(25.0, 0.0, 20.0, 0.0),
+                      child: Text("Add ons",style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold),),
+                    ),
+                    ListView.builder(
+                      physics: BouncingScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: loadItems[mainItemIndex]['add_ons'].length == null ? 0 : loadItems[mainItemIndex]['add_ons'].length,
+                      itemBuilder: (BuildContext context, int index) {
+                            return Padding(
+                              padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 5.0),
+                              child:Container(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children:[
+                                    Expanded(
+                                        child: Text(' + ${loadItems[mainItemIndex]['add_ons'][index]['product_name'].toString()} - ${loadItems[mainItemIndex]['add_ons'][index]['addon_price'].toString()}',style: TextStyle(fontSize: 18.0,),maxLines: 6, overflow: TextOverflow.ellipsis,)
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                      },
+                    ),
+
+                    ListView.builder(
+                      physics: BouncingScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: loadItems[mainItemIndex]['choices'] == null ? 0 : loadItems[mainItemIndex]['choices'].length,
+                      itemBuilder: (BuildContext context, int index) {
+                          return Padding(
+                            padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 5.0),
+                            child:Container(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:[
+                                  Expanded(
+                                      child: Text(' + ${loadItems[mainItemIndex]['choices'][index]['product_name'].toString()} - ${loadItems[mainItemIndex]['choices'][index]['addon_price'].toString()}',style: TextStyle(fontSize: 18.0,),maxLines: 6, overflow: TextOverflow.ellipsis,)
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                      },
+                    ),
+//                     ListView.builder(
 //                       physics: BouncingScrollPhysics(),
 //                       shrinkWrap: true,
-//                       itemCount: lGetAmountPerTenant == null ? 0 : lGetAmountPerTenant.length,
+//                       itemCount: loadCartData[mainItemIndex]['flavors'] == null ? 0 : loadCartData[mainItemIndex]['flavors'].length,
 //                       itemBuilder: (BuildContext context, int index) {
-//                         var f = index;
-//                         f++;
-//                         return Padding(
-//                           padding: EdgeInsets.fromLTRB(25.0, 15.0, 25.0, 5.0),
-//                           child:Container(
-//                             child: Row(
-//                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                               children: [
-//                                 Text('$f. ${lGetAmountPerTenant[index]['bu_name']} ${lGetAmountPerTenant[index]['tenant_name']} ',style: TextStyle(fontSize: 13.0,fontWeight: FontWeight.bold)),
-//                                 Text('₱${oCcy.format(int.parse(lGetAmountPerTenant[index]['total'].toString()))}',style: TextStyle(fontSize: 13.0,fontWeight: FontWeight.bold)),
-//                               ],
+//                         if(loadCartData[mainItemIndex]['flavors'].length > 0){
+//                           return Padding(
+//                             padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 5.0),
+//                             child:Container(
+//                               child: Row(
+//                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                                 children:[
+//                                   Expanded(child: Text(' + ${loadIMainItems[mainItemIndex]['flavors'][0]['flavor']} - Php ${loadIMainItems[mainItemIndex]['flavors'][0]['addon_price']}',style: TextStyle(fontSize: 18.0,),maxLines: 6, overflow: TextOverflow.ellipsis,)),
+//                                 ],
+//                               ),
 //                             ),
-//                           ),
 // //                          child: Text('$f. ${lGetAmountPerTenant[index]['d_bu_name']} - ${lGetAmountPerTenant[index]['d_tenant']}  ₱${oCcy.format(double.parse(lGetAmountPerTenant[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
+//                           );
+//                         }
+//                         return SizedBox(
 //                         );
 //                       },
 //                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           );
-//         });
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
   }
 
   cancelSuccess(){
@@ -207,7 +298,6 @@ class _ToDeliver extends State<ToDeliverFood> {
     setState(() {
       isLoading = false;
       lookItemsSegregateList = res['user_details'];
-      print(lookItemsSegregateList);
     });
   }
 
@@ -360,7 +450,7 @@ class _ToDeliver extends State<ToDeliverFood> {
                                             return Visibility(
                                               visible: loadItems[index]['tenant_id'] != lookItemsSegregateList[index0]['tenant_id'] ? false : true,
                                               child: Container(
-                                                height: 150.0,
+                                                height: 180.0,
                                                 width: 50.0,
                                                 child: Card(
                                                   color: Colors.transparent,
@@ -460,13 +550,31 @@ class _ToDeliver extends State<ToDeliverFood> {
                                                                           ),
                                                                           onPressed: (){
                                                                             cancelOrder(loadItems[index]['toms_id'],loadItems[index]['ticketId']);
-                                                                            print(loadItems[index]['toms_id']);
-                                                                            print(loadItems[index]['ticketId']);
                                                                           },
                                                                           child:Text("Cancel this item"),
                                                                         ),
                                                                       )
                                                                     ],
+                                                                  ),
+                                                                  Visibility(
+                                                                    visible: loadItems[index]['addon_length'] <= 0? false : true,
+                                                                    child: Padding(
+                                                                      padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                                                      child:Container(
+                                                                        width: 70.0,
+                                                                        child: OutlinedButton(
+                                                                          style: TextButton.styleFrom(
+                                                                            primary: Colors.red,
+                                                                            onSurface: Colors.red,
+                                                                            shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                                                                          ),
+                                                                          child:Text('${loadItems[index]['addon_length'].toString()}  more',style: TextStyle(fontSize: 10.0),),
+                                                                          onPressed: ()async {
+                                                                            viewAddon(context, index);
+                                                                          },
+                                                                        ),
+                                                                      ),
+                                                                    ),
                                                                   ),
                                                                 ],
                                                               ),
@@ -486,7 +594,6 @@ class _ToDeliver extends State<ToDeliverFood> {
                                 ),
                             );
                           }
-
                         ),
                       ),
                     ),
@@ -536,7 +643,8 @@ class _ToDeliver extends State<ToDeliverFood> {
                               context: context,
                             ),
                             child: Center(
-                                child: Text("Total ₱ ${grandTotal.toString()}", style:TextStyle(fontStyle: FontStyle.normal, fontWeight: FontWeight.bold, fontSize: 13.0),
+                                // ₱${oCcy.format(int.parse(lGetAmountPerTenant[index]['sumpertenats'].toString()))}
+                                child: Text("Total ₱ ${oCcy.format(int.parse(grandTotal.toString()))}", style:TextStyle(fontStyle: FontStyle.normal, fontWeight: FontWeight.bold, fontSize: 13.0),
                               ),
                             ),
                           ),

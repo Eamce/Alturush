@@ -300,6 +300,10 @@ class _ViewItem extends State<ViewItem>{
                                             itemCount:addonData == null ? 0 : addonData.length,
                                             itemBuilder: (BuildContext context, int index1) {
                                               String uomName = "";
+                                              String addonPrice = addonData[index1]['addon_price'];
+                                              if(addonPrice == '0.00'){
+                                                addonPrice = "Free";
+                                              }
                                               if(addonData[index1]['unit']!=null){
                                                 uomName = addonData[index1]['unit'];
                                               }
@@ -307,13 +311,14 @@ class _ViewItem extends State<ViewItem>{
                                               return Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
+
                                                   CheckboxListTile(
                                                     activeColor: Colors.deepOrange,
                                                     title: Row(
                                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                       children: [
                                                         Text('${addonData[index1]['sub_productname']}  $uomName'),
-                                                        Text('+ ₱ ${addonData[index1]['addon_price']}')
+                                                        Text('+ ₱ $addonPrice')
                                                       ],
                                                     ),
                                                     value: side[index1],
@@ -352,7 +357,7 @@ class _ViewItem extends State<ViewItem>{
                                     children: [
                                       Padding(
                                         padding: EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 10.0),
-                                        child: Text("Select side",style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold),),
+                                        child: Text("Choice of drinks",style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold),),
                                       ),
                                       Padding(
                                         padding: EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 10.0),
@@ -362,6 +367,12 @@ class _ViewItem extends State<ViewItem>{
                                             itemCount:choicesData == null ? 0 : choicesData.length,
                                             itemBuilder: (BuildContext context, int index2) {
                                               String uomName = "";
+                                              String sidePrice;
+                                              if(choicesData[index2]['addon_price'] == '0.00'){
+                                                sidePrice = "Free";
+                                              }else{
+                                                sidePrice ='+ ₱ ${choicesData[index2]['addon_price']}';
+                                              }
                                               if(choicesData[index2]['unit']!=null){
                                                 uomName = choicesData[index2]['unit'].toString();
                                               }
@@ -380,7 +391,7 @@ class _ViewItem extends State<ViewItem>{
                                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                             children: [
                                                               Text('${choicesData[index2]['sub_productname']}  $uomName'),
-                                                              Text('+ ₱ ${choicesData[index2]['addon_price']}'),
+                                                              Text('$sidePrice'),
                                                             ],
                                                           ),
                                                           value: index2,
@@ -426,6 +437,7 @@ class _ViewItem extends State<ViewItem>{
                                             itemCount:uomData == null ? 0 : uomData.length,
                                             itemBuilder: (BuildContext context, int index3) {
                                               String uomName = "";
+
                                               if(uomData[index3]['unit']!=null){
                                                 uomName = uomData[index3]['unit'].toString();
                                               }
@@ -489,6 +501,13 @@ class _ViewItem extends State<ViewItem>{
                                             itemCount:flavorData == null ? 0 : flavorData.length,
                                             itemBuilder: (BuildContext context, int index4) {
                                               String uomName = "";
+
+                                              String flavorPriceD;
+                                              if(flavorData[index4]['price'] == '0.00'){
+                                                flavorPriceD = "Free";
+                                              }else{
+                                                flavorPriceD ='+ ₱ ${flavorData[index4]['price']}';
+                                              }
                                               if(flavorData[index4]['unit']!=null){
                                                 uomName = flavorData[index4]['unit'].toString();
                                               }
@@ -507,7 +526,7 @@ class _ViewItem extends State<ViewItem>{
                                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                             children: [
                                                               Text('${flavorData[index4]['flavor_name']}  $uomName'),
-                                                              Text('₱ ${flavorData[index4]['price']}'),
+                                                              Text('$flavorPriceD'),
                                                             ],
                                                           ),
                                                           value: index4,
