@@ -25,6 +25,8 @@ class _MyHomePageState extends State<MyHomePage>  {
 
   final oCcy = new NumberFormat("#,##0.00", "en_US");
   final db = RapidA();
+  final province = TextEditingController();
+  final town = TextEditingController();
   List listCounter;
   List buData;
   List loadProfileData;
@@ -43,17 +45,28 @@ class _MyHomePageState extends State<MyHomePage>  {
   String quotes = "";
   String author = "";
   int counter;
+  int provinceId;
+  int townID;
 
   Future loadBu() async{
-//    await db.init();
-//    var res = await db.getBusinessUnits();
-    listenCartCount();
+
     var res = await db.getBusinessUnitsCi();
     if (!mounted) return;
     setState(() {
       buData = res['user_details'];
     });
+    Timer(Duration(milliseconds:500), () {
+      _needsScroll = true;
+      _scrollToEnd();
+    });
+  }
 
+  _scrollToEnd() async{
+    if (_needsScroll) {
+      _needsScroll = false;
+      _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 200), curve: Curves.easeInOut);
+    }
   }
 
   Future futureLoadQuotes() async{
@@ -75,13 +88,11 @@ class _MyHomePageState extends State<MyHomePage>  {
       setState(() {
         loadProfileData = res['user_details'];
         firstName = loadProfileData[0]['d_fname'];
-//          profilePhoto = loadProfileData[0]['d_photo'];
         isLoading = false;
         isVisible = true;
       });
     }
     else{
-      //loadProfileData;
       locationString = "Location";
       firstName = "";
       profilePhoto = "";
@@ -110,13 +121,158 @@ class _MyHomePageState extends State<MyHomePage>  {
     });
   }
 
+ List getProvinceData;
+  selectProvince() async{
+    var res = await db.getProvince();
+    if (!mounted) return;
+    setState(() {
+      getProvinceData = res['user_details'];
+    });
+    FocusScope.of(context).requestFocus(FocusNode());
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8.0))
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
+          title: Text('Select Province',),
+          content: Container(
+            height: 90.0,
+            width: 300.0,
+            child: Scrollbar(
+              child: ListView.builder(
+                physics: BouncingScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: getProvinceData == null ? 0 : getProvinceData.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return InkWell(
+                    onTap:(){
+                      province.text = getProvinceData[index]['prov_name'];
+                      provinceId = int.parse(getProvinceData[index]['prov_id']);
+                      town.clear();
+                      Navigator.of(context).pop();
+                    },
+                    child: ListTile(
+                      title: Text(getProvinceData[index]['prov_name']),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                'Close',
+                style: TextStyle(
+                  color: Colors.grey.withOpacity(0.8),
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text(
+                'Clear',
+                style: TextStyle(
+                  color: Colors.grey.withOpacity(0.8),
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                // province.clear();
+                // town.clear();
+                // barangay.clear();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
+  List getTownData;
+  selectTown() async{
+    var res = await db.selectTown(provinceId.toString());
+    if (!mounted) return;
+    setState(() {
+      getTownData = res['user_details'];
+    });
+    FocusScope.of(context).requestFocus(FocusNode());
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8.0))
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
+          title: Text('Select Town',),
+          content: Container(
+            height: 300.0,
+            width: 300.0,
+            child: Scrollbar(
+              child:ListView.builder(
+                physics: BouncingScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: getTownData == null ? 0 : getTownData.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return InkWell(
+                    onTap:(){
+                      town.text = getTownData[index]['town_name'];
+                      townID = int.parse(getTownData[index]['town_id']);
+                      Navigator.of(context).pop();
+                    },
+                    child: ListTile(
+                      title: Text(getTownData[index]['town_name']),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                'Close',
+                style: TextStyle(
+                  color: Colors.grey.withOpacity(0.8),
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text(
+                'Clear',
+                style: TextStyle(
+                  color: Colors.grey.withOpacity(0.8),
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                town.clear();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  ScrollController _scrollController = new ScrollController();
+  bool _needsScroll = false;
 
   @override
   void initState(){
     futureLoadQuotes();
+    listenCartCount();
     loadProfile();
-    loadBu();
+    // loadBu();
     super.initState();
   }
 
@@ -180,7 +336,6 @@ class _MyHomePageState extends State<MyHomePage>  {
                       SizedBox(
                         height: 70.0,
                       ),
-
                       SizedBox(
                         height: 30.0,
                       ),
@@ -278,75 +433,184 @@ class _MyHomePageState extends State<MyHomePage>  {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Expanded(
-              child: RefreshIndicator(
-                onRefresh: loadBu,
-                child:Scrollbar(
-                  child:ListView(
-                    physics: AlwaysScrollableScrollPhysics(),
-                    children: <Widget>[
-                      SizedBox(
-                        height: 35.0,
-                      ),
-                      Center(
-                        child:Text("Howdy ${firstName.toString()}",style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 23.0),),
-                      ),
-                      Center(
-                        child:Text(quotes,style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
-                      ),
-                      Center(
-                        child:Text(author,style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
-                      ),
-                      SizedBox(
-                        height: 50.0,
-                      ),
-                      ListView.builder(
-                          physics: BouncingScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: buData == null ? 0: buData.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return InkWell(
-                              onTap: () async{
-                                await Navigator.of(context).push(_gotoTenants(buData[index]['logo'],buData[index]['business_unit'],buData[index]['bunit_code']));
-                                getCounter();
-                                listenCartCount();
-                              },
-                              child:Container(
-                                height: 120.0,
-                                width: 30.0,
-                                child: Card(
-                                  color: Colors.white,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      ListTile(
-                                        leading:Container(
-                                          width: 60.0,
-                                          height: 60.0,
-                                          decoration: new BoxDecoration(
-                                            image: new DecorationImage(
-                                              image: new NetworkImage(buData[index]['logo']),
-                                              fit: BoxFit.cover,
-                                            ),
-                                            borderRadius: new BorderRadius.all(new Radius.circular(50.0)),
-                                            border: new Border.all(
-                                              color: Colors.black54,
-                                              width: 0.5,
-                                            ),
-                                          ),
+              child: Scrollbar(
+                child:ListView(
+                  controller: _scrollController,
+                  physics: AlwaysScrollableScrollPhysics(),
+                  children: <Widget>[
+                    SizedBox(
+                      height: 35.0,
+                    ),
+                    Center(
+                      child:Text("Howdy ${firstName.toString()}",style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 23.0),),
+                    ),
+                    Center(
+                      child:Text(quotes,style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                    ),
+                    Center(
+                      child:Text(author,style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                    ),
+                    SizedBox(
+                      height: 20.0,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
+                      child: Card(
+                        elevation: 0.1,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(40, 10, 5, 15),
+                              child: new Text(
+                                "You don't need a silver fork to eat good food.",
+                                style: GoogleFonts.openSans(
+                                    fontStyle: FontStyle.normal,fontWeight: FontWeight.bold, fontSize: 45.0),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(40, 10, 5, 5),
+                              child: new Text(
+                                "Select Povince",
+                                style: GoogleFonts.openSans(
+                                    fontStyle: FontStyle.normal, fontSize: 18.0),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 5.0),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(30.0),
+                                onTap: (){
+                                  selectProvince();
+                                },
+                                child: IgnorePointer(
+                                  child: new TextFormField(
+                                      textInputAction: TextInputAction.done,
+                                      cursorColor: Colors.deepOrange.withOpacity(0.8),
+                                      controller: province,
+                                      decoration: InputDecoration(
+                                        contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: Colors.deepOrange.withOpacity(0.8),
+                                              width: 2.0),
                                         ),
-                                        title: Text(buData[index]['business_unit'],style: GoogleFonts.openSans(color: Colors.black54,fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 22.0),),
-                                      ),
-                                    ],
+                                        border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(30.0)),
+                                      )
                                   ),
-                                  elevation: 0.2,
-                                  margin: EdgeInsets.all(3),
                                 ),
                               ),
-                            );
-                          }
+                            ),
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(40, 10, 5, 5),
+                              child: new Text(
+                                "Select town",
+                                style: GoogleFonts.openSans(
+                                    fontStyle: FontStyle.normal, fontSize: 18.0),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 5.0),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(30.0),
+                                onTap: (){
+                                  selectTown();
+                                },
+                                child: IgnorePointer(
+                                  child: new TextFormField(
+                                      textInputAction: TextInputAction.done,
+                                      cursorColor: Colors.deepOrange.withOpacity(0.8),
+                                      controller:town,
+                                      decoration: InputDecoration(
+                                        contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: Colors.deepOrange.withOpacity(0.8),
+                                              width: 2.0),
+                                        ),
+                                        border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(30.0)),
+                                      )
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10.0,
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 5.0),
+                              child: Container(
+                                height: 50.0,
+                                child: OutlinedButton(
+                                  onPressed: (){
+                                    loadBu();
+                                  },
+                                  style: TextButton.styleFrom(
+                                    backgroundColor: Colors.deepOrangeAccent,
+                                    primary: Colors.white,
+                                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+                                  ),
+                                  child: Text("Go"),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10.0,
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
+                    ),
+
+                    ListView.builder(
+                        physics: BouncingScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: buData == null ? 0: buData.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return InkWell(
+                            onTap: () async{
+                              await Navigator.of(context).push(_gotoTenants(buData[index]['logo'],buData[index]['business_unit'],buData[index]['bunit_code']));
+                              getCounter();
+                              listenCartCount();
+                            },
+                            child:Container(
+                              height: 120.0,
+                              width: 30.0,
+                              child: Card(
+                                color: Colors.white,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    ListTile(
+                                      leading:Container(
+                                        width: 60.0,
+                                        height: 60.0,
+                                        decoration: new BoxDecoration(
+                                          image: new DecorationImage(
+                                            image: new NetworkImage(buData[index]['logo']),
+                                            fit: BoxFit.cover,
+                                          ),
+                                          borderRadius: new BorderRadius.all(new Radius.circular(50.0)),
+                                          border: new Border.all(
+                                            color: Colors.black54,
+                                            width: 0.5,
+                                          ),
+                                        ),
+                                      ),
+                                      title: Text(buData[index]['business_unit'],style: GoogleFonts.openSans(color: Colors.black54,fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 22.0),),
+                                    ),
+                                  ],
+                                ),
+                                elevation: 0.1,
+                                margin: EdgeInsets.all(3),
+                              ),
+                            ),
+                          );
+                        }
+                    ),
+                  ],
                 ),
               ),
             ),

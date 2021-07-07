@@ -625,12 +625,7 @@ class _CreateAccountSignIn extends State<CreateAccountSignIn> with SingleTickerP
 //    } catch (err) {}
 //  }
 
-  _facebookSignIn() async{
 
-    // fbLogin.loginBehavior = FacebookLoginBehavior.webViewOnly;
-    // if you remove above comment then facebook login will take username and pasword for login in Webview
-
-  }
 
   _signInCheck() {
     String alert;
@@ -1047,6 +1042,7 @@ class _CreateAccountSignIn extends State<CreateAccountSignIn> with SingleTickerP
                               Container(
                                 width: screenWidth / 4.5,
                                 child: InkWell(
+                                  borderRadius: BorderRadius.circular(3.0),
                                   onTap: () {
                                     barrio.clear();
                                     selectSuffixDia();
@@ -1128,6 +1124,7 @@ class _CreateAccountSignIn extends State<CreateAccountSignIn> with SingleTickerP
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
                           child: InkWell(
+                            borderRadius: BorderRadius.circular(3.0),
                             onTap: _getBirthDay,
                             child: IgnorePointer(
                               child: new TextFormField(
@@ -1229,6 +1226,7 @@ class _CreateAccountSignIn extends State<CreateAccountSignIn> with SingleTickerP
                           padding: EdgeInsets.symmetric(
                                horizontal: 30.0, vertical: 5.0),
                           child: InkWell(
+                            borderRadius: BorderRadius.circular(3.0),
                             onTap: () {},
                             child: IgnorePointer(
                               child: new TextFormField(
@@ -1266,6 +1264,7 @@ class _CreateAccountSignIn extends State<CreateAccountSignIn> with SingleTickerP
                           padding: EdgeInsets.symmetric(
                               horizontal: 30.0, vertical: 5.0),
                           child: InkWell(
+                            borderRadius: BorderRadius.circular(3.0),
                             onTap: () {
                               barrio.clear();
                               selectTown();
@@ -1306,6 +1305,7 @@ class _CreateAccountSignIn extends State<CreateAccountSignIn> with SingleTickerP
                           padding: EdgeInsets.symmetric(
                               horizontal: 30.0, vertical: 5.0),
                           child: InkWell(
+                            borderRadius: BorderRadius.circular(3.0),
                             onTap: () {
                               town.text.isEmpty ? print('no town selected') : selectBarrio();
                             },

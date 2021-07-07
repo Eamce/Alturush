@@ -802,6 +802,7 @@ class _PlaceOrder extends State<PlaceOrder>    with SingleTickerProviderStateMix
                                   Padding(
                                     padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
                                     child: InkWell(
+                                      borderRadius: BorderRadius.circular(3.0),
                                       onTap: (){
                                         FocusScope.of(context).requestFocus(FocusNode());
 //                                    placeOrderBrg.clear();
@@ -831,6 +832,7 @@ class _PlaceOrder extends State<PlaceOrder>    with SingleTickerProviderStateMix
                                   Padding(
                                     padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
                                     child: InkWell(
+                                      borderRadius: BorderRadius.circular(3.0),
                                       onTap: (){
                                         FocusScope.of(context).requestFocus(FocusNode());
                                         placeOrderTown.text.isEmpty ? print('no town selected') : selectBarrio();
