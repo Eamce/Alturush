@@ -212,6 +212,18 @@ class RapidA {
     var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Map dataUser;
+    final response = await client.post(Uri.parse("$server/getBu_r"),body:{
+      'cusId':prefs.getString('s_customerId')
+    });
+    dataUser = jsonDecode(response.body);
+    client.close();
+    return dataUser;
+  }
+
+  Future getBuSegregate1() async{
+    var client = http.Client();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map dataUser;
     final response = await client.post(Uri.parse("$server/getBu_r1"),body:{
       'cusId':prefs.getString('s_customerId')
     });
@@ -381,11 +393,11 @@ class RapidA {
   }
 
   //node
-  Future getBusinessUnitsCi() async{
+  Future getBusinessUnitsCi(unitGroupId) async{
     var client = http.Client();
     Map dataUser;
     final response = await client.post(Uri.parse("$server/display_store_r"),body:{
-
+      'unitGroupId':'$unitGroupId'
     });
     dataUser = jsonDecode(response.body);
     client.close();

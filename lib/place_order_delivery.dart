@@ -580,37 +580,63 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
+                              // Padding(
+                              //   padding: EdgeInsets.fromLTRB(25, 20, 200, 5),
+                              //   child: OutlinedButton(
+                              //     style: TextButton.styleFrom(
+                              //       shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+                              //     ),
+                              //     onPressed: () async{
+                              //       FocusScope.of(context).requestFocus(FocusNode());
+                              //       SharedPreferences prefs = await SharedPreferences.getInstance();
+                              //       String username = prefs.getString('s_customerId');
+                              //       if(username == null){
+                              //         Navigator.of(context).push(_signIn());
+                              //       }else{
+                              //         displayAddresses(context);
+                              //       }
+                              //     },
+                              //     child: Container(
+                              //       height: 50.0,
+                              //       child: Row(
+                              //         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              //         children: [
+                              //           Icon(
+                              //             Icons.location_on,
+                              //             color: Colors.deepOrangeAccent,
+                              //           ),
+                              //           Text("Select address",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 15.0),),
+                              //         ],
+                              //       ),
+                              //     ),
+                              //   ),
+                              // ),
                               Padding(
                                 padding: EdgeInsets.fromLTRB(25, 20, 200, 5),
-                                child: OutlinedButton(
-                                  style: TextButton.styleFrom(
-                                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
-                                  ),
-                                  onPressed: () async{
-                                    FocusScope.of(context).requestFocus(FocusNode());
+                                child: Container(
+                                  height: 40.0,
+                                  child: OutlinedButton(
+                                    onPressed: () async{
+                                      FocusScope.of(context).requestFocus(FocusNode());
+                                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                                      String username = prefs.getString('s_customerId');
+                                      if(username == null){
+                                        Navigator.of(context).push(_signIn());
+                                      }else{
+                                        displayAddresses(context);
+                                      }
+                                    },
+                                    style: TextButton.styleFrom(
 
-                                    SharedPreferences prefs = await SharedPreferences.getInstance();
-                                    String username = prefs.getString('s_customerId');
-                                    if(username == null){
-                                      Navigator.of(context).push(_signIn());
-                                    }else{
-                                      displayAddresses(context);
-                                    }
-                                  },
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Icon(
-                                        Icons.location_on,
-                                        color: Colors.deepOrangeAccent,
-                                      ),
-                                      Text("Select address",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 15.0),),
-                                    ],
+                                      primary: Colors.black,
+                                      shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+                                    ),
+                                    child: Text("Select address"),
                                   ),
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
+                                padding: EdgeInsets.fromLTRB(35, 15, 5, 5),
                                 child: new Text("Name", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                               ),
                               Padding(
@@ -644,7 +670,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
+                                padding: EdgeInsets.fromLTRB(35, 15, 5, 5),
                                 child: new Text("Town *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                               ),
                               Padding(
@@ -679,7 +705,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                               ),
 
                               Padding(
-                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
+                                padding: EdgeInsets.fromLTRB(35, 15, 5, 5),
                                 child: new Text("Barangay *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                               ),
                               Padding(
@@ -712,7 +738,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
+                                padding: EdgeInsets.fromLTRB(35, 15, 5, 5),
                                 child: new Text("Phone Number *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                               ),
                               Padding(
@@ -750,7 +776,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
+                                padding: EdgeInsets.fromLTRB(35, 15, 5, 5),
                                 child: new Text("Street *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                               ),
                               Padding(
@@ -775,7 +801,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
+                                padding: EdgeInsets.fromLTRB(35, 15, 5, 5),
                                 child: new Text("House number(optional)", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                               ),
                               Padding(
@@ -796,11 +822,11 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                               ),
 
                               Padding(
-                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
+                                padding: EdgeInsets.fromLTRB(35, 15, 5, 5),
                                 child: new Text("Delivery date *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                               ),
                               Padding(
-                                padding:EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
+                                padding:EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
                                 child: InkWell(
                                   onTap: (){
                                     deliveryTime.clear();
@@ -917,7 +943,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                     ),
                               ),
                               Padding(
-                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
+                                padding: EdgeInsets.fromLTRB(35, 15, 5, 5),
                                 child: new Text("Delivery time*", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                               ),
                               Padding(
@@ -1037,7 +1063,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                               ),
 
                               Padding(
-                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
+                                padding: EdgeInsets.fromLTRB(35, 15, 5, 5),
                                 child: new Text("Avail Discount(Optional)", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                               ),
 
@@ -1072,7 +1098,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
+                                padding: EdgeInsets.fromLTRB(35, 15, 5, 5),
                                 child: new Text("Landmark*", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                               ),
                               Padding(
@@ -1082,34 +1108,6 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                   textInputAction: TextInputAction.done,
                                   cursorColor: Colors.deepOrange,
                                   controller: placeRemarks,
-                                  validator: (value) {
-                                    if (value.isEmpty) {
-                                      return 'Please enter some value';
-                                    }
-                                    return null;
-                                  },
-                                  maxLines: 4,
-                                  decoration: InputDecoration(
-                                    hintText:"E.g Near at plaza/Be ware of dogs",
-                                    contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
-                                    focusedBorder:OutlineInputBorder(
-                                      borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
-                                    ),
-                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
-                                child: new Text("Special instruction*", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
-                              ),
-                              Padding(
-                                padding:EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
-                                child: new TextFormField(
-                                  keyboardType: TextInputType.multiline,
-                                  textInputAction: TextInputAction.done,
-                                  cursorColor: Colors.deepOrange,
-                                  controller: specialInstruction,
                                   validator: (value) {
                                     if (value.isEmpty) {
                                       return 'Please enter some value';
@@ -1140,8 +1138,8 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: <Widget>[
                                           Padding(
-                                            padding: EdgeInsets.fromLTRB(17.0,10.0, 0.0,10.0),
-                                            child: Text('$num. ${getBu[index0]['d_bu_name'].toString()}',style: TextStyle(color: Colors.deepOrange,fontWeight: FontWeight.bold ,fontSize: 15.0)),
+                                            padding: EdgeInsets.fromLTRB(17.0,20.0, 0.0,10.0),
+                                            child: Text('$num. ${getBu[index0]['d_bu_name'].toString()}',style: TextStyle(color: Colors.deepOrange,fontWeight: FontWeight.bold ,fontSize: 18.0)),
                                           ),
                                           ListView.builder(
                                               physics: BouncingScrollPhysics(),
@@ -1156,17 +1154,35 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                                       children: <Widget>[
                                                         Padding(
                                                           padding: EdgeInsets.fromLTRB(25.0,0.0, 25.0,1.0),
-                                                          child: OutlinedButton(
-                                                            onPressed: null,
-                                                            style: TextButton.styleFrom(
-                                                              shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
-                                                            ),
-                                                            child:Row(
-                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                              children: [
-                                                                Text('${getTenant[index]['tenant_name']}',style: TextStyle(color: Colors.black),),
-                                                                Text('₱${oCcy.format(int.parse(getTenant[index]['total'].toString()))}',style: TextStyle(color: Colors.black),),
-                                                              ],
+                                                          child: Row(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                            children: [
+                                                              Text('${getTenant[index]['tenant_name']}',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15.0,color: Colors.black),),
+                                                              Text('₱${oCcy.format(int.parse(getTenant[index]['total'].toString()))}',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15.0,color: Colors.black),),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
+                                                          child: new TextFormField(
+                                                            keyboardType: TextInputType.multiline,
+                                                            textInputAction: TextInputAction.done,
+                                                            cursorColor: Colors.deepOrange,
+                                                            controller: specialInstruction,
+                                                            validator: (value) {
+                                                              if (value.isEmpty) {
+                                                                return 'Please enter some value';
+                                                              }
+                                                              return null;
+                                                            },
+                                                            maxLines: 4,
+                                                            decoration: InputDecoration(
+                                                              hintText:"Special instruction",
+                                                              contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
+                                                              focusedBorder:OutlineInputBorder(
+                                                                borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
+                                                              ),
+                                                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
                                                             ),
                                                           ),
                                                         ),
@@ -1216,7 +1232,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                 child: new Text("Customer tender(ie.4,000.00)", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                               ),
                               Padding(
-                                padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                padding:EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
                                 child: new TextFormField(
                                   textInputAction: TextInputAction.done,
                                   cursorColor: Colors.deepOrange,
@@ -1249,7 +1265,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                 ),
               ),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
+                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
                 child: Row(
                   children: <Widget>[
                     Flexible(

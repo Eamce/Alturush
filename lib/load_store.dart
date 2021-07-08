@@ -12,7 +12,6 @@ import 'package:intl/intl.dart';
 import 'dart:async';
 import 'package:loading_gifs/loading_gifs.dart';
 import 'package:sleek_button/sleek_button.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -257,7 +256,6 @@ class _LoadStore extends State<LoadStore> {
           backgroundColor: Colors.white,
           elevation: 0.1,
           iconTheme: new IconThemeData(color: Colors.black),
-//          title: Text("Menu",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
           title: Row(
             children: [
               Container(

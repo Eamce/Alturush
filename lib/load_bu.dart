@@ -47,10 +47,10 @@ class _MyHomePageState extends State<MyHomePage>  {
   int counter;
   int provinceId;
   int townID;
+  int unitGroupId;
 
   Future loadBu() async{
-
-    var res = await db.getBusinessUnitsCi();
+    var res = await db.getBusinessUnitsCi(unitGroupId);
     if (!mounted) return;
     setState(() {
       buData = res['user_details'];
@@ -183,9 +183,7 @@ class _MyHomePageState extends State<MyHomePage>  {
               ),
               onPressed: () {
                 Navigator.of(context).pop();
-                // province.clear();
-                // town.clear();
-                // barangay.clear();
+                province.clear();
               },
             ),
           ],
@@ -224,6 +222,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                     onTap:(){
                       town.text = getTownData[index]['town_name'];
                       townID = int.parse(getTownData[index]['town_id']);
+                      unitGroupId = int.parse(getTownData[index]['bunit_group_id']);
                       Navigator.of(context).pop();
                     },
                     child: ListTile(
@@ -266,7 +265,7 @@ class _MyHomePageState extends State<MyHomePage>  {
 
   ScrollController _scrollController = new ScrollController();
   bool _needsScroll = false;
-
+  final _formKey = GlobalKey<FormState>();
   @override
   void initState(){
     futureLoadQuotes();
@@ -457,109 +456,126 @@ class _MyHomePageState extends State<MyHomePage>  {
                       padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
                       child: Card(
                         elevation: 0.1,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(40, 10, 5, 15),
-                              child: new Text(
-                                "You don't need a silver fork to eat good food.",
-                                style: GoogleFonts.openSans(
-                                    fontStyle: FontStyle.normal,fontWeight: FontWeight.bold, fontSize: 45.0),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(40, 10, 5, 5),
-                              child: new Text(
-                                "Select Povince",
-                                style: GoogleFonts.openSans(
-                                    fontStyle: FontStyle.normal, fontSize: 18.0),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 5.0),
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(30.0),
-                                onTap: (){
-                                  selectProvince();
-                                },
-                                child: IgnorePointer(
-                                  child: new TextFormField(
-                                      textInputAction: TextInputAction.done,
-                                      cursorColor: Colors.deepOrange.withOpacity(0.8),
-                                      controller: province,
-                                      decoration: InputDecoration(
-                                        contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(
-                                              color: Colors.deepOrange.withOpacity(0.8),
-                                              width: 2.0),
-                                        ),
-                                        border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(30.0)),
-                                      )
-                                  ),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(40, 10, 5, 15),
+                                child: new Text(
+                                  "You don't need a silver fork to eat good food.",
+                                  style: GoogleFonts.openSans(
+                                      fontStyle: FontStyle.normal,fontWeight: FontWeight.bold, fontSize: 45.0),
                                 ),
                               ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(40, 10, 5, 5),
-                              child: new Text(
-                                "Select town",
-                                style: GoogleFonts.openSans(
-                                    fontStyle: FontStyle.normal, fontSize: 18.0),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 5.0),
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(30.0),
-                                onTap: (){
-                                  selectTown();
-                                },
-                                child: IgnorePointer(
-                                  child: new TextFormField(
-                                      textInputAction: TextInputAction.done,
-                                      cursorColor: Colors.deepOrange.withOpacity(0.8),
-                                      controller:town,
-                                      decoration: InputDecoration(
-                                        contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(
-                                              color: Colors.deepOrange.withOpacity(0.8),
-                                              width: 2.0),
-                                        ),
-                                        border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(30.0)),
-                                      )
-                                  ),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(40, 10, 5, 5),
+                                child: new Text(
+                                  "Select Province",
+                                  style: GoogleFonts.openSans(
+                                      fontStyle: FontStyle.normal, fontSize: 18.0),
                                 ),
                               ),
-                            ),
-                            SizedBox(
-                              height: 10.0,
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 5.0),
-                              child: Container(
-                                height: 50.0,
-                                child: OutlinedButton(
-                                  onPressed: (){
-                                    loadBu();
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 5.0),
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                  onTap: (){
+                                    selectProvince();
                                   },
-                                  style: TextButton.styleFrom(
-                                    backgroundColor: Colors.deepOrangeAccent,
-                                    primary: Colors.white,
-                                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+                                  child: IgnorePointer(
+                                    child: new TextFormField(
+                                        textInputAction: TextInputAction.done,
+                                        cursorColor: Colors.deepOrange.withOpacity(0.8),
+                                        controller: province,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Please select a province';
+                                          }
+                                          return null;
+                                        },
+                                        decoration: InputDecoration(
+                                          contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.deepOrange.withOpacity(0.8),
+                                                width: 2.0),
+                                          ),
+                                          border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(30.0)),
+                                        )
+                                    ),
                                   ),
-                                  child: Text("Go"),
                                 ),
                               ),
-                            ),
-                            SizedBox(
-                              height: 10.0,
-                            ),
-                          ],
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(40, 10, 5, 5),
+                                child: new Text(
+                                  "Select town",
+                                  style: GoogleFonts.openSans(
+                                      fontStyle: FontStyle.normal, fontSize: 18.0),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 5.0),
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                  onTap: (){
+                                    selectTown();
+                                  },
+                                  child: IgnorePointer(
+                                    child: new TextFormField(
+                                        textInputAction: TextInputAction.done,
+                                        cursorColor: Colors.deepOrange.withOpacity(0.8),
+                                        controller:town,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Please select a town';
+                                          }
+                                          return null;
+                                        },
+                                        decoration: InputDecoration(
+                                          contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.deepOrange.withOpacity(0.8),
+                                                width: 2.0),
+                                          ),
+                                          border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(30.0)),
+                                        )
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 10.0,
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 5.0),
+                                child: Container(
+                                  height: 50.0,
+                                  child: OutlinedButton(
+                                    onPressed: (){
+                                      if (_formKey.currentState.validate()) {
+                                        loadBu();
+                                      }
+                                    },
+                                    style: TextButton.styleFrom(
+                                      backgroundColor: Colors.deepOrangeAccent,
+                                      primary: Colors.white,
+                                      shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+                                    ),
+                                    child: Text("Go"),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 10.0,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

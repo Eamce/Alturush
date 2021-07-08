@@ -67,7 +67,7 @@ class _LoadCart extends State<LoadCart> {
   }
 
   Future getBuSegregate() async{
-    var res = await db.getBuSegregate();
+    var res = await db.getBuSegregate1();
     if (!mounted) return;
     setState(() {
       getBu = res['user_details'];
@@ -241,8 +241,8 @@ class _LoadCart extends State<LoadCart> {
                    ),
                  ),
                ],
-             ),
-           ),
+              ),
+            ),
           );
         });
   }

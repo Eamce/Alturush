@@ -16,7 +16,7 @@ class Splash extends StatefulWidget {
 
 class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
 
-  void selectType(BuildContext context) async{
+  void selectType(BuildContext context ,width ,height) async{
     showModalBottomSheet(
         isScrollControlled: true,
         isDismissible: true,
@@ -26,7 +26,7 @@ class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
         ),
         builder: (ctx) {
           return Container(
-            height: MediaQuery.of(context).size.height/2.9,
+            height: MediaQuery.of(context).size.height/3.4,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children:[
@@ -40,12 +40,12 @@ class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
                           Navigator.of(context).push(_foodRoute());
                         },
                         child: Container(
-                          width:170,
-                          height:170,
+                          width:width/2.5,
+                          height:height/3,
                           child: Column(
                             children:[
                               Padding(
-                                padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
+                                padding: EdgeInsets.fromLTRB(20.0, 50.0, 20.0, 20.0),
                                 child: Image.asset("assets/png/food.png",),
                               ),
                               Text("Food",style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold),),
@@ -59,12 +59,12 @@ class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
                           Navigator.of(context).push(_groceryRoute());
                         },
                         child: Container(
-                          width:170,
-                          height:170,
+                          width:width/2.5,
+                          height:height/3,
                           child: Column(
                             children: [
                               Padding(
-                                padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
+                                padding: EdgeInsets.fromLTRB(20.0, 50.0, 20.0, 20.0),
                                 child: Image.asset("assets/png/grocery.png"),
                               ),
                               Text("Grocery",style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold),),
@@ -72,8 +72,6 @@ class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
                           ),
                         ),
                       ),
-
-
                     ],
                   ),
                 ),
@@ -145,10 +143,11 @@ class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
       body: Container(
+
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage("assets/png/logo_raider8.2.png"),
-            fit: BoxFit.fitWidth,
+            fit: BoxFit.scaleDown
           ),
         ),
         child: Column(
@@ -260,24 +259,20 @@ class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
                 child: SizedBox(
                   width: width-50,
                   height: 50.0,
-                  child:  OutlineButton(
-                    highlightedBorderColor: Colors.deepOrange,
-                    highlightColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5.0),
-                        side: BorderSide(color: Colors.red)
+                  child:  OutlinedButton(
+                    style: TextButton.styleFrom(
+                      primary: Colors.black, // foreground
+                      // backgroundColor: Colors.deepOrange,
+                      shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
                     ),
-                    color: Colors.deepOrange,
                     onPressed: (){
-                      selectType(context);
-//                      Navigator.of(context).push(_createRoute());
-
+                      selectType(context ,width, height);
                     },
                     child: Text("Get started", style: GoogleFonts.openSans(
                         fontWeight: FontWeight.bold,
                         fontStyle: FontStyle.normal,
                         color: Colors.black,
-                        fontSize: 18.0),),
+                        fontSize: 20.0),),
                   ),
                 ),
               ),
