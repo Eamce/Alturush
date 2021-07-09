@@ -514,7 +514,7 @@ class _GroceryMain extends State<GroceryMain> with SingleTickerProviderStateMixi
                         style: SleekButtonStyle.flat(
                           color: Colors.green,
                           inverted: false,
-                          rounded: false,
+                          rounded: true,
                           size: SleekButtonSize.big,
                           context: context,
                         ),

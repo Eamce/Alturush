@@ -62,6 +62,7 @@ dependencies:
   nice_button: ^0.1.7
 # flutter_facebook_auth: ^3.3.3+1
 # firebase_auth:
+  simple_connection_checker: ^0.1.1
 
 
 

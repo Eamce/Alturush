@@ -1278,7 +1278,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                         style: SleekButtonStyle.flat(
                           color: Colors.deepOrange,
                           inverted: false,
-                          rounded: false,
+                          rounded: true,
                           size: SleekButtonSize.big,
                           context: context,
                         ),

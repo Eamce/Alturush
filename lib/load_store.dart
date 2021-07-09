@@ -706,7 +706,7 @@ class _LoadStore extends State<LoadStore> {
                     style: SleekButtonStyle.outlined(
                       color: Colors.deepOrange,
                       inverted: false,
-                      rounded: false,
+                      rounded: true,
                       size: SleekButtonSize.big,
                       context: context,
                     ),
@@ -735,7 +735,7 @@ class _LoadStore extends State<LoadStore> {
                         style: SleekButtonStyle.flat(
                           color: Colors.deepOrange,
                           inverted: false,
-                          rounded: false,
+                          rounded: true,
                           size: SleekButtonSize.big,
                           context: context,
                         ),

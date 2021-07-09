@@ -627,7 +627,6 @@ class _PlaceOrderPickUp extends State<PlaceOrderPickUp>    with SingleTickerProv
                                         );
                                       }
                                   ),
-
                                   // Padding(
                                   //   padding: EdgeInsets.fromLTRB(35, 20, 5, 5),
                                   //   child: new Text("Customer tender(ie.4,000.00)", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
@@ -739,7 +738,7 @@ class _PlaceOrderPickUp extends State<PlaceOrderPickUp>    with SingleTickerProv
                           style: SleekButtonStyle.flat(
                             color: Colors.deepOrange,
                             inverted: false,
-                            rounded: false,
+                            rounded: true,
                             size: SleekButtonSize.big,
                             context: context,
                           ),

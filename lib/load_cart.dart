@@ -569,7 +569,6 @@ bool ignorePointer = false;
                         child: ListView.builder(
                           itemCount:  getBu == null ? 0 : getBu.length,
                           itemBuilder: (BuildContext context, int index0) {
-
                             return Container(
                                 child:Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -661,12 +660,10 @@ bool ignorePointer = false;
                                                                             }
                                                                           },
                                                                           elevation: 1.0,
-//                                                            fillColor: Colors.transparent,
                                                                           child: Icon(
                                                                             Icons.delete_outline,
                                                                             size: 25.0,
                                                                           ),
-//                                                          padding: EdgeInsets.all(15.0),
                                                                           shape: CircleBorder(),
                                                                         )
                                                                     ),
@@ -676,10 +673,11 @@ bool ignorePointer = false;
                                                                         width: 50.0,
                                                                         child: TextButton(
                                                                           style: TextButton.styleFrom(
-                                                                            primary: Colors.blue,
+                                                                            backgroundColor: Colors.white12,
+                                                                            primary: Colors.black,
                                                                             onSurface: Colors.red,
                                                                           ),
-                                                                          child: Text('-'),
+                                                                          child: Text('-',style: TextStyle(fontSize: 18.0)),
                                                                           onPressed: () async{
                                                                             SharedPreferences prefs = await SharedPreferences.getInstance();
                                                                             String username = prefs.getString('s_customerId');
@@ -702,8 +700,8 @@ bool ignorePointer = false;
                                                                     ),
 
                                                                     Padding(
-                                                                      padding:EdgeInsets.fromLTRB(1, 5, 5, 5),
-                                                                      child:Text(loadCartData[index]['main_item']['quantity'].toString()),
+                                                                      padding:EdgeInsets.fromLTRB(15, 5, 15, 5),
+                                                                      child:Text(loadCartData[index]['main_item']['quantity'].toString(),style: TextStyle(fontSize: 17.0),),
                                                                     ),
                                                                     Padding(
                                                                       padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
@@ -711,11 +709,12 @@ bool ignorePointer = false;
                                                                         width: 50.0,
                                                                         child: TextButton(
                                                                           style: TextButton.styleFrom(
-                                                                            primary: Colors.blue,
+                                                                            backgroundColor: Colors.white12,
+                                                                            primary: Colors.black,
                                                                             onSurface: Colors.red,
                                                                           ),
-                                                                          child: Text('+'),
-                                                                          onPressed: ()async {
+                                                                          child: Text('+',style: TextStyle(fontSize: 18.0)),
+                                                                          onPressed: () async{
                                                                             SharedPreferences prefs = await SharedPreferences.getInstance();
                                                                             String username = prefs.getString('s_customerId');
                                                                             if(username == null){
@@ -809,7 +808,7 @@ bool ignorePointer = false;
                                       style: SleekButtonStyle.flat(
                                         color: Colors.deepOrange,
                                         inverted: false,
-                                        rounded: false,
+                                        rounded: true,
                                         size: SleekButtonSize.big,
                                         context: context,
                                       ),
@@ -845,7 +844,7 @@ bool ignorePointer = false;
                                     style: SleekButtonStyle.flat(
                                       color: Colors.deepOrange,
                                       inverted: false,
-                                      rounded: false,
+                                      rounded: true,
                                       size: SleekButtonSize.big,
                                       context: context,
                                     ),

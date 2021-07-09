@@ -911,7 +911,7 @@ class _CreateAccountSignIn extends State<CreateAccountSignIn> with SingleTickerP
                                 style: SleekButtonStyle.flat(
                                   color: Colors.deepOrange,
                                   inverted: false,
-                                  rounded: false,
+                                  rounded: true,
                                   size: SleekButtonSize.big,
                                   context: context,
                                 ),
@@ -1223,8 +1223,7 @@ class _CreateAccountSignIn extends State<CreateAccountSignIn> with SingleTickerP
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                               horizontal: 30.0, vertical: 5.0),
+                          padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
                           child: InkWell(
                             borderRadius: BorderRadius.circular(3.0),
                             onTap: () {},
@@ -1302,8 +1301,7 @@ class _CreateAccountSignIn extends State<CreateAccountSignIn> with SingleTickerP
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 30.0, vertical: 5.0),
+                          padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
                           child: InkWell(
                             borderRadius: BorderRadius.circular(3.0),
                             onTap: () {
@@ -1313,8 +1311,7 @@ class _CreateAccountSignIn extends State<CreateAccountSignIn> with SingleTickerP
                               child: new TextFormField(
                                 readOnly: true,
                                 textInputAction: TextInputAction.done,
-                                cursorColor:
-                                    Colors.deepOrange.withOpacity(0.8),
+                                cursorColor: Colors.deepOrange.withOpacity(0.8),
                                 controller: barrio,
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.fromLTRB(
@@ -1328,7 +1325,6 @@ class _CreateAccountSignIn extends State<CreateAccountSignIn> with SingleTickerP
                                   border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(3.0)),
                                 ),
-//                      focusNode: textSecondFocusNode,
                               ),
                             ),
                           ),
@@ -1345,7 +1341,7 @@ class _CreateAccountSignIn extends State<CreateAccountSignIn> with SingleTickerP
                               style: SleekButtonStyle.flat(
                                 color: Colors.deepOrange,
                                 inverted: false,
-                                rounded: false,
+                                rounded: true,
                                 size: SleekButtonSize.big,
                                 context: context,
                               ),

@@ -396,7 +396,7 @@ class _LoadTenants extends State<LoadTenants> {
                       style: SleekButtonStyle.flat(
                         color: Colors.deepOrange,
                         inverted: false,
-                        rounded: false,
+                        rounded: true,
                         size: SleekButtonSize.big,
                         context: context,
                       ),

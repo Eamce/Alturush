@@ -596,7 +596,7 @@ class _ViewItem extends State<ViewItem>{
                         style: SleekButtonStyle.flat(
                           color: Colors.deepOrange,
                           inverted: false,
-                          rounded: false,
+                          rounded: true,
                           size: SleekButtonSize.big,
                           context: context,
                         ),

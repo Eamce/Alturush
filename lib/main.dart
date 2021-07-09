@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:simple_connection_checker/simple_connection_checker.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:async';
 import 'splashScreen.dart';
 
@@ -17,8 +19,19 @@ class _MyApp extends State<MyApp>{
   Timer _timerSession;
   void handleUserInteraction([_]) {
     _initializeTimer();
+    _checkInternet(context);
   }
 
+  _checkInternet(context) async{
+    bool isConnected = await SimpleConnectionChecker.isConnectedToInternet();
+    if(!isConnected){
+      Fluttertoast.showToast(
+          msg: "Please check your internet connection",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+      );
+    }
+  }
   _logOutUser() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.clear();
