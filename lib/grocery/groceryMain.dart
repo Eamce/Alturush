@@ -19,6 +19,8 @@ import '../load_bu.dart';
 //paul jearic
 
 class GroceryMain extends StatefulWidget {
+  final groceryRoute;
+  GroceryMain({Key key, @required this.groceryRoute,}) : super(key: key);
   @override
   _GroceryMain createState() => _GroceryMain();
 }
@@ -47,20 +49,21 @@ class _GroceryMain extends State<GroceryMain> with SingleTickerProviderStateMixi
 //    var res = await db.getBusinessUnits();
 //    getGcCounter();
 //    getCounter();
-    listenCartCount();
-    setState(() {
-      isLoading = true;
-      isLoading1 = false;
-      cartLoading = true;
-    });
-    var res = await db.getBusinessUnitsCi(1);
-    //to modified
-    if (!mounted) return;
-    setState(() {
-      cartLoading = false;
-      isLoading = false;
-      buData = res['user_details'];
-    });
+      getGlobalCat();
+      listenCartCount();
+      setState(() {
+        isLoading = true;
+        isLoading1 = false;
+        cartLoading = true;
+      });
+      var res = await db.getBusinessUnitsCi(1,1);
+      //to modified
+      if (!mounted) return;
+      setState(() {
+        cartLoading = false;
+        isLoading = false;
+        buData = res['user_details'];
+      });
   }
 
   Future getCounter() async {
@@ -224,6 +227,15 @@ class _GroceryMain extends State<GroceryMain> with SingleTickerProviderStateMixi
         });
   }
 
+  List globalCat;
+  Future getGlobalCat() async{
+    var res = await db.getGlobalCat();
+    if (!mounted) return;
+    setState(() {
+      globalCat = res['user_details'];
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -302,37 +314,35 @@ class _GroceryMain extends State<GroceryMain> with SingleTickerProviderStateMixi
                       SizedBox(
                         height: 50.0,
                       ),
-                      NiceButton(
-                        background:Colors.redAccent ,
-                        radius: 20,
-                        padding: const EdgeInsets.all(15),
-                        text: "Order Food",
-                        gradientColors: [Colors.redAccent, Colors.deepOrangeAccent],
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          Navigator.of(context).push(_loadFood());
-                        },
+                      ListView.builder(
+                          shrinkWrap: true,
+                          physics: BouncingScrollPhysics(),
+                          itemCount:  globalCat == null ? 0 : globalCat.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor: Colors.transparent,
+                                  child: Image.network(globalCat[index]['cat_picture']),
+                                ),
+                                title: Text(globalCat[index]['category'],style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 16.0),),
+                                onTap: () async{
+                                  Navigator.pop(context);
+                                  if(globalCat[index]['id'] == '1'){
+                                    Navigator.of(context).push(_foodRoute(globalCat[index]['id']));
+                                  }if(globalCat[index]['id'] == '2'){
+                                    Navigator.of(context).push(_groceryRoute(globalCat[index]['id']));
+                                  }if(globalCat[index]['id'] == '3'){
+                                    Navigator.of(context).push(_foodRoute(globalCat[index]['id']));
+                                  }
+                                }
+                            );
+                          }
                       ),
-                      SizedBox(
-                        height: 50.0,
-                      ),
-                      // ListTile(
-                      //     leading: Icon(Icons.home_outlined,size: 30.0,),
-                      //     title: Text('Home',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 16.0),),
-                      //     onTap: () async{
-                      //       Navigator.of(context).pop();
-                      //       Navigator.of(context).push(_mainPage());
-                      //     }
-                      // ),
                       ListTile(
                           leading: Icon(Icons.person,size: 30.0,),
-                          title: Text('Profile',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 16.0),),
+                          title: Text('Profile',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 16.0),),
                           onTap: () async{
                             Navigator.of(context).pop();
-                            // SharedPreferences prefs = await SharedPreferences.getInstance();
-                            // String status  = prefs.getString('s_status');
-                            // status != null ? Navigator.of(context).push(_profilePage()) : Navigator.of(context).push(_signIn());
-
                             SharedPreferences prefs = await SharedPreferences.getInstance();
                             String username = prefs.getString('s_customerId');
                             if(username == null){
@@ -350,12 +360,9 @@ class _GroceryMain extends State<GroceryMain> with SingleTickerProviderStateMixi
                       ),
                       ListTile(
                           leading: Icon(Icons.add,size: 30.0,),
-                          title: Text('Add discount',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 16.0),),
+                          title: Text('Add discount',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 16.0),),
                           onTap: () async{
                             Navigator.of(context).pop();
-                            // SharedPreferences prefs = await SharedPreferences.getInstance();
-                            // String status  = prefs.getString('s_status');
-                            // status != null ? Navigator.of(context).push(viewIds()) : Navigator.of(context).push(_signIn());
                             SharedPreferences prefs = await SharedPreferences.getInstance();
                             String username = prefs.getString('s_customerId');
                             if(username == null){
@@ -371,28 +378,14 @@ class _GroceryMain extends State<GroceryMain> with SingleTickerProviderStateMixi
                             }
                           }
                       ),
-                      // ListTile(
-                      //   leading: Icon(Icons.info_outline,size: 30.0,color: Colors.green,),
-                      //   title: Text('About',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 16.0),),
-                      // ),
                       ListTile(
                         leading: Icon(Icons.info_outline,size: 30.0,),
-                        title: Text('Data privacy',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 16.0),),
+                        title: Text('Data privacy',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 16.0),),
                           onTap: () {
                             Navigator.of(context).pop();
                             Navigator.of(context).push(showDpn2());
                           }
                       ),
-//                      ListTile(
-//                            leading: Icon(Icons.help_outline,size: 30.0,color: Colors.deepOrange,),
-//                            title: Text('Log out',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 16.0),),
-//                            onTap: () async{
-//                                Navigator.of(context).pop();
-//                                _googleSignIn.signOut();
-//                                SharedPreferences prefs = await SharedPreferences.getInstance();
-//                                prefs.clear();
-//                            }
-//                        ),
                     ],
                   ),
                 ),
@@ -616,23 +609,6 @@ Route _profilePage() {
 }
 
 
-
-Route _loadFood(){
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => MyHomePage(),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      var begin = Offset(0.0, 1.0);
-      var end = Offset.zero;
-      var curve = Curves.decelerate;
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
-}
-
 Route _loadGC(logo,categoryName,categoryNo,businessUnit,bUnitCode){
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => GcLoadStore(logo:logo,categoryName:categoryName,categoryNo:categoryNo,businessUnit:businessUnit,bUnitCode:bUnitCode),
@@ -684,6 +660,38 @@ Route showDpn2() {
 Route _signIn() {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => CreateAccountSignIn(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(0.0, 1.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route _foodRoute(_globalCatID) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => MyHomePage(globalCatID:_globalCatID),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(0.0, 1.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route _groceryRoute(_groceryRoute) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => GroceryMain(groceryRoute:_groceryRoute),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;

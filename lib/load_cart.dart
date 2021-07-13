@@ -73,6 +73,7 @@ class _LoadCart extends State<LoadCart> {
       getBu = res['user_details'];
     });
   }
+
   Future loadTotal() async{
     var res = await db.loadSubTotal();
     if (!mounted) return;
@@ -303,8 +304,6 @@ class _LoadCart extends State<LoadCart> {
                           ),
                         ),
                       ),
-
-
                     ],
                   ),
                 ),

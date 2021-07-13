@@ -6,8 +6,7 @@ import 'grocery/groceryMain.dart';
 import 'load_bu.dart';
 import 'package:root_check/root_check.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import 'db_helper.dart';
 
 class Splash extends StatefulWidget {
   @override
@@ -15,7 +14,8 @@ class Splash extends StatefulWidget {
 }
 
 class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
-
+  final db = RapidA();
+  List globalCat;
   void selectType(BuildContext context ,width ,height) async{
     showModalBottomSheet(
         isScrollControlled: true,
@@ -30,49 +30,41 @@ class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children:[
+                Padding(
+                    padding: EdgeInsets.fromLTRB(12, 10, 10, 5),
+                    child: Text("Please select",style: TextStyle(fontSize: 23.0,),)
+                ),
                 Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children:[
-                      GestureDetector(
-                        onTap: (){
-                          Navigator.pop(context);
-                          Navigator.of(context).push(_foodRoute());
-                        },
-                        child: Container(
-                          width:width/2.5,
-                          height:height/3,
-                          child: Column(
-                            children:[
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(20.0, 50.0, 20.0, 20.0),
-                                child: Image.asset("assets/png/food.png",),
+                  child:Container(
+                    height: 400.0, // Change as per your requirement
+                    // width: 300.0, // Change as per your requirement
+                    child: Scrollbar(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount:  globalCat == null ? 0 : globalCat.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return InkWell(
+                            onTap: () {
+                              Navigator.pop(context);
+                              if(globalCat[index]['id'] == '1'){
+                                Navigator.of(context).push(_foodRoute(globalCat[index]['id']));
+                              }if(globalCat[index]['id'] == '2'){
+                                Navigator.of(context).push(_groceryRoute(globalCat[index]['id']));
+                              }if(globalCat[index]['id'] == '3'){
+                                Navigator.of(context).push(_foodRoute(globalCat[index]['id']));
+                              }
+                            },
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: Colors.transparent,
+                                child: Image.network(globalCat[index]['cat_picture']),
                               ),
-                              Text("Food",style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold),),
-                            ],
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: (){
-                          Navigator.pop(context);
-                          Navigator.of(context).push(_groceryRoute());
+                              title: Text(globalCat[index]['category'],style: TextStyle(fontSize: 18),),
+                            ),
+                          );
                         },
-                        child: Container(
-                          width:width/2.5,
-                          height:height/3,
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(20.0, 50.0, 20.0, 20.0),
-                                child: Image.asset("assets/png/grocery.png"),
-                              ),
-                              Text("Grocery",style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold),),
-                            ],
-                          ),
-                        ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ],
@@ -126,9 +118,19 @@ class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
     }
   }
 
+
+  Future getGlobalCat() async{
+    var res = await db.getGlobalCat();
+    if (!mounted) return;
+    setState(() {
+      globalCat = res['user_details'];
+    });
+  }
+
   @override
   void initState() {
     initPlatformState();
+    getGlobalCat();
     super.initState();
   }
   @override
@@ -284,9 +286,9 @@ class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
   }
 }
 
-Route _foodRoute() {
+Route _foodRoute(_globalCatID) {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => MyHomePage(),
+    pageBuilder: (context, animation, secondaryAnimation) => MyHomePage(globalCatID:_globalCatID),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;
@@ -300,9 +302,9 @@ Route _foodRoute() {
   );
 }
 
-Route _groceryRoute() {
+Route _groceryRoute(_groceryRoute) {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => GroceryMain(),
+    pageBuilder: (context, animation, secondaryAnimation) => GroceryMain(groceryRoute:_groceryRoute),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;

@@ -95,7 +95,7 @@ class _LoadTenants extends State<LoadTenants> {
                                 shrinkWrap: true,
                                 itemCount: categoryData.length,
                                 itemBuilder: (BuildContext context, int index) {
-                                  return GestureDetector(
+                                  return InkWell(
                                     onTap: () async{
                                       Navigator.pop(context);
                                       if(index == 0){
@@ -326,12 +326,9 @@ class _LoadTenants extends State<LoadTenants> {
                           shrinkWrap: true,
                           itemCount: loadTenants == null ? 0 : loadTenants.length,
                           itemBuilder: (BuildContext context, int index) {
-                            return GestureDetector(
+                            return InkWell(
                               onTap: () {
                                 selectCategory(context,widget.buCode,loadTenants[index]['logo'], loadTenants[index]['tenant_id'], loadTenants[index]['d_tenant_name']);
-
-                                // Navigator.of(context).push(_loadStore(widget.buCode,loadTenants[index]['logo'], loadTenants[index]['tenant_id'], loadTenants[index]['d_tenant_name']));
-
                               },
                               child:Container(
                                 height: 120.0,

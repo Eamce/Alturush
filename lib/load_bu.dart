@@ -17,7 +17,10 @@ import 'package:arush/idmasterfile.dart';
 import 'main.dart';
 
 
+
 class MyHomePage extends StatefulWidget {
+  final globalCatID;
+  MyHomePage({Key key, @required this.globalCatID,}) : super(key: key);
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -50,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage>  {
   int unitGroupId;
 
   Future loadBu() async{
-    var res = await db.getBusinessUnitsCi(unitGroupId);
+    var res = await db.getBusinessUnitsCi(unitGroupId,widget.globalCatID);
     if (!mounted) return;
     setState(() {
       buData = res['user_details'];
@@ -266,14 +269,27 @@ class _MyHomePageState extends State<MyHomePage>  {
   ScrollController _scrollController = new ScrollController();
   bool _needsScroll = false;
   final _formKey = GlobalKey<FormState>();
+
+  List globalCat;
+  Future getGlobalCat() async{
+    var res = await db.getGlobalCat();
+    if (!mounted) return;
+    setState(() {
+      globalCat = res['user_details'];
+    });
+  }
+
   @override
   void initState(){
     futureLoadQuotes();
     listenCartCount();
     loadProfile();
+    getGlobalCat();
     // loadBu();
     super.initState();
   }
+
+
 
   @override
   void dispose() {
@@ -344,23 +360,33 @@ class _MyHomePageState extends State<MyHomePage>  {
                       SizedBox(
                         height: 50.0,
                       ),
-                      NiceButton(
-                        background:Colors.redAccent ,
-                        radius: 20,
-                        padding: const EdgeInsets.all(15),
-                        text: "Order groceries",
-                        gradientColors: [Colors.green, Colors.lightGreen],
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          Navigator.of(context).push(_loadGrocery());
-                        },
-                      ),
-                      SizedBox(
-                        height: 50.0,
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: BouncingScrollPhysics(),
+                        itemCount:  globalCat == null ? 0 : globalCat.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: Colors.transparent,
+                                child: Image.network(globalCat[index]['cat_picture']),
+                              ),
+                              title: Text(globalCat[index]['category'],style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 16.0),),
+                              onTap: () async{
+                                Navigator.pop(context);
+                                if(globalCat[index]['id'] == '1'){
+                                  Navigator.of(context).push(_foodRoute(globalCat[index]['id']));
+                                }if(globalCat[index]['id'] == '2'){
+                                  Navigator.of(context).push(_groceryRoute(globalCat[index]['id']));
+                                }if(globalCat[index]['id'] == '3'){
+                                  Navigator.of(context).push(_foodRoute(globalCat[index]['id']));
+                                }
+                              }
+                          );
+                         }
                       ),
                       ListTile(
                           leading: Icon(Icons.person,size: 30.0,),
-                          title: Text('Profile',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 16.0),),
+                          title: Text('Profile',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 16.0),),
                           onTap: () async{
                             Navigator.of(context).pop();
                             SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -373,7 +399,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                       ),
                       ListTile(
                           leading: Icon(Icons.add,size: 30.0,),
-                          title: Text('Manage discount',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 16.0),),
+                          title: Text('Manage discount',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 16.0),),
                           onTap: () async{
                             Navigator.of(context).pop();
                             SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -397,7 +423,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                       // ),
                       ListTile(
                           leading: Icon(Icons.info_outline,size: 30.0,),
-                          title: Text('Data privacy',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 16.0),),
+                          title: Text('Data privacy',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 16.0),),
                           onTap: () {
                             Navigator.of(context).pop();
                             Navigator.of(context).push(showDpn2());
@@ -455,7 +481,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                     Padding(
                       padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
                       child: Card(
-                        elevation: 0.1,
+                        elevation: 0.0,
                         child: Form(
                           key: _formKey,
                           child: Column(
@@ -486,6 +512,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                                   },
                                   child: IgnorePointer(
                                     child: new TextFormField(
+
                                         textInputAction: TextInputAction.done,
                                         cursorColor: Colors.deepOrange.withOpacity(0.8),
                                         controller: province,
@@ -496,12 +523,17 @@ class _MyHomePageState extends State<MyHomePage>  {
                                           return null;
                                         },
                                         decoration: InputDecoration(
+                                          errorStyle: TextStyle(color: Colors.blue),
+                                          errorBorder: new OutlineInputBorder(
+                                            borderSide: new BorderSide(color: Colors.blue,),
+                                          ),
                                           contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
                                           focusedBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                                 color: Colors.deepOrange.withOpacity(0.8),
                                                 width: 2.0),
                                           ),
+
                                           border: OutlineInputBorder(
                                               borderRadius: BorderRadius.circular(30.0)),
                                         )
@@ -619,7 +651,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                                     ),
                                   ],
                                 ),
-                                elevation: 0.1,
+                                elevation: 0.0,
                                 margin: EdgeInsets.all(3),
                               ),
                             ),
@@ -749,37 +781,6 @@ Route _loadCart(){
   );
 }
 
-Route _loadGrocery(){
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => GroceryMain(),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      var begin = Offset(0.0, 1.0);
-      var end = Offset.zero;
-      var curve = Curves.decelerate;
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
-}
-
-Route _mainPage() {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => MyApp(),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      var begin = Offset(0.0, 1.0);
-      var end = Offset.zero;
-      var curve = Curves.decelerate;
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
-}
 
 Route viewIds() {
   return PageRouteBuilder(
@@ -800,6 +801,38 @@ Route viewIds() {
 Route _signIn() {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => CreateAccountSignIn(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(0.0, 1.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route _foodRoute(_globalCatID) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => MyHomePage(globalCatID:_globalCatID),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(0.0, 1.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route _groceryRoute(_groceryRoute) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => GroceryMain(groceryRoute:_groceryRoute),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;

@@ -7,6 +7,7 @@ import 'profile/addressMasterFile.dart';
 import 'to_deliverFood.dart';
 import 'idmasterfile.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'profile/changePassword.dart';
 
 class TrackOrder extends StatefulWidget {
   @override
@@ -106,7 +107,22 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                           //                       child: Text('$f. ${lGetAmountPerTenant[index]['d_bu_name']} - ${lGetAmountPerTenant[index]['d_tenant']}  ₱${oCcy.format(double.parse(lGetAmountPerTenant[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
                         ),
                       ),
-
+                      InkWell(
+                        onTap: (){
+                          Navigator.of(context).pop();
+                          Navigator.of(context).push(changePassword());
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 20.0),
+                          child:Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("Change password",style: TextStyle(fontSize: 15.0,fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                          //                       child: Text('$f. ${lGetAmountPerTenant[index]['d_bu_name']} - ${lGetAmountPerTenant[index]['d_tenant']}  ₱${oCcy.format(double.parse(lGetAmountPerTenant[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
+                        ),
+                      ),
                     ],
                   );
                 },
@@ -155,7 +171,7 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
         appBar: AppBar(
           brightness: Brightness.light,
           backgroundColor: Colors.white,
-          elevation: 0.1,
+          elevation: 0.0,
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.black,size: 23,),
             onPressed: () => Navigator.of(context).pop(),
@@ -189,7 +205,7 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                             Padding(
                               padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
                               child: Card(
-                                // elevation: 0.1,
+                                elevation: 0.0,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
@@ -270,7 +286,7 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                                             child: Container(
                                               height: 100.0,
                                               child: Card(
-                                                // elevation: 0.0,
+                                                elevation: 0.0,
                                                 child: Column(
                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: <Widget>[
@@ -382,4 +398,21 @@ Route addressMasterFileRoute() {
     },
   );
 }
+
+Route changePassword() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => ChangePassword(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
 

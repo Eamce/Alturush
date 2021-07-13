@@ -393,11 +393,12 @@ class RapidA {
   }
 
   //node
-  Future getBusinessUnitsCi(unitGroupId) async{
+  Future getBusinessUnitsCi(unitGroupId,globalCatID) async{
     var client = http.Client();
     Map dataUser;
     final response = await client.post(Uri.parse("$server/display_store_r"),body:{
-      'unitGroupId':'$unitGroupId'
+      'unitGroupId':'$unitGroupId',
+      'globalCatID': '$globalCatID',
     });
     dataUser = jsonDecode(response.body);
     client.close();
@@ -1288,12 +1289,21 @@ class RapidA {
   }
 
   Future getTotalFee(ticketID) async{
-    print(ticketID);
     var client = http.Client();
     Map dataUser;
-
     final response = await client.post(Uri.parse("$server/getTotalFee_r"),body:{
           'ticketID':ticketID.toString()
+    });
+    dataUser = jsonDecode(response.body);
+    client.close();
+    return dataUser;
+  }
+
+  Future getGlobalCat() async{
+    var client = http.Client();
+    Map dataUser;
+    final response = await client.post(Uri.parse("$server/getglobalcat_r"),body:{
+
     });
     dataUser = jsonDecode(response.body);
     client.close();
