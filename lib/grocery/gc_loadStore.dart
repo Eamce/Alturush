@@ -684,7 +684,7 @@ class _GcLoadStore extends State<GcLoadStore> {
                     style: SleekButtonStyle.outlined(
                       color: Colors.green,
                       inverted: false,
-                      rounded: false,
+                      rounded: true,
                       size: SleekButtonSize.big,
                       context: context,
                     ),

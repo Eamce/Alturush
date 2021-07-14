@@ -1348,7 +1348,7 @@ class _PlaceOrder extends State<PlaceOrder>    with SingleTickerProviderStateMix
                             style: SleekButtonStyle.flat(
                               color: Colors.deepOrange,
                               inverted: false,
-                              rounded: false,
+                              rounded: true,
                               size: SleekButtonSize.big,
                               context: context,
                             ),
@@ -1647,7 +1647,7 @@ class _PlaceOrder extends State<PlaceOrder>    with SingleTickerProviderStateMix
                             style: SleekButtonStyle.flat(
                               color: Colors.deepOrange,
                               inverted: false,
-                              rounded: false,
+                              rounded: true,
                               size: SleekButtonSize.big,
                               context: context,
                             ),

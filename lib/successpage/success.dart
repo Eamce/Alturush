@@ -81,7 +81,7 @@ class _Success extends State<Success> {
                 style: SleekButtonStyle.flat(
                   color: Colors.deepOrange,
                   inverted: false,
-                  rounded: false,
+                  rounded: true,
                   size: SleekButtonSize.big,
                   context: context,
                 ),

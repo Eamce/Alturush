@@ -353,7 +353,7 @@ class _SubmitPickUp extends State<SubmitPickUp>  {
                         style: SleekButtonStyle.flat(
                           color: Colors.deepOrange,
                           inverted: false,
-                          rounded: false,
+                          rounded: true,
                           size: SleekButtonSize.big,
                           context: context,
                         ),

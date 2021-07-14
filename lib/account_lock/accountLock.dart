@@ -241,7 +241,7 @@ class _AccountLock extends State<AccountLock> {
                 style: SleekButtonStyle.flat(
                   color: Colors.deepOrange,
                   inverted: false,
-                  rounded: false,
+                  rounded: true,
                   size: SleekButtonSize.big,
                   context: context,
                 ),

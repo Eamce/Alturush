@@ -91,6 +91,7 @@ class RapidA {
     var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var userID = prefs.getString('s_customerId');
+    print(userID);
     Map dataUser;
     final response = await client.post(Uri.parse("$server/getPlaceOrderData_r"),body:{
       'cusId':encrypt(userID)
@@ -173,7 +174,6 @@ class RapidA {
        'changeFor':changeFor
     });
     client.close();
-    print(client);
   }
 
   // Future getLastOrder() async{

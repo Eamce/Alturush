@@ -1233,13 +1233,15 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                               ),
                               Padding(
                                 padding:EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
-                                child: new TextFormField(
+                                  child: new TextFormField(
                                   textInputAction: TextInputAction.done,
                                   cursorColor: Colors.deepOrange,
                                   controller: changeFor,
                                   validator: (value) {
                                     if (value.isEmpty) {
                                       return 'Please enter some value';
+                                    }if(int.parse(value) < grandTotal){
+                                      return 'Amount tender is lesser than your total payable';
                                     }
                                     return null;
                                   },

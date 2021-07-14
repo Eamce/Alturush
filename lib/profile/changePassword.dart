@@ -129,7 +129,7 @@ class _ChangePassword extends State<ChangePassword> {
                   SizedBox(
                     height: 1.0,
                   ),
-                  Padding( b
+                  Padding(
                     padding: EdgeInsets.fromLTRB(25, 10, 5, 5),
                     child: new Text(
                       "Re-type new password",

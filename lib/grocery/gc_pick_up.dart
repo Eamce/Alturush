@@ -758,7 +758,7 @@ class _GcPickUp extends State<GcPickUp> {
                               style: SleekButtonStyle.flat(
                                 color: Colors.green,
                                 inverted: false,
-                                rounded: false,
+                                rounded: true,
                                 size: SleekButtonSize.big,
                                 context: context,
                               ),

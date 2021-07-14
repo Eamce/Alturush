@@ -602,7 +602,7 @@ class _ShowDpn extends State<ShowDpn> {
                   style: SleekButtonStyle.flat(
                     color:btnColor,
                     inverted: false,
-                    rounded: false,
+                    rounded: true,
                     size: SleekButtonSize.big,
                     context: context,
                   ),

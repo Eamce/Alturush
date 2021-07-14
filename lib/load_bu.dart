@@ -523,10 +523,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                                           return null;
                                         },
                                         decoration: InputDecoration(
-                                          errorStyle: TextStyle(color: Colors.blue),
-                                          errorBorder: new OutlineInputBorder(
-                                            borderSide: new BorderSide(color: Colors.blue,),
-                                          ),
+
                                           contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
                                           focusedBorder: OutlineInputBorder(
                                             borderSide: BorderSide(

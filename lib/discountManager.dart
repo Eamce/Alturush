@@ -194,7 +194,7 @@ class _DiscountManager extends State<DiscountManager> {
                     style: SleekButtonStyle.flat(
                       color: Colors.deepOrange,
                       inverted: false,
-                      rounded: false,
+                      rounded: true,
                       size: SleekButtonSize.big,
                       context: context,
                     ),

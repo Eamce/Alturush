@@ -615,7 +615,7 @@ class _ToDeliver extends State<ToDeliverFood> {
                             style: SleekButtonStyle.flat(
                               color: Colors.deepOrange,
                               inverted: false,
-                              rounded: false,
+                              rounded: true,
                               size: SleekButtonSize.big,
                               context: context,
                             ),
@@ -637,14 +637,14 @@ class _ToDeliver extends State<ToDeliverFood> {
                             },
                             style: SleekButtonStyle.flat(
                               color: Colors.deepOrange,
-                              inverted: false,
-                              rounded: false,
+                              inverted: true,
+                              rounded: true,
                               size: SleekButtonSize.big,
                               context: context,
                             ),
                             child: Center(
                                 // ₱${oCcy.format(int.parse(lGetAmountPerTenant[index]['sumpertenats'].toString()))}
-                                child: Text("Total ₱ ${oCcy.format(int.parse(grandTotal.toString()))}", style:TextStyle(fontStyle: FontStyle.normal, fontWeight: FontWeight.bold, fontSize: 13.0),
+                                child: Text("Total ₱ ${oCcy.format(int.parse(grandTotal.toString()))}", style:TextStyle(fontStyle: FontStyle.normal, fontWeight: FontWeight.bold, fontSize: 18.0),
                               ),
                             ),
                           ),
