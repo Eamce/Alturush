@@ -251,7 +251,6 @@ class _LoadStore extends State<LoadStore> {
       },
       child: Scaffold(
         appBar: AppBar(
-
           brightness: Brightness.light,
           backgroundColor: Colors.white,
           elevation: 0.1,

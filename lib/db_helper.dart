@@ -7,6 +7,7 @@ import 'package:encrypt/encrypt.dart';
 List loadIdList;
 List<bool> side = [];
 List<String> selectedDiscountType = [];
+int unitGroupId;
 
 class RapidA {
   static final RapidA _instance = RapidA._();
@@ -1304,6 +1305,19 @@ class RapidA {
     Map dataUser;
     final response = await client.post(Uri.parse("$server/getglobalcat_r"),body:{
 
+    });
+    dataUser = jsonDecode(response.body);
+    client.close();
+    return dataUser;
+  }
+
+
+  Future searchProd(search,unitGroupId) async{
+    var client = http.Client();
+    Map dataUser;
+    final response = await client.post(Uri.parse("$server/search_item_r"),body:{
+      'search':search,
+      'unitGroupId':'$unitGroupId'
     });
     dataUser = jsonDecode(response.body);
     client.close();

@@ -142,7 +142,6 @@ class _ProfilePage extends State<ProfilePage> {
                                             fontStyle: FontStyle.normal,
                                             fontSize: 20.0),
                                       ),
-
                                     ],
                                   )),
                                   Center(

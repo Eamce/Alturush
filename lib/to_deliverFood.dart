@@ -506,10 +506,10 @@ class _ToDeliver extends State<ToDeliverFood> {
                                                                     ],
                                                                   ),
                                                                   Row(
-                                                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                                     children: [
                                                                       Padding(
-                                                                        padding: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                                                                        padding: EdgeInsets.fromLTRB(15, 0, 20, 0),
                                                                         child: new Text('Quantity: ${loadItems[index]['d_qty']}',
                                                                           style: TextStyle(
                                                                             fontWeight: FontWeight.bold,
@@ -520,7 +520,7 @@ class _ToDeliver extends State<ToDeliverFood> {
                                                                       ),
                                                                       loadItems[index]['canceled_status'] == '1'?
                                                                       Padding(
-                                                                        padding: EdgeInsets.fromLTRB(15, 0, 5, 0),
+                                                                        padding: EdgeInsets.fromLTRB(0, 0, 25, 0),
                                                                         child: OutlinedButton(
                                                                           style: TextButton.styleFrom(
                                                                             primary: Colors.black, // foreground
@@ -532,7 +532,7 @@ class _ToDeliver extends State<ToDeliverFood> {
                                                                       ):
                                                                       loadItems[index]['ifexists'] == 'true'?
                                                                       Padding(
-                                                                        padding: EdgeInsets.fromLTRB(15, 0, 5, 0),
+                                                                        padding: EdgeInsets.fromLTRB(0, 0, 25, 0),
                                                                         child: OutlinedButton(
                                                                           style: TextButton.styleFrom(
                                                                             primary: Colors.black, // foreground
@@ -542,7 +542,7 @@ class _ToDeliver extends State<ToDeliverFood> {
                                                                           child: Text("Rider is tagged"),
                                                                         ),
                                                                       ):Padding(
-                                                                        padding: EdgeInsets.fromLTRB(15, 0, 5, 0),
+                                                                        padding: EdgeInsets.fromLTRB(0, 0, 25, 0),
                                                                         child: OutlinedButton(
                                                                           style: TextButton.styleFrom(
                                                                             primary: Colors.black, // foreground

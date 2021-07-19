@@ -10,6 +10,8 @@ import 'track_order.dart';
 import 'package:sleek_button/sleek_button.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
+import 'search.dart';
+
 class LoadTenants extends StatefulWidget {
   final buCode;
   final buLogo;
@@ -228,6 +230,12 @@ class _LoadTenants extends State<LoadTenants> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         actions: <Widget>[
+          IconButton(
+              icon: Icon(Icons.search_outlined, color: Colors.black),
+              onPressed: () async {
+                Navigator.of(context).push(_search());
+                }
+          ),
           status == null ? TextButton(
             onPressed: () async {
               await Navigator.of(context).push(_signIn());
@@ -517,3 +525,20 @@ Route _signIn() {
     },
   );
 }
+
+Route _search() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => Search(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+

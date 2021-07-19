@@ -50,7 +50,7 @@ class _MyHomePageState extends State<MyHomePage>  {
   int counter;
   int provinceId;
   int townID;
-  int unitGroupId;
+
 
   Future loadBu() async{
     var res = await db.getBusinessUnitsCi(unitGroupId,widget.globalCatID);
@@ -512,7 +512,6 @@ class _MyHomePageState extends State<MyHomePage>  {
                                   },
                                   child: IgnorePointer(
                                     child: new TextFormField(
-
                                         textInputAction: TextInputAction.done,
                                         cursorColor: Colors.deepOrange.withOpacity(0.8),
                                         controller: province,
