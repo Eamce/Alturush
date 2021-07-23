@@ -171,19 +171,6 @@ class _ViewItem extends State<ViewItem>{
           );
         },
       );
-
-      // print(widget.buCode);
-      // print(widget.prodId);
-      // print(widget.productUom);
-      //
-      // print(choiceUomId);
-      // print(choiceId);
-      // print(uomId);
-      // print(flavorId);
-      // print(selectedSideItems);
-      // print(selectedSideItemsUom);
-      // print(_counter);
-      // await db.addToCartCiTest(widget.buCode,widget.tenantCode,widget.prodId,widget.productUom,flavorId,drinkId,drinkUom,friesId,friesUom,sideId,sideUom,selectedSideItems,selectedSideItemsUom,selectedDessertItems,selectedDessertItemsUom,boolFlavorId,boolDrinkId,boolFriesId,boolSideId,_counter);
       await db.addToCartNew(widget.prodId,uomId,_counter,uomPrice,choiceUomId,choiceId,choicePrice,flavorId,flavorPrice,selectedSideOnPrice,selectedSideItems,selectedSideItemsUom);
     }
   }
@@ -231,11 +218,19 @@ class _ViewItem extends State<ViewItem>{
           backgroundColor: Colors.white,
           elevation: 0.1,
           iconTheme: new IconThemeData(color: Colors.black),
-          title: Text("Customize",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
+          title: Text("Details",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.black,size: 23,),
             onPressed: () => Navigator.of(context).pop(),
           ),
+          actions: [
+            IconButton(
+                icon: Icon(Icons.info_outline, color: Colors.black),
+                onPressed: () async {
+
+                }
+            ),
+          ],
         ),
         body: isLoading
             ? Center(
@@ -267,7 +262,6 @@ class _ViewItem extends State<ViewItem>{
                                   padding:EdgeInsets.fromLTRB(20.0, 0.0, 5.0, 5.0),
                                   child: Row(
                                     children:[
-
                                       Text('₱ $uomPrice', style: TextStyle(fontSize: 20,color: Colors.deepOrange,),),
                                     ],
                                   ),

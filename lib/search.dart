@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'db_helper.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'view_item.dart';
 
 class Search extends StatefulWidget {
   @override
@@ -59,9 +60,9 @@ class _Search extends State<Search> {
                 controller: search,
                 onChanged: (text) {
                   searchProd();
-                  if(search.text.length == 0){
+                  if(search.text.length <= 1){
                     setState(() {
-                      searchProdData.clear();
+                      load = true;
                     });
                   }
                 },
@@ -106,7 +107,15 @@ class _Search extends State<Search> {
               itemBuilder: (BuildContext context, int index){
                 return InkWell(
                   onTap: (){
-
+                    FocusScope.of(context).unfocus();
+                    Navigator.of(context).push(_viewItem(
+                        searchProdData[index]['bu_id'],
+                        searchProdData[index]['tenant_id'],
+                        searchProdData[index]['product_id'],
+                        searchProdData[index]['product_uom'],
+                        searchProdData[index]['unit_measure'],
+                        searchProdData[index]['price']
+                    ));
                   },
                   child:Padding(
                       padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 15.0),
@@ -117,7 +126,7 @@ class _Search extends State<Search> {
                             height: 30.0,
                             decoration: new BoxDecoration(
                               image: new DecorationImage(
-                                image: new NetworkImage(searchProdData[index]['prod_image']),
+                                image: new NetworkImage(searchProdData[index]['image']),
                                 fit: BoxFit.cover,
                               ),
                               borderRadius: new BorderRadius.all(new Radius.circular(50.0)),
@@ -130,7 +139,14 @@ class _Search extends State<Search> {
                           SizedBox(
                             width: 10.0,
                           ),
-                          Text(searchProdData[index]['prod_name'],style: TextStyle(fontSize: 12.0),)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(searchProdData[index]['product_name'],style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13.0,color: Colors.black54),),
+                              Text(searchProdData[index]['prod_bu']+ " - "+ searchProdData[index]['tenant_name'],style: TextStyle(fontSize: 10.0),)
+                            ],
+                          ),
+
                         ],
                       ),
                   ),
@@ -155,4 +171,21 @@ class _Search extends State<Search> {
       ),
     );
   }
+}
+
+Route _viewItem(buCode, tenantCode, prodId,productUom,unitOfMeasure,price) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        ViewItem(buCode: buCode, tenantCode: tenantCode, prodId: prodId,productUom:productUom,unitOfMeasure:unitOfMeasure,price:price),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(0.0, 1.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
 }

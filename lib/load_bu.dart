@@ -11,11 +11,8 @@ import 'load_cart.dart';
 import 'dart:async';
 import 'package:sleek_button/sleek_button.dart';
 import 'package:intl/intl.dart';
-import 'package:nice_button/nice_button.dart';
 import 'grocery/groceryMain.dart';
 import 'package:arush/idmasterfile.dart';
-import 'main.dart';
-
 
 
 class MyHomePage extends StatefulWidget {
@@ -53,6 +50,8 @@ class _MyHomePageState extends State<MyHomePage>  {
 
 
   Future loadBu() async{
+    print(unitGroupId);
+    print(widget.globalCatID);
     var res = await db.getBusinessUnitsCi(unitGroupId,widget.globalCatID);
     if (!mounted) return;
     setState(() {
