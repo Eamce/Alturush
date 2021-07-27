@@ -147,6 +147,7 @@ class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
       body: Container(
 
         decoration: BoxDecoration(
+          color: Colors.white,
           image: DecorationImage(
             image: AssetImage("assets/png/logo_raider8.2.png"),
             fit: BoxFit.scaleDown

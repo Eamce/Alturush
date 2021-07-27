@@ -4,15 +4,14 @@ import 'package:flutter/services.dart';
 import '../db_helper.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
-import 'package:nice_button/nice_button.dart';
 import '../create_account_signin.dart';
 import '../track_order.dart';
-import '../load_bu.dart';
 import 'package:loading_gifs/loading_gifs.dart';
 import 'package:sleek_button/sleek_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'gcview_item.dart';
 import 'gc_cart.dart';
+import 'gc_search.dart';
 
 class GcLoadStore extends StatefulWidget {
   final logo;
@@ -29,7 +28,7 @@ class GcLoadStore extends StatefulWidget {
 class _GcLoadStore extends State<GcLoadStore> {
   final db = RapidA();
   final oCcy = new NumberFormat("#,##0.00", "en_US");
-  final _search = TextEditingController();
+  // final _search = TextEditingController();
   List loadStoreData = List();
   List loadStoreDataTemp = List();
   List getItemsByCategoriesListTemp = List();
@@ -48,7 +47,7 @@ class _GcLoadStore extends State<GcLoadStore> {
   String categoryName = "";
 
   ScrollController scrollController;
-  ScrollController  _categoryController;
+  // ScrollController  _categoryController;
   bool cat = false;
 
   AppBar buildAppBar(BuildContext context) {
@@ -59,7 +58,7 @@ class _GcLoadStore extends State<GcLoadStore> {
       iconTheme: new IconThemeData(color: Colors.black),
 //          title: Text("Menu",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
       title: Row(
-        children: [
+        children:[
           Container(
             width: 30.0,
             height: 30.0,
@@ -86,6 +85,12 @@ class _GcLoadStore extends State<GcLoadStore> {
         onPressed: () => Navigator.of(context).pop(),
       ),
       actions: [
+        IconButton(
+            icon: Icon(Icons.search_outlined, color: Colors.black),
+            onPressed: () async {
+              Navigator.of(context).push(_search());
+            }
+        ),
         status == null ? TextButton(
           onPressed: () async {
             await Navigator.of(context).push(_signIn());
@@ -353,7 +358,7 @@ class _GcLoadStore extends State<GcLoadStore> {
   @override
   void initState() {
     super.initState();
-    print(widget.categoryName);
+    bUnitCodeGc = widget.bUnitCode;
     categoryName = widget.categoryName;
     loadStore();
     getGcCounter();
@@ -365,7 +370,6 @@ class _GcLoadStore extends State<GcLoadStore> {
       // _search.clear();
       if (scrollController.position.atEdge) {
         if (scrollController.position.pixels != 0) {
-
           setState(() {
             offset += 10;
             if(cat == false){
@@ -458,52 +462,6 @@ class _GcLoadStore extends State<GcLoadStore> {
                       ),
 
                       Padding(
-                        padding: EdgeInsets.fromLTRB(30, 20, 30, 5),
-                        child: Container(
-                          child: new TextFormField(
-                            textInputAction: TextInputAction.search,
-                            cursorColor: Colors.green.withOpacity(0.8),
-                            controller: _search,
-                            decoration: InputDecoration(
-                              suffixIcon: IconButton(
-                                icon: Icon(Icons.search_outlined,color: Colors.green,),
-                                onPressed: (){
-                                  FocusScope.of(context).requestFocus(FocusNode());
-                                  itemSearch(_search.text);
-                                },
-                              ),
-                              hintText: "Search",
-                              contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30.0),
-                                borderSide: BorderSide(
-                                    color: Colors.green.withOpacity(0.8),
-                                    width: 2.0),
-                              ),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(30.0)),
-                            ),
-                            onFieldSubmitted: (searchText){
-                              itemSearch(searchText);
-                            },
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(1, 20, 1, 5),
-                        child:  NiceButton(
-                          width: screenWidth,
-                          background:Colors.redAccent ,
-                          radius: 20,
-                          padding: const EdgeInsets.all(15),
-                          text: "We also deliver food",
-                          gradientColors: [Colors.redAccent, Colors.deepOrangeAccent],
-                          onPressed: () {
-                            Navigator.of(context).push(_loadFood());
-                          },
-                        ),
-                      ),
-                      Padding(
                         padding: EdgeInsets.fromLTRB(10, 20, 5, 5),
                         child: new Text(categoryName, style: GoogleFonts.openSans(fontWeight: FontWeight.bold, fontStyle: FontStyle.normal, fontSize: 20.0),),
                       ),
@@ -538,7 +496,8 @@ class _GcLoadStore extends State<GcLoadStore> {
                                     loadStoreData[index]['uom'],
                                     loadStoreData[index]['uom_id'],
                                     widget.bUnitCode
-                                ));
+                                )
+                               );
                                getGcCounter();
                                loadProfile();
                                if(username != null){
@@ -825,10 +784,26 @@ Route _profilePage() {
     },
   );
 }
+//
+// Route _loadFood(){
+//   return PageRouteBuilder(
+//     pageBuilder: (context, animation, secondaryAnimation) => MyHomePage(),
+//     transitionsBuilder: (context, animation, secondaryAnimation, child) {
+//       var begin = Offset(0.0, 1.0);
+//       var end = Offset.zero;
+//       var curve = Curves.decelerate;
+//       var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+//       return SlideTransition(
+//         position: animation.drive(tween),
+//         child: child,
+//       );
+//     },
+//   );
+// }
 
-Route _loadFood(){
+Route _signIn() {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => MyHomePage(),
+    pageBuilder: (context, animation, secondaryAnimation) => CreateAccountSignIn(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;
@@ -842,11 +817,11 @@ Route _loadFood(){
   );
 }
 
-Route _signIn() {
+Route _search() {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => CreateAccountSignIn(),
+    pageBuilder: (context, animation, secondaryAnimation) => GcSearch(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      var begin = Offset(0.0, 1.0);
+      var begin = Offset(1.0, 0.0);
       var end = Offset.zero;
       var curve = Curves.decelerate;
       var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));

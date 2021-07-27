@@ -56,12 +56,15 @@ class _MyApp extends State<MyApp>{
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
-
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.white,
+    ));
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: handleUserInteraction,
       onPanDown: handleUserInteraction,
       child: MaterialApp(
+          debugShowCheckedModeBanner: false,
           theme: ThemeData(
           // Define the default brightness and colors.
 //        brightness: Brightness.dark,

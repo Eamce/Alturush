@@ -99,7 +99,7 @@ class _LoadTenants extends State<LoadTenants> {
                                 itemBuilder: (BuildContext context, int index) {
                                   return InkWell(
                                     onTap: () async{
-                                      Navigator.pop(context);
+
                                       if(index == 0){
                                         await Navigator.of(context).push(_loadStore('All items',categoryData[index]['category_id'],buCode,logo,tenantId,tenantName));
                                         getCounter();
@@ -498,7 +498,7 @@ Route _loadStore(categoryName,categoryId,buCode, storeLogo, tenantCode, tenantNa
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => LoadStore(categoryName:categoryName,categoryId:categoryId, buCode:buCode, storeLogo:storeLogo, tenantCode:tenantCode, tenantName:tenantName),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      var begin = Offset(1.0, 0.0);
+      var begin = Offset(0.0, 1.0);
       var end = Offset.zero;
       var curve = Curves.decelerate;
       var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));

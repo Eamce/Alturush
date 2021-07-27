@@ -644,7 +644,7 @@ class _ToDeliver extends State<ToDeliverFood> {
                             ),
                             child: Center(
                                 // ₱${oCcy.format(int.parse(lGetAmountPerTenant[index]['sumpertenats'].toString()))}
-                                child: Text("Total ₱ ${oCcy.format(int.parse(grandTotal.toString()))}", style:TextStyle(fontStyle: FontStyle.normal, fontWeight: FontWeight.bold, fontSize: 18.0),
+                                child: Text("Totalasd ₱ ${oCcy.format(int.parse(grandTotal.toString()))}", style:TextStyle(fontStyle: FontStyle.normal, fontWeight: FontWeight.bold, fontSize: 18.0),
                               ),
                             ),
                           ),

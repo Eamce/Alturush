@@ -8,7 +8,7 @@ List loadIdList;
 List<bool> side = [];
 List<String> selectedDiscountType = [];
 int unitGroupId;
-
+String bUnitCodeGc;
 class RapidA {
   static final RapidA _instance = RapidA._();
   RapidA._();
@@ -784,7 +784,6 @@ class RapidA {
   }
 
   Future getGcStoreCi(String offset,categoryNo,[itemSearch = ""]) async{
-    print(categoryNo);
     var client = http.Client();
     Map dataUser;
     final response = await client.post(Uri.parse("$server/getGcItems_r"),body:{
@@ -798,14 +797,6 @@ class RapidA {
   }
 
   Future addToCartGc(buCode,prodId,itemCode,uomSymbol,uomId,_counter) async{
-    print(buCode);
-    print(prodId);
-    print(itemCode);
-    print(uomSymbol);
-    print(uomId);
-    print(_counter);
-
-
     var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var userID = prefs.getString('s_customerId');
@@ -1324,6 +1315,17 @@ class RapidA {
     return dataUser;
   }
 
+  Future searchProdGc(search,unitGroupId) async{
+    var client = http.Client();
+    Map dataUser;
+    final response = await client.post(Uri.parse("$server/searchGc_item_r"),body:{
+      'search':search,
+      'unitGroupId':'$unitGroupId'
+    });
+    dataUser = jsonDecode(response.body);
+    client.close();
+    return dataUser;
+  }
 }
 
 

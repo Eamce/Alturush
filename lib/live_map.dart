@@ -7,7 +7,6 @@ import 'db_helper.dart';
 // import "package:latlong/latlong.dart" as latLng;
 import 'package:geolocator/geolocator.dart';
 import 'package:arush/chat/chat.dart';
-import 'package:sleek_button/sleek_button.dart';
 
 class ViewOrderStatus extends StatefulWidget {
   final ticketNo;
@@ -18,8 +17,7 @@ class ViewOrderStatus extends StatefulWidget {
 
 class _ViewOrderStatus extends State<ViewOrderStatus>{
   final db = RapidA();
-  List riderList;
-  List loadTotalData = [];
+  List riderList = [];
   Position position;
   var lat;
   var long;
@@ -32,11 +30,15 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
   String motorDesc = "";
   String riderPhoto = "";
   String riderVehiclePhoto = "";
+  String riderPlateNo = "";
+  String riderMobileNo = "";
 
   Future loadRiderPage() async{
+    _isGettingLocation = true;
     var res = await db.loadRiderPage(widget.ticketNo);
     if (!mounted) return;
     setState(() {
+      _isGettingLocation = false;
       riderList = res['user_details'];
       firstName = riderList[0]['r_firstname'];
       lastName = riderList[0]['r_lastname'];
@@ -44,7 +46,8 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
       motorDesc = riderList[0]['rm_color'];
       riderPhoto = riderList[0]['r_picture'];
       riderVehiclePhoto = riderList[0]['rm_picture'];
-
+      riderPlateNo = riderList[0]['rm_plate_no'];
+      riderMobileNo = riderList[0]['rm_mobile_no'];
     });
   }
 
@@ -114,15 +117,6 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
 //
 //   }
 
-  void getTotalFee() async{
-    var res = await db.getTotalFee(widget.ticketNo);
-    if (!mounted) return;
-    setState(() {
-      loadTotalData = res['user_details'];
-      _isGettingLocation = false;
-    });
-  }
-
 //  void getUserLocation() async{
 //    try {
 //      Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation);
@@ -143,7 +137,6 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
   void initState() {
 //    getUserLocation();
     loadRiderPage();
-    getTotalFee();
     super.initState();
   }
   @override
@@ -154,8 +147,6 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         brightness: Brightness.light,
@@ -179,207 +170,166 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
         child: CircularProgressIndicator(
           valueColor: new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
         ),
-      ) :Column(
-        children:[
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: loadRiderPage,
-              child: Scrollbar(
-                child: ListView(
-                  shrinkWrap: true,
-                  children: [
-                    Column(
-                    crossAxisAlignment:CrossAxisAlignment.start,
+      ) : RefreshIndicator(
+        onRefresh: loadRiderPage,
+        child: Scrollbar(
+          child: ListView(
+            // shrinkWrap: true,
+            children: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
+                child: Card(
+                  elevation: 0.0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  child: Column(
+                    crossAxisAlignment:CrossAxisAlignment.center,
                     children: [
                       Padding(
-                        padding: EdgeInsets.fromLTRB(15, 10, 5, 5),
-                         child: new Text('Your rider: $firstName $lastName', overflow: TextOverflow.clip, style: GoogleFonts.openSans(fontStyle: FontStyle.normal, fontSize: 18.0),
-                        ),
+                          padding: EdgeInsets.fromLTRB(20, 20, 20, 5),
+                          child: Text("Delivery fee",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.bold,fontSize: 12.0),)
                       ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(15, 10, 5, 5),
-                        child: new Text('Vehicle: $motorBrand $motorDesc', overflow: TextOverflow.clip, style: GoogleFonts.openSans(fontStyle: FontStyle.normal, fontSize: 18.0),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(15, 10, 5, 5),
-                        child: new Text('Rider fee: ${loadTotalData[0]['delivery_charge']}', overflow: TextOverflow.clip, style: GoogleFonts.openSans(fontStyle: FontStyle.normal, fontSize: 18.0),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(15, 10, 5, 5),
-                        child: new Text('Total: ${loadTotalData[0]['amount']}', overflow: TextOverflow.clip, style: GoogleFonts.openSans(fontStyle: FontStyle.normal, fontSize: 18.0),
-                        ),
-                      ),
-                     ],
-                   ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(20, 25, 20, 5),
-                      child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          width: width / 2.4,
-                          height: height / 4,
-                          decoration: new BoxDecoration(
-                            image: new DecorationImage(
-                              image: new NetworkImage(riderPhoto),
-                              fit: BoxFit.contain,
-                            ),
-                            border: new Border.all(
-                              color: Colors.black54,
-                              width: 0.5,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: width/2.4,
-                          height: height/4,
-                          decoration: new BoxDecoration(
-                            image: new DecorationImage(
-                              image: new NetworkImage(riderVehiclePhoto),
-                              fit: BoxFit.contain,
-                            ),
-                            // borderRadius: new BorderRadius.all(new Radius.circular(50.0)),
-                            border: new Border.all(
-                              color: Colors.black54,
-                              width: 0.5,
-                            ),
-                          ),
-                        ),
-                      ],
-                      ),
-                    ),
-                  ],
+                       Padding(
+                           padding: EdgeInsets.fromLTRB(20, 5, 20, 20),
+                           child: Text("120.00",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.bold,fontSize: 17.0),)
+                       ),
+                    ],
+                  ),
                 ),
               ),
-            ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  elevation: 0.0,
+                  child: Column(
+                  crossAxisAlignment:CrossAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+                      child: Container(
+                        height: 120.0,
+                        width: 120.0,
+                        child: CircleAvatar(
+                          radius: 30.0,
+                          backgroundImage: NetworkImage(riderPhoto),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                        padding: EdgeInsets.fromLTRB(20, 10, 20, 20),
+                        child: Text("$firstName $lastName",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.bold,fontSize: 17.0),),
+                     ),
+                    ],
+                  ),
+                ),
+              ),
+
+              Padding(
+                padding: EdgeInsets.fromLTRB(20, 10.0, 20, 10),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  elevation: 0.0,
+                  child: Column(
+                    crossAxisAlignment:CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
+                        child: Container(
+                          height: 120.0,
+                          width: 120.0,
+                          child: CircleAvatar(
+                            radius: 30.0,
+                            backgroundImage: NetworkImage(riderVehiclePhoto),
+                          ),
+                        ),
+                      ),
+
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
+                        child: Row(
+                          crossAxisAlignment:CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment:CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(20, 10, 20, 0.0),
+                                  child: Text("Vehicle",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.bold,fontSize: 12.0),),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(20, 0.0, 20, 20),
+                                  child: Text("$motorBrand",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.bold,fontSize: 17.0),),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment:CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(20, 10, 20, 0.0),
+                                  child: Text("Plate No.",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.bold,fontSize: 12.0),),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(20, 0.0, 20, 20),
+                                  child: Text("$riderPlateNo",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.bold,fontSize: 17.0),),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 20.0),
+                        child:Row(
+                          crossAxisAlignment:CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment:CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(20, 10, 20, 0.0),
+                                  child:Text("Vehicle description",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.bold,fontSize: 12.0),),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(20, 0.0, 20, 20),
+                                  child:Text("$motorDesc",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.bold,fontSize: 17.0),),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment:CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(20, 10, 20, 0.0),
+                                  child:Text("Mobile number",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.bold,fontSize: 12.0),),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(20, 0.0, 20, 20),
+                                  child:Text("$riderMobileNo",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.bold,fontSize: 17.0),),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+            ],
           ),
-
-
-
-          // Container(
-          //   height: height/2,
-          //   child: FlutterMap(
-          //     mapController: mapController,
-          //     options: new MapOptions(
-          //       boundsOptions: FitBoundsOptions(padding: EdgeInsets.all(8.0)),
-          //       center: latLng.LatLng(lat,long),
-          //       maxZoom: 25.0,
-          //       minZoom: 10.0,
-          //     ),
-          //     layers: [
-          //       new TileLayerOptions(
-          //           urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-          //           subdomains: ['a', 'b', 'c']
-          //       ),
-          //       new MarkerLayerOptions(
-          //         markers: [
-          //           new Marker(
-          //             width: 45.0,
-          //             height: 45.0,
-          //             point: new latLng.LatLng(lat,long),
-          //             builder: (context) => new Container(
-          //               child: IconButton(
-          //                 tooltip: "My location",
-          //                 icon:Icon(Icons.location_on),
-          //                 color: Colors.blue,
-          //                 iconSize: 70.0,
-          //                 onPressed: (){
-          //
-          //                 },
-          //               ),
-          //             ),
-          //           ),
-          //         ],
-          //       ),
-          //       new MarkerLayerOptions(
-          //         markers: [
-          //           new Marker(
-          //             width: 45.0,
-          //             height: 45.0,
-          //             point: new latLng.LatLng(9.647111411110227, 123.86350931891319),
-          //             builder: (context) => new Container(
-          //               child: IconButton(
-          //                 tooltip: "your rider",
-          //                 icon:Icon(Icons.location_on),
-          //                 color: Colors.deepOrange,
-          //                 iconSize: 70.0,
-          //                 onPressed: (){
-          //
-          //                 },
-          //               ),
-          //             ),
-          //           ),
-          //         ],
-          //       )
-          //     ],
-          //   ),
-          // ),
-        ],
+        ),
       ),
-      // floatingActionButton:
-      // Visibility (
-      //   visible : _isGettingLocation == false,
-      //    child: Stack(
-      //     children: <Widget>[
-      //       Positioned(
-      //         bottom: 220.0,
-      //         right: 10.0,
-      //         child: FloatingActionButton(
-      //           onPressed: () {
-      //             _zoomIn();
-      //           },
-      //           heroTag: 'Zoom in',
-      //           child: Icon(Icons.add),
-      //           tooltip: "Zoom in",
-      //           backgroundColor: Colors.white60,
-      //         ),
-      //       ),
-      //
-      //       Positioned(
-      //         bottom: 150.0,
-      //         right: 10.0,
-      //         child: FloatingActionButton(
-      //           onPressed: () {
-      //             _zoomOut();
-      //           },
-      //           heroTag: 'Zoom out',
-      //           child: Icon(Icons.remove),
-      //           tooltip: "Zoom out",
-      //           backgroundColor: Colors.white60,
-      //         ),
-      //       ),
-      //
-      //       Positioned(
-      //         bottom: 80.0,
-      //         right: 10.0,
-      //         child: FloatingActionButton(
-      //           onPressed: () {
-      //             locateRiderLocation();
-      //           },
-      //           heroTag: 'Locate you rider location',
-      //           child: Icon(Icons.motorcycle),
-      //           tooltip: "Locate you rider location",
-      //           backgroundColor: Colors.white60,
-      //         ),
-      //       ),
-      //       Positioned(
-      //         bottom: 10.0,
-      //         right: 10.0,
-      //         child: FloatingActionButton(
-      //           onPressed: () {
-      //             locateYourLocation();
-      //           },
-      //           heroTag: 'My location',
-      //           child: Icon(Icons.my_location),
-      //           tooltip: "My location",
-      //           backgroundColor: Colors.white60,
-      //         ),
-      //       ),
-      //     ],
-      // ),
-      //  ),
     );
   }
 }

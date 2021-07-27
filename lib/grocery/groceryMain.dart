@@ -46,15 +46,11 @@ class _GroceryMain extends State<GroceryMain> with SingleTickerProviderStateMixi
 
 
   Future loadBu() async{
-      print(unitGroupId);
-      print(widget.groceryRoute);
       var res = await db.getBusinessUnitsCi(unitGroupId,1);
       if (!mounted) return;
       setState(() {
         buData = res['user_details'];
-        print(buData);
       });
-
       Timer(Duration(milliseconds:500), () {
         _needsScroll = true;
         _scrollToEnd();
@@ -312,7 +308,7 @@ class _GroceryMain extends State<GroceryMain> with SingleTickerProviderStateMixi
                                 shrinkWrap: true,
                                 itemCount: categoryData.length,
                                 itemBuilder: (BuildContext context, int index) {
-                                  return GestureDetector(
+                                  return InkWell(
                                     onTap: () async{
                                       Navigator.pop(context);
                                       await Navigator.of(context).push(_loadGC(logo,categoryData[index]['category_name'],categoryData[index]['category_no'],businessUnit,bUnitCode));
@@ -698,9 +694,6 @@ class _GroceryMain extends State<GroceryMain> with SingleTickerProviderStateMixi
                           return InkWell(
                             onTap: () async{
                               selectGcCategory(context,buData[index]['logo'],buData[index]['business_unit'],buData[index]['bunit_code']);
-                              // await Navigator.of(context).push(_loadGC(buData[index]['logo'],buData[index]['business_unit'],buData[index]['bunit_code']));
-                              // listenCartCount();
-                              // loadProfile();
                             },
                             child:Container(
                               height: 120.0,
@@ -732,7 +725,7 @@ class _GroceryMain extends State<GroceryMain> with SingleTickerProviderStateMixi
                                     ),
                                   ],
                                 ),
-                                elevation: 0.2,
+                                elevation: 0.0,
                                 margin: EdgeInsets.all(3),
                               ),
                             ),
