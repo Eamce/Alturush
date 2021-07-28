@@ -6,8 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'profile/addressMasterFile.dart';
 import 'to_deliverFood.dart';
 import 'idmasterfile.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:badges/badges.dart';
 import 'profile/changePassword.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class TrackOrder extends StatefulWidget {
   @override
@@ -156,8 +157,8 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
     return WillPopScope(
       onWillPop: () async {
         Navigator.pop(context, () {
@@ -184,15 +185,28 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                     moreOptions();
                 }
             ),
+
           ],
+          // bottom: TabBar(
+          //   indicatorWeight: 2.0,
+          //   indicatorColor: Colors.deepOrange,
+          //   labelColor: Colors.black87,
+          //   tabs: [
+          //     Tab(child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('3',style: TextStyle(fontSize: 15.0),), child: Text("Pending",style: TextStyle(fontWeight: FontWeight.bold),))),
+          //     Tab(child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('0',style: TextStyle(fontSize: 15.0),), child: Text("On transit",style: TextStyle(fontWeight: FontWeight.bold),))),
+          //     Tab(child: Text("Delivered",style: TextStyle(fontWeight: FontWeight.bold),)),
+          //     Tab(child: Text("Cancelled",style: TextStyle(fontWeight: FontWeight.bold),)),
+          //   ],
+          // ),
         ),
+
         body: isLoading
             ? Center(
           child: CircularProgressIndicator(
             valueColor: new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
           ),
         ):  Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Expanded(
               child: RefreshIndicator(
@@ -327,29 +341,13 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                   ),
                 ),
               ],
-            ),
-//      ),
-      ),
+          ),
+     ),
     );
   }
 }
 
-//
-// Route viewUpComingGood(ticketNo,customerId) {
-//   return PageRouteBuilder(
-//     pageBuilder: (context, animation, secondaryAnimation) => ToDeliverGood(ticketNo:ticketNo,customerId:customerId),
-//     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-//       var begin = Offset(1.0, 0.0);
-//       var end = Offset.zero;
-//       var curve = Curves.decelerate;
-//       var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-//       return SlideTransition(
-//         position: animation.drive(tween),
-//         child: child,
-//       );
-//     },
-//   );
-// }
+
 
 Route viewUpComingFood(ticketNo,dmop,type) {
   return PageRouteBuilder(

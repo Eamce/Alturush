@@ -7,6 +7,7 @@ import 'db_helper.dart';
 // import "package:latlong/latlong.dart" as latLng;
 import 'package:geolocator/geolocator.dart';
 import 'package:arush/chat/chat.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ViewOrderStatus extends StatefulWidget {
   final ticketNo;
@@ -176,28 +177,28 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
           child: ListView(
             // shrinkWrap: true,
             children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
-                child: Card(
-                  elevation: 0.0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                  child: Column(
-                    crossAxisAlignment:CrossAxisAlignment.center,
-                    children: [
-                      Padding(
-                          padding: EdgeInsets.fromLTRB(20, 20, 20, 5),
-                          child: Text("Delivery fee",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.bold,fontSize: 12.0),)
-                      ),
-                       Padding(
-                           padding: EdgeInsets.fromLTRB(20, 5, 20, 20),
-                           child: Text("120.00",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.bold,fontSize: 17.0),)
-                       ),
-                    ],
-                  ),
-                ),
-              ),
+              // Padding(
+              //   padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
+              //   child: Card(
+              //     elevation: 0.0,
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(20.0),
+              //     ),
+              //     child: Column(
+              //       crossAxisAlignment:CrossAxisAlignment.center,
+              //       children: [
+              //         Padding(
+              //             padding: EdgeInsets.fromLTRB(20, 20, 20, 5),
+              //             child: Text("Delivery fee",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.bold,fontSize: 12.0),)
+              //         ),
+              //          Padding(
+              //              padding: EdgeInsets.fromLTRB(20, 5, 20, 20),
+              //              child: Text("120.00",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.bold,fontSize: 17.0),)
+              //          ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
               Padding(
                 padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
                 child: Card(
@@ -220,9 +221,23 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
                       ),
                     ),
                     Padding(
-                        padding: EdgeInsets.fromLTRB(20, 10, 20, 20),
+                        padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
                         child: Text("$firstName $lastName",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.bold,fontSize: 17.0),),
                      ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(20, 0.0, 25, 20),
+                      child:OutlinedButton.icon(
+                        icon: Icon(Icons.phone,color: Colors.black87,),
+                        style: TextButton.styleFrom(
+                          primary: Colors.black,
+                          shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+                        ),
+                        onPressed: (){
+                          launch("tel://$riderMobileNo");
+                        },
+                        label:Text("Call rider",style: GoogleFonts.openSans(color:Colors.deepOrange,fontWeight: FontWeight.bold,fontSize: 15.0),),
+                      ),
+                    ),
                     ],
                   ),
                 ),
@@ -313,7 +328,7 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
                                   child:Text("Mobile number",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.bold,fontSize: 12.0),),
                                 ),
                                 Padding(
-                                  padding: EdgeInsets.fromLTRB(20, 0.0, 20, 20),
+                                  padding: EdgeInsets.fromLTRB(20, 0.0, 20, 5),
                                   child:Text("$riderMobileNo",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.bold,fontSize: 17.0),),
                                 ),
                               ],

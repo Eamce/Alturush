@@ -781,7 +781,6 @@ class _CreateAccountSignIn extends State<CreateAccountSignIn> with SingleTickerP
             ),
             bottom: TabBar(
               controller: _tabController,
-              isScrollable: true,
               labelColor: Colors.black,
               indicatorColor: Colors.deepOrange,
               tabs: [

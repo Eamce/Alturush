@@ -46,7 +46,6 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
   List loadDiscountedPerson;
   var isLoading = true;
   var townId,townName,barrioId,brgName,contact;
-
   double deliveryCharge = 0;
   double grandTotal = 0.0;
   double minimumAmount = 0.0;
@@ -71,7 +70,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
     if (!mounted) return;
     setState(() {
       placeOrder = res1['user_details'];
-      // print(placeOrder);
+
       deliveryCharge = double.parse(placeOrder[0]['d_charge_amt']);
       townId = placeOrder[0]['d_townId'];
       barrioId = placeOrder[0]['d_brgId'];
@@ -144,11 +143,11 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text("Select your address",style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold),),
-                      OutlineButton(
-                        borderSide: BorderSide(color: Colors.deepOrangeAccent),
-                        highlightedBorderColor: Colors.deepOrangeAccent,
-                        highlightColor: Colors.transparent,
-                        shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                      OutlinedButton(
+                        style: TextButton.styleFrom(
+                          primary: Colors.black,
+                          shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+                        ),
                         onPressed: (){
                           Navigator.pop(context);
                           Navigator.of(context).push(addNewAddress());
@@ -518,7 +517,6 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
     super.initState();
     getPlaceOrderData();
     getBuSegregate();
-    print("hello");
     print(selectedDiscountType);
     // loadTotal();
     // getTenantSegregate();
@@ -580,65 +578,60 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              // Padding(
-                              //   padding: EdgeInsets.fromLTRB(25, 20, 200, 5),
-                              //   child: OutlinedButton(
-                              //     style: TextButton.styleFrom(
-                              //       shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
-                              //     ),
-                              //     onPressed: () async{
-                              //       FocusScope.of(context).requestFocus(FocusNode());
-                              //       SharedPreferences prefs = await SharedPreferences.getInstance();
-                              //       String username = prefs.getString('s_customerId');
-                              //       if(username == null){
-                              //         Navigator.of(context).push(_signIn());
-                              //       }else{
-                              //         displayAddresses(context);
-                              //       }
-                              //     },
-                              //     child: Container(
-                              //       height: 50.0,
-                              //       child: Row(
-                              //         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              //         children: [
-                              //           Icon(
-                              //             Icons.location_on,
-                              //             color: Colors.deepOrangeAccent,
-                              //           ),
-                              //           Text("Select address",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 15.0),),
-                              //         ],
-                              //       ),
-                              //     ),
-                              //   ),
-                              // ),
                               Padding(
-                                padding: EdgeInsets.fromLTRB(25, 20, 200, 5),
-                                child: Container(
-                                  height: 40.0,
-                                  child: OutlinedButton(
-                                    onPressed: () async{
-                                      FocusScope.of(context).requestFocus(FocusNode());
-                                      SharedPreferences prefs = await SharedPreferences.getInstance();
-                                      String username = prefs.getString('s_customerId');
-                                      if(username == null){
-                                        Navigator.of(context).push(_signIn());
-                                      }else{
-                                        displayAddresses(context);
-                                      }
-                                    },
-                                    style: TextButton.styleFrom(
-
-                                      primary: Colors.black,
-                                      shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+                                padding: EdgeInsets.fromLTRB(15, 20, 20, 2),
+                                child: Card(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20.0),
+                                  ),
+                                  elevation: 0.0,
+                                  child: Padding(
+                                    padding: EdgeInsets.fromLTRB(15, 20, 20, 20),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text("Paul Jearic Niones",style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),),
+                                        Text("Sender",style: TextStyle(color:Colors.deepOrange),),
+                                      ],
                                     ),
-                                    child: Text("Select address"),
                                   ),
                                 ),
                               ),
+
                               Padding(
-                                padding: EdgeInsets.fromLTRB(35, 15, 5, 5),
-                                child: new Text("Name", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                                padding: EdgeInsets.fromLTRB(15, 2, 10, 2),
+                                // child: new Text("Name", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.fromLTRB(5, 2, 5, 5),
+                                      child: new Text("Recipient", style: GoogleFonts.openSans(fontWeight:FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 15.0),),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.fromLTRB(5, 2, 5, 5),
+                                      child:  OutlinedButton(
+                                        onPressed: () async{
+                                          FocusScope.of(context).requestFocus(FocusNode());
+                                          SharedPreferences prefs = await SharedPreferences.getInstance();
+                                          String username = prefs.getString('s_customerId');
+                                          if(username == null){
+                                            Navigator.of(context).push(_signIn());
+                                          }else{
+                                            displayAddresses(context);
+                                          }
+                                        },
+                                        style: TextButton.styleFrom(
+                                          primary: Colors.black,
+                                          shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+                                        ),
+                                        child: Text("Change Recipient"),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
+
                               Padding(
                                 padding:EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
                                 child: InkWell(

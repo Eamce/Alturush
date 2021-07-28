@@ -129,7 +129,6 @@ class _DiscountManager extends State<DiscountManager> {
                                         children: [
                                           Text('$q. ${loadIdList[index]['name']}',style: TextStyle(fontSize: 17,),),
                                           Text('    ${loadIdList[index]['discount_name']} # ${loadIdList[index]['discount_no']}',style: TextStyle(color:Colors.black,fontSize: 17  ,),),
-                                          Text('    ${loadIdList[index]['discount_percent']} Off',style: TextStyle(color:Colors.black,fontSize: 17  ,),),
                                         ],
                                       ),
                                       // Text('${loadIdList[index]['discount_name']} # ${loadIdList[index]['id_number']}',style: TextStyle(color:Colors.black,fontSize: 20  ,),),

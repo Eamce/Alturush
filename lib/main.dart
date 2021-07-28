@@ -58,7 +58,10 @@ class _MyApp extends State<MyApp>{
     ]);
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.white,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.dark,
     ));
+
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: handleUserInteraction,
@@ -66,6 +69,7 @@ class _MyApp extends State<MyApp>{
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
+
           // Define the default brightness and colors.
 //        brightness: Brightness.dark,
 //        primaryColor: Colors.lightBlue[800],

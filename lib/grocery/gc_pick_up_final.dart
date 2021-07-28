@@ -177,7 +177,7 @@ class _GcPickUpFinal extends State<GcPickUpFinal> {
                           children: [
                             Padding(
                               padding:EdgeInsets.fromLTRB(20.0, 7.0, 5.0, 5.0),
-                              child: new Text("Convenience Fee:", style: TextStyle(color: Colors.black87.withOpacity(0.8),fontStyle: FontStyle.normal,fontSize: 20.0),),
+                              child: new Text("Picking Fee:", style: TextStyle(color: Colors.black87.withOpacity(0.8),fontStyle: FontStyle.normal,fontSize: 20.0),),
                             ),
                             Padding(
                               padding:EdgeInsets.fromLTRB(20.0, 7.0, 20.0, 5.0),
@@ -241,7 +241,7 @@ class _GcPickUpFinal extends State<GcPickUpFinal> {
                                 ),
                                 Padding(
                                   padding: EdgeInsets.fromLTRB(20, 0, 5, 5),
-                                  child: new Text("Convenience fee: "+conFee.toString(), style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 20.0),),
+                                  child: new Text("Picking fee: "+conFee.toString(), style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 20.0),),
                                 ),
                                 Padding(
                                   padding: EdgeInsets.fromLTRB(20, 0, 5, 5),

@@ -16,7 +16,9 @@ class Splash extends StatefulWidget {
 class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
   final db = RapidA();
   List globalCat;
+
   void selectType(BuildContext context ,width ,height) async{
+    getGlobalCat();
     showModalBottomSheet(
         isScrollControlled: true,
         isDismissible: true,
@@ -32,7 +34,7 @@ class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
               children:[
                 Padding(
                     padding: EdgeInsets.fromLTRB(12, 10, 10, 5),
-                    child: Text("Please select",style: TextStyle(fontSize: 23.0,),)
+                    child: Text("Please select",style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold),)
                 ),
                 Expanded(
                   child:Container(
@@ -59,7 +61,7 @@ class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
                                 backgroundColor: Colors.transparent,
                                 child: Image.network(globalCat[index]['cat_picture']),
                               ),
-                              title: Text(globalCat[index]['category'],style: TextStyle(fontSize: 18),),
+                              title: Text(globalCat[index]['category'],style: TextStyle(color: Colors.black87,fontSize: 17,fontWeight: FontWeight.bold),),
                             ),
                           );
                         },
