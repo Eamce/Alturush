@@ -9,6 +9,7 @@ import 'idmasterfile.dart';
 import 'package:badges/badges.dart';
 import 'profile/changePassword.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:arush/profile_page.dart';
 
 class TrackOrder extends StatefulWidget {
   @override
@@ -18,22 +19,47 @@ class TrackOrder extends StatefulWidget {
 class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
   var isLoading = true;
   final db = RapidA();
-  List listGetTicketNoFood;
+  List listGetTicketNoFood = []; //pending list
+  List listGetTicketOnTransit = [];
+  List listGetTicketOnDelivered = [];
   var firstName;
   var lastName;
+  var status;
+
 
   Future getTicketNoFood() async{
     var res = await db.getTicketNoFood();
     if (!mounted) return;
     setState(() {
       listGetTicketNoFood = res['user_details'];
-      isLoading = false;
-      print(listGetTicketNoFood);
     });
   }
 
+
+  Future getTicketNoFoodOnTransit() async{
+    var res = await db.getTicketNoFoodOnTransit();
+    if (!mounted) return;
+    setState(() {
+      listGetTicketOnTransit = res['user_details'];
+    });
+  }
+
+  Future getTicketNoFoodOnDelivered() async{
+    var res = await db.getTicketNoFoodOnDelivered();
+    if (!mounted) return;
+    setState(() {
+      listGetTicketOnDelivered = res['user_details'];
+    });
+  }
+
+
+
+
   Future toRefresh() async{
-    getTicketNoFood();
+    getTicketNoFood(); //pending request
+    getTicketNoFoodOnTransit(); //on transit request
+    getTicketNoFoodOnDelivered(); // on delivered
+    isLoading = false;
   }
 
   moreOptions() {
@@ -62,7 +88,6 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                         onTap: () async{
                           Navigator.of(context).pop();
                           Navigator.of(context).pop();
-                          // Navigator.of(context).push(logout());
                           SharedPreferences prefs = await SharedPreferences.getInstance();
                           prefs.clear();
                         },
@@ -143,11 +168,12 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
     });
   }
 
+
   @override
   void initState() {
     getUserName();
 //    loadProfile();
-    getTicketNoFood();
+    toRefresh();
     super.initState();
   }
   @override
@@ -168,190 +194,315 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
         });
         return true;
       },
-      child: Scaffold(
-        appBar: AppBar(
-          brightness: Brightness.light,
-          backgroundColor: Colors.white,
-          elevation: 0.0,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.black,size: 23,),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          title: Text("Profile",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
-          actions: [
-            IconButton(
-                icon: Icon(Icons.more_vert_outlined, color: Colors.black54),
-                onPressed: () {
-                    moreOptions();
-                }
+      child: DefaultTabController(
+        length: 4,
+        child: Scaffold(
+          appBar: AppBar(
+            brightness: Brightness.light,
+            backgroundColor: Colors.white,
+            elevation: 0.0,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back, color: Colors.black,size: 23,),
+              onPressed: () => Navigator.of(context).pop(),
             ),
+            title: Text("Profile",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
+            actions: [
+              InkWell(
+                customBorder: CircleBorder(),
+                onTap: (){
+                  Navigator.of(context).push(profile());
+                },
+                child: Container(
+                  width: 70.0,
+                  height: 70.0,
+                  child: Padding(
+                    padding:EdgeInsets.all(5.0),
+                    child: CircleAvatar(
+                      backgroundImage: NetworkImage("https://coachpennylove.com/wp-content/uploads/2019/08/facetune_29-07-2019-02-58-10.jpg"),
+                    ),
+                  ),
+                ),
+              ),
 
-          ],
-          // bottom: TabBar(
-          //   indicatorWeight: 2.0,
-          //   indicatorColor: Colors.deepOrange,
-          //   labelColor: Colors.black87,
-          //   tabs: [
-          //     Tab(child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('3',style: TextStyle(fontSize: 15.0),), child: Text("Pending",style: TextStyle(fontWeight: FontWeight.bold),))),
-          //     Tab(child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('0',style: TextStyle(fontSize: 15.0),), child: Text("On transit",style: TextStyle(fontWeight: FontWeight.bold),))),
-          //     Tab(child: Text("Delivered",style: TextStyle(fontWeight: FontWeight.bold),)),
-          //     Tab(child: Text("Cancelled",style: TextStyle(fontWeight: FontWeight.bold),)),
-          //   ],
-          // ),
-        ),
-
-        body: isLoading
-            ? Center(
-          child: CircularProgressIndicator(
-            valueColor: new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
+              // IconButton(
+              //     icon: Icon(Icons.more_vert_outlined, color: Colors.black54),
+              //     onPressed:(){
+              //         moreOptions();
+              //     }
+              // ),
+            ],
+            bottom: TabBar(
+              indicatorWeight: 2.0,
+              indicatorColor: Colors.deepOrange,
+              labelColor: Colors.black87,
+              tabs: [
+                Tab(child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('3',style: TextStyle(fontSize: 15.0),), child: Text("Pending",style: TextStyle(fontWeight: FontWeight.bold),))),
+                Tab(child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('0',style: TextStyle(fontSize: 15.0),), child: Text("On transit",style: TextStyle(fontWeight: FontWeight.bold),))),
+                Tab(child: Text("Delivered",style: TextStyle(fontWeight: FontWeight.bold),)),
+                Tab(child: Text("Cancelled",style: TextStyle(fontWeight: FontWeight.bold),)),
+              ],
+            ),
           ),
-        ):  Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Expanded(
-              child: RefreshIndicator(
-                onRefresh: toRefresh,
-                  child: Scrollbar(
-                    child: ListView(
-                     // physics:  BouncingScrollPhysics(),
-                      // shrinkWrap: true,
-                          children: <Widget>[
+            body: isLoading
+                ? Center(
+              child: CircularProgressIndicator(
+                valueColor: new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
+              ),
+            ): TabBarView(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: toRefresh,
+                        child: Scrollbar(
+                          child: ListView(
+                            children: [
                             Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                              child: Card(
-                                elevation: 0.0,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Padding(
-                                      padding: EdgeInsets.only(top: 20.0),
-                                      child: new Stack(
-                                          fit: StackFit.loose,
-                                          children: <Widget>[
-                                            new Row(
-                                              crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                              mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                padding:EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
+                              child:ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: BouncingScrollPhysics(),
+                                  itemCount: listGetTicketNoFood == null ? 0 : listGetTicketNoFood.length,
+                                  itemBuilder: (BuildContext context, int index) {
+                                    String type = "";
+                                    if(listGetTicketNoFood[index]['order_type_stat'] == '0'){
+                                      type = "assets/svg/fast-food.svg";
+                                    }else{
+                                      type = "assets/svg/basket.svg";
+                                    }
+                                    return Padding(
+                                      padding:EdgeInsets.symmetric(horizontal: 2.0, vertical: 0.0),
+                                      child: InkWell(
+                                        onTap:(){
+                                          if(listGetTicketNoFood[index]['order_type_stat'] == '0'){
+                                            Navigator.of(context).push(viewUpComingFood(1,listGetTicketNoFood[index]['d_ticket_id'],listGetTicketNoFood[index]['d_mop'],listGetTicketNoFood[index]['order_type_stat']));
+                                          }
+                                          else{
+                                            Navigator.of(context).push(viewUpComingFood(1,listGetTicketNoFood[index]['d_ticket_id'],listGetTicketNoFood[index]['d_mop'],listGetTicketNoFood[index]['order_type_stat']));
+                                          }
+                                          // viewInside(listGetTicketNoFood[index]['d_ticket_id'],listGetTicketNoFood[index]['d_customerId']);
+                                        },
+                                        child: Container(
+                                          height: 80.0,
+                                          child: Card(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(10.0),
+                                            ),
+                                            elevation: 0.0,
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
                                               children: <Widget>[
-                                                new Container(
-                                                    width: 120.0,
-                                                    height: 120.0,
-                                                    decoration: new BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      image: new DecorationImage(
-                                                        image: new ExactAssetImage(
-                                                            'assets/png/as.png'),
-                                                        fit: BoxFit.cover,
+                                                Padding(
+                                                  padding: EdgeInsets.fromLTRB(5.0, 10.0, 10.0, 5.0),
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children:<Widget>[
+                                                      Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: <Widget>[
+                                                          Text('${listGetTicketNoFood[index]['d_mop']}',style: TextStyle(color: Colors.black),),
+                                                          Text('Ticket # ${listGetTicketNoFood[index]['d_ticket_id']}',style: TextStyle(fontSize: 20.0,color: Colors.black54, fontWeight: FontWeight.bold)),
+                                                        ],
                                                       ),
-                                                    )
+                                                      Container(
+                                                        height: screenHeight/15,
+                                                        width: screenWidth/15,
+                                                        child: SvgPicture.asset(type),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
                                               ],
                                             ),
-                                          ]),
-                                    ),
-                                    Padding(
-                                        padding:
-                                        EdgeInsets.fromLTRB(5.0, 30.0, 5.0, 15.0),
-                                        child: new Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            Text('$firstName $lastName',
-                                              style: GoogleFonts.openSans(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontStyle: FontStyle.normal,
-                                                  fontSize: 20.0),
-                                            ),
-                                          ],
-                                        )),
-                                  ],
-                                ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }),
+
                               ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-                                child:Column(
-                                  children: [
-                                   ListView.builder(
-                                      shrinkWrap: true,
-                                      physics: BouncingScrollPhysics(),
-                                      itemCount: listGetTicketNoFood == null ? 0 : listGetTicketNoFood.length,
-                                      itemBuilder: (BuildContext context, int index) {
-                                        int q = index;
-                                        q++;
-                                        String type = "";
-                                        if(listGetTicketNoFood[index]['order_type_stat'] == '0'){
-                                          type = "assets/svg/fast-food.svg";
-                                        }else{
-                                          type = "assets/svg/basket.svg";
-                                        }
-                                        return Padding(
-                                          padding:EdgeInsets.symmetric(horizontal: 10.0, vertical: 2.0),
-                                          child: InkWell(
-                                            onTap:(){
-                                              if(listGetTicketNoFood[index]['order_type_stat'] == '0'){
-                                                Navigator.of(context).push(viewUpComingFood(listGetTicketNoFood[index]['d_ticket_id'],listGetTicketNoFood[index]['d_mop'],listGetTicketNoFood[index]['order_type_stat']));
-                                              }
-                                              else{
-                                                Navigator.of(context).push(viewUpComingFood(listGetTicketNoFood[index]['d_ticket_id'],listGetTicketNoFood[index]['d_mop'],listGetTicketNoFood[index]['order_type_stat']));
-                                              }
-                                             // viewInside(listGetTicketNoFood[index]['d_ticket_id'],listGetTicketNoFood[index]['d_customerId']);
-                                            },
-                                            child: Container(
-                                              height: 100.0,
-                                              child: Card(
-                                                elevation: 0.0,
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: <Widget>[
-                                                    Padding(
-                                                      padding: EdgeInsets.fromLTRB(5.0, 10.0, 10.0, 5.0),
-                                                      child: Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                        children:<Widget>[
-                                                          Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                              children: <Widget>[
-                                                                Text(listGetTicketNoFood[index]['d_mop'],style: TextStyle(color: Colors.black),),
-                                                                Text('$q. Ticket # ${listGetTicketNoFood[index]['d_ticket_id']}',style: TextStyle(fontSize: 20.0,color: Colors.black54, fontWeight: FontWeight.bold)),
-                                                              ],
-                                                          ),
-                                                          Container(
-                                                            height: screenHeight/15,
-                                                            width: screenWidth/15,
-                                                            child: SvgPicture.asset(type),
-                                                          ),
-                                                        ],
-                                                      ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: toRefresh,
+                        child: Scrollbar(
+                          child: ListView(
+                            children: [
+                              Padding(
+                                padding:EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
+                                child:ListView.builder(
+                                    shrinkWrap: true,
+                                    physics: BouncingScrollPhysics(),
+                                    itemCount: listGetTicketOnTransit == null ? 0 : listGetTicketOnTransit.length,
+                                    itemBuilder: (BuildContext context, int index) {
+                                      String type = "";
+                                      if(listGetTicketOnTransit[index]['order_type_stat'] == '0'){
+                                        type = "assets/svg/fast-food.svg";
+                                      }else{
+                                        type = "assets/svg/basket.svg";
+                                      }
+                                      return Padding(
+                                        padding:EdgeInsets.symmetric(horizontal: 2.0, vertical: 0.0),
+                                        child: InkWell(
+                                          onTap:(){
+                                            if(listGetTicketOnTransit[index]['order_type_stat'] == '0'){
+                                              Navigator.of(context).push(viewUpComingFood(0,listGetTicketOnTransit[index]['d_ticket_id'],listGetTicketOnTransit[index]['d_mop'],listGetTicketOnTransit[index]['order_type_stat']));
+                                            }
+                                            else{
+                                              Navigator.of(context).push(viewUpComingFood(0,listGetTicketOnTransit[index]['d_ticket_id'],listGetTicketOnTransit[index]['d_mop'],listGetTicketOnTransit[index]['order_type_stat']));
+                                            }
+                                            // viewInside(listGetTicketNoFood[index]['d_ticket_id'],listGetTicketNoFood[index]['d_customerId']);
+                                          },
+                                          child: Container(
+                                            height: 80.0,
+                                            child: Card(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(10.0),
+                                              ),
+                                              elevation: 0.0,
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: <Widget>[
+                                                  Padding(
+                                                    padding: EdgeInsets.fromLTRB(5.0, 10.0, 10.0, 5.0),
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children:<Widget>[
+                                                        Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: <Widget>[
+                                                            Text('${listGetTicketOnTransit[index]['d_mop']}',style: TextStyle(color: Colors.black),),
+                                                            Text('Ticket # ${listGetTicketOnTransit[index]['d_ticket_id']}',style: TextStyle(fontSize: 20.0,color: Colors.black54, fontWeight: FontWeight.bold)),
+                                                          ],
+                                                        ),
+                                                        Container(
+                                                          height: screenHeight/15,
+                                                          width: screenWidth/15,
+                                                          child: SvgPicture.asset(type),
+                                                        ),
+                                                      ],
                                                     ),
-                                                  ],
-                                                ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           ),
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
-                            ),
-                          ],
+                                        ),
+                                      );
+                                    }),
+
+                              ),
+                            ],
+                          ),
                         ),
-                     ),
-                  ),
+                      ),
+                    ),
+                  ],
                 ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: toRefresh,
+                        child: Scrollbar(
+                          child: ListView(
+                            children: [
+                              Padding(
+                                padding:EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
+                                child:ListView.builder(
+                                    shrinkWrap: true,
+                                    physics: BouncingScrollPhysics(),
+                                    itemCount: listGetTicketOnDelivered == null ? 0 : listGetTicketOnDelivered.length,
+                                    itemBuilder: (BuildContext context, int index) {
+                                      String type = "";
+                                      if(listGetTicketOnDelivered[index]['order_type_stat'] == '0'){
+                                        type = "assets/svg/fast-food.svg";
+                                      }else{
+                                        type = "assets/svg/basket.svg";
+                                      }
+                                      return Padding(
+                                        padding:EdgeInsets.symmetric(horizontal: 2.0, vertical: 0.0),
+                                        child: InkWell(
+                                          onTap:(){
+                                            if(listGetTicketOnDelivered[index]['order_type_stat'] == '0'){
+                                              Navigator.of(context).push(viewUpComingFood(0,listGetTicketOnDelivered[index]['d_ticket_id'],listGetTicketOnDelivered[index]['d_mop'],listGetTicketOnDelivered[index]['order_type_stat']));
+                                            }
+                                            else{
+                                              Navigator.of(context).push(viewUpComingFood(0,listGetTicketOnDelivered[index]['d_ticket_id'],listGetTicketOnDelivered[index]['d_mop'],listGetTicketOnDelivered[index]['order_type_stat']));
+                                            }
+                                            // viewInside(listGetTicketNoFood[index]['d_ticket_id'],listGetTicketNoFood[index]['d_customerId']);
+                                          },
+                                          child: Container(
+                                            height: 80.0,
+                                            child: Card(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(10.0),
+                                              ),
+                                              elevation: 0.0,
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: <Widget>[
+                                                  Padding(
+                                                    padding: EdgeInsets.fromLTRB(5.0, 10.0, 10.0, 5.0),
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children:<Widget>[
+                                                        Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: <Widget>[
+                                                            Text('${listGetTicketOnDelivered[index]['d_mop']}',style: TextStyle(color: Colors.black),),
+                                                            Text('Ticket # ${listGetTicketOnDelivered[index]['d_ticket_id']}',style: TextStyle(fontSize: 20.0,color: Colors.black54, fontWeight: FontWeight.bold)),
+                                                          ],
+                                                        ),
+                                                        Container(
+                                                          height: screenHeight/15,
+                                                          width: screenWidth/15,
+                                                          child: SvgPicture.asset(type),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }),
+
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Icon(Icons.directions_car, size: 350),
+
               ],
-          ),
+            ),
      ),
+      ),
     );
   }
 }
 
-
-
-Route viewUpComingFood(ticketNo,dmop,type) {
+Route viewUpComingFood(pend,ticketNo,dmop,type) {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => ToDeliverFood(ticketNo:ticketNo,dmop:dmop,type:type),
+    pageBuilder: (context, animation, secondaryAnimation) => ToDeliverFood(pend:pend,ticketNo:ticketNo,dmop:dmop,type:type),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1.0, 0.0);
       var end = Offset.zero;
@@ -413,4 +564,19 @@ Route changePassword() {
   );
 }
 
+Route profile(){
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => ProfilePage(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
 

@@ -281,6 +281,30 @@ class RapidA {
     return dataUser;
   }
 
+  Future getTicketNoFoodOnTransit() async{
+    var client = http.Client();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map dataUser;
+    final response = await client.post(Uri.parse("$server/getTicketNoFood_ontrans_r"),body:{
+      'cusId':prefs.getString('s_customerId'),
+    });
+    dataUser = jsonDecode(response.body);
+    client.close();
+    return dataUser;
+  }
+
+  Future getTicketNoFoodOnDelivered() async{
+    var client = http.Client();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map dataUser;
+    final response = await client.post(Uri.parse("$server/getTicketNoFood_delivered_r"),body:{
+      'cusId':prefs.getString('s_customerId'),
+    });
+    dataUser = jsonDecode(response.body);
+    client.close();
+    return dataUser;
+  }
+
   // Future getTicketNoGood() async{
   //   SharedPreferences prefs = await SharedPreferences.getInstance();
   //   Map dataUser;

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
 import 'db_helper.dart';
-import 'package:timeline_tile/timeline_tile.dart';
+import 'package:flutter/cupertino.dart';
+import 'profile/changePassword.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -45,7 +46,6 @@ class _ProfilePage extends State<ProfilePage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          centerTitle: true,
           brightness: Brightness.light,
           backgroundColor: Colors.white,
           elevation: 0.1,
@@ -53,14 +53,7 @@ class _ProfilePage extends State<ProfilePage> {
             icon: Icon(Icons.arrow_back, color: Colors.black,size: 23,),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          title: Text(
-            "Profile",
-            style: GoogleFonts.openSans(
-                fontWeight: FontWeight.bold,
-                color: Colors.deepOrange,
-                fontStyle: FontStyle.normal,
-                fontSize: 20.0),
-          ),
+          title: Text("Profile",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
         ),
         body: isLoading
             ? Center(
@@ -72,13 +65,18 @@ class _ProfilePage extends State<ProfilePage> {
                 itemCount: 1,
                 itemBuilder: (BuildContext context, int index) {
                   return Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 10.0, vertical: 5.0),
+                        padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
                         child: Card(
-                          elevation: 0.1,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          elevation: 0.0,
                           child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               Padding(
@@ -93,21 +91,19 @@ class _ProfilePage extends State<ProfilePage> {
                                             MainAxisAlignment.center,
                                         children: <Widget>[
                                           new Container(
-                                              width: 120.0,
-                                              height: 120.0,
-                                              decoration: new BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                image: new DecorationImage(
-                                                  image: new ExactAssetImage(
-                                                      'assets/png/as.png'),
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              )),
+                                            width: 130.0,
+                                            height: 130.0,
+                                            child: Padding(
+                                              padding:EdgeInsets.all(5.0),
+                                              child: CircleAvatar(
+                                                backgroundImage: NetworkImage("https://coachpennylove.com/wp-content/uploads/2019/08/facetune_29-07-2019-02-58-10.jpg"),
+                                              ),
+                                            ),
+                                          ),
                                         ],
                                       ),
                                       Padding(
-                                          padding: EdgeInsets.only(
-                                              top: 90.0, right: 90.0),
+                                          padding: EdgeInsets.only(top: 90.0, right: 90.0),
                                           child: new Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
@@ -117,12 +113,11 @@ class _ProfilePage extends State<ProfilePage> {
 
                                                   },
                                                   child: new CircleAvatar(
-                                                    backgroundColor: Colors
-                                                        .deepOrange,
+                                                    backgroundColor: Colors.white70,
                                                     radius: 20.0,
                                                     child: new Icon(
-                                                      Icons.camera_alt,
-                                                      color: Colors.white,
+                                                      Icons.edit_outlined,
+                                                      color: Colors.black87,
                                                     ),
                                                   )),
                                             ],
@@ -130,8 +125,7 @@ class _ProfilePage extends State<ProfilePage> {
                                     ]),
                               ),
                               Padding(
-                                  padding:
-                                      EdgeInsets.fromLTRB(5.0, 30.0, 5.0, 0.0),
+                                  padding: EdgeInsets.fromLTRB(5.0, 30.0, 5.0, 0.0),
                                   child: new Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
@@ -143,69 +137,96 @@ class _ProfilePage extends State<ProfilePage> {
                                             fontSize: 20.0),
                                       ),
                                     ],
-                                  )),
-                                  Center(
-                                  child:TextButton(
-                                      onPressed: (){
-
-                                      },
-                                      child: Text("Log out"),
-                                    ),
                                   ),
-                                SizedBox(
+                              ),
+                              SizedBox(
                                   height: 20.0,
-                                ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  TextButton(
-                                    onPressed: (){
-
-                                    },
-                                    child: Column( // Replace with a Row for horizontal icon + text
-                                      children: <Widget>[
-                                        Icon(Icons.record_voice_over),
-                                        Text("your order")
-                                      ],
-                                    ),
-                                  ),
-                                  TextButton(
-                                    onPressed: (){
-
-                                    },
-                                    child: Column( // Replace with a Row for horizontal icon + text
-                                      children: <Widget>[
-                                        Icon(Icons.motorcycle),
-                                        Text("In transit")
-                                      ],
-                                    ),
-                                  ),
-                                  TextButton(
-                                    onPressed: (){
-
-                                    },
-                                    child: Column( // Replace with a Row for horizontal icon + text
-                                      children: <Widget>[
-                                        Icon(Icons.history),
-                                        Text("History")
-                                      ],
-                                    ),
-                                  ),
-                                ],
                               ),
                             ],
                           ),
                         ),
                       ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(10.0, 15.0, 10.0, 10.0),
+                        child: Text("Settings",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 25),),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(10.0, 15.0, 10.0, 10.0),
+                        child: Row(
+                          children: [
+                            Icon(CupertinoIcons.person,),
+                            SizedBox(
+                              width: 5.0,
+                            ),
+                            Text("Account",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),),
+                          ],
+                        ),
+                      ),
+                      Divider(color: Colors.black87,),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(0.0, 2.0, 0.0, 0.0),
+                        child: InkWell(
+                          onTap: (){
+                            Navigator.of(context).push(changePassword());
+                          },
+                          child: Card(
+                            elevation: 0.0,
+                            child: Padding(
+                              padding: EdgeInsets.all(17),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("Change password",style: TextStyle(fontSize: 18),),
+                                  Icon(CupertinoIcons.forward,),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(0.0, 2.0, 0.0, 0.0),
+                        child: InkWell(
+                          onTap: (){
+                            print("hello");
+                          },
+                          child: Card(
+                            elevation: 0.0,
+                            child: Padding(
+                              padding: EdgeInsets.all(17),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("View Address",style: TextStyle(fontSize: 18),),
+                                  Icon(CupertinoIcons.forward,),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
 
-                     Column(
-//                       crossAxisAlignment: ,
-                        children: [
-                            yourOrder(),
-                        ],
-                     ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(0.0, 2.0, 0.0, 10.0),
+                        child: InkWell(
+                          onTap: (){
 
-
+                          },
+                          child: Card(
+                            elevation: 0.0,
+                            child: Padding(
+                              padding: EdgeInsets.all(17),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("Log out",style: TextStyle(fontSize: 18),),
+                                  Icon(CupertinoIcons.forward,),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   );
                 },
@@ -213,4 +234,20 @@ class _ProfilePage extends State<ProfilePage> {
       ),
     );
   }
+}
+
+Route changePassword() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => ChangePassword(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
 }

@@ -12,10 +12,11 @@ import 'create_account_signin.dart';
 
 import 'dart:async';
 class ToDeliverFood extends StatefulWidget {
+  final pend;
   final ticketNo;
   final dmop;
   final type;
-  ToDeliverFood({Key key, @required this.ticketNo,this.dmop,this.type}) : super(key: key);//
+  ToDeliverFood({Key key, @required this.pend, this.ticketNo,this.dmop,this.type}) : super(key: key);//
   @override
   _ToDeliver createState() => _ToDeliver();
 }
@@ -280,6 +281,7 @@ class _ToDeliver extends State<ToDeliverFood> {
       }if(widget.type == '1'){
         lookItemsGood();
       }
+
     });
   }
 
@@ -369,11 +371,11 @@ class _ToDeliver extends State<ToDeliverFood> {
   @override
   void initState(){
 
-
+    print(widget.pend);
     super.initState();
     selectType();
     getTotal();
-    if(widget.dmop=='Pick-up'){
+    if(widget.dmop=='Pick-up' || widget.pend == 1){
       visible = false;
     }
   }
@@ -422,7 +424,7 @@ class _ToDeliver extends State<ToDeliverFood> {
                         onPressed: () {
                           checkIfOnGoing();
                         },
-                        child: Text("Show more"),
+                        child: Text("View rider"),
                       ),
                     ),
                   ),
@@ -531,17 +533,19 @@ class _ToDeliver extends State<ToDeliverFood> {
                                                                         ),
                                                                       ):
                                                                       loadItems[index]['ifexists'] == 'true'?
-                                                                      Padding(
-                                                                        padding: EdgeInsets.fromLTRB(0, 0, 25, 0),
-                                                                        child: OutlinedButton(
-                                                                          style: TextButton.styleFrom(
-                                                                            primary: Colors.black, // foreground
-                                                                            shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
-                                                                          ),
-                                                                          onPressed: null,
-                                                                          child: Text("Rider is tagged"),
-                                                                        ),
-                                                                      ):Padding(
+                                                                      // Padding(
+                                                                      //   padding: EdgeInsets.fromLTRB(0, 0, 25, 0),
+                                                                      //   child: OutlinedButton(
+                                                                      //     style: TextButton.styleFrom(
+                                                                      //       primary: Colors.black, // foreground
+                                                                      //       shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                                                                      //     ),
+                                                                      //     onPressed: null,
+                                                                      //     child: Text("Rider is tagged"),
+                                                                      //   ),
+                                                                      // )
+                                                                      Container()
+                                                                       :Padding(
                                                                         padding: EdgeInsets.fromLTRB(0, 0, 25, 0),
                                                                         child: OutlinedButton(
                                                                           style: TextButton.styleFrom(
@@ -644,7 +648,7 @@ class _ToDeliver extends State<ToDeliverFood> {
                             ),
                             child: Center(
                                 // ₱${oCcy.format(int.parse(lGetAmountPerTenant[index]['sumpertenats'].toString()))}
-                                child: Text("Totalasd ₱ ${oCcy.format(int.parse(grandTotal.toString()))}", style:TextStyle(fontStyle: FontStyle.normal, fontWeight: FontWeight.bold, fontSize: 18.0),
+                                child: Text("Total ₱ ${oCcy.format(int.parse(grandTotal.toString()))}", style:TextStyle(fontStyle: FontStyle.normal, fontWeight: FontWeight.bold, fontSize: 18.0),
                               ),
                             ),
                           ),

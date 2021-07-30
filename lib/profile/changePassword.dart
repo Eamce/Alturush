@@ -4,6 +4,7 @@ import 'package:sleek_button/sleek_button.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:arush/db_helper.dart';
 import 'addNewAddress.dart';
+import 'package:flutter/cupertino.dart';
 
 class ChangePassword extends StatefulWidget {
   @override
@@ -13,10 +14,8 @@ class ChangePassword extends StatefulWidget {
 class _ChangePassword extends State<ChangePassword> {
   final db = RapidA();
 
-
-
-
-
+  TextEditingController currentPassword = TextEditingController();
+  TextEditingController newPassword = TextEditingController();
 
   @override
   void initState() {
@@ -53,7 +52,7 @@ class _ChangePassword extends State<ChangePassword> {
                   Padding(
                     padding: EdgeInsets.fromLTRB(25, 10, 5, 5),
                     child: new Text(
-                      "Old password",
+                      "Current password",
                       style: GoogleFonts.openSans(
                           fontStyle: FontStyle.normal, fontSize: 16.0),
                     ),
@@ -61,29 +60,25 @@ class _ChangePassword extends State<ChangePassword> {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
                     child: Container(
-                      height: 50.0,
-                      child: new TextFormField(
-                          textInputAction: TextInputAction.done,
-                          cursorColor: Colors.deepOrange.withOpacity(0.8),
-                          // controller:town,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your old password';
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Colors.deepOrange.withOpacity(0.4),
-                                  width: 2.0),
-                              borderRadius: BorderRadius.circular(30.0),
-                            ),
-                            border: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
-                                borderRadius: BorderRadius.circular(30.0)),
-                          )
+                      height: 40.0,
+                      child: CupertinoTextField(
+                        controller: currentPassword,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.black12,
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+
+                        style: TextStyle(fontSize: 15.0),
+                        keyboardType: TextInputType.text,
+                        prefix: Padding(
+                          padding: EdgeInsets.only(left: 10),
+                          child: Icon(Icons.vpn_key,color: Colors.black54,),
+                        ),
+                        cursorColor: Colors.black54,
+                        // placeholder: "Old password",
                       ),
                     ),
                   ),
@@ -101,67 +96,24 @@ class _ChangePassword extends State<ChangePassword> {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
                     child: Container(
-                      height: 50.0,
-                      child: new TextFormField(
-                          textInputAction: TextInputAction.done,
-                          cursorColor: Colors.deepOrange.withOpacity(0.8),
-                          // controller:town,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your new password';
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Colors.deepOrange.withOpacity(0.4),
-                                  width: 2.0),
-                              borderRadius: BorderRadius.circular(30.0),
-                            ),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30.0)),
-                          )
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 1.0,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(25, 10, 5, 5),
-                    child: new Text(
-                      "Re-type new password",
-                      style: GoogleFonts.openSans(
-                          fontStyle: FontStyle.normal, fontSize: 16.0),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.0, vertical:   5.0),
-                    child: Container(
-                      height: 50.0,
-                      child: new TextFormField(
-                          textInputAction: TextInputAction.done,
-                          cursorColor: Colors.deepOrange.withOpacity(0.8),
-                          // controller:town,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please re-type your new password';
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Colors.deepOrange.withOpacity(0.4),
-                                  width: 2.0),
-                                borderRadius: BorderRadius.circular(30.0),
-                            ),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30.0)),
-                          )
+                      height: 40.0,
+                      child: CupertinoTextField(
+                        controller: newPassword,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.black12,
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        style: TextStyle(fontSize: 15.0),
+                        keyboardType: TextInputType.text,
+                        prefix: Padding(
+                          padding: EdgeInsets.only(left: 10),
+                          child: Icon(Icons.vpn_key,color: Colors.black54,),
+                        ),
+                        cursorColor: Colors.black54,
+                        // placeholder: "Old password",
                       ),
                     ),
                   ),
@@ -178,8 +130,121 @@ class _ChangePassword extends State<ChangePassword> {
                 ),
                 Flexible(
                   child: SleekButton(
-                    onTap: () async {
-
+                    onTap: () {
+                      if (newPassword.text.isEmpty && currentPassword.text.isEmpty) {
+                        showDialog<void>(
+                          context: context,
+                          builder:(BuildContext context) {
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(8.0))
+                              ),
+                              contentPadding:
+                              EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
+                              title: Text(
+                                'Hello!',
+                                style: TextStyle(fontSize: 18.0),
+                              ),
+                              content: SingleChildScrollView(
+                                child:Padding(
+                                    padding:EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
+                                    child: Text("Please don't leave all the fields empty")
+                                ),
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text(
+                                    'Close',
+                                    style: TextStyle(
+                                      color: Colors.deepOrange,
+                                    ),
+                                  ),
+                                  onPressed: (){
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                      else if(newPassword.text.isEmpty){
+                        showDialog<void>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(8.0))
+                              ),
+                              contentPadding:
+                              EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
+                              title: Text(
+                                'Hello!',
+                                style: TextStyle(fontSize: 18.0),
+                              ),
+                              content: SingleChildScrollView(
+                                child:Padding(
+                                    padding:EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
+                                    child: Text("Please enter your new password")
+                                ),
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text(
+                                    'Close',
+                                    style: TextStyle(
+                                      color: Colors.deepOrange,
+                                    ),
+                                  ),
+                                  onPressed: (){
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                      else if(currentPassword.text.isEmpty){
+                        showDialog<void>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(8.0))
+                              ),
+                              contentPadding:
+                              EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
+                              title: Text(
+                                'Hello!',
+                                style: TextStyle(fontSize: 18.0),
+                              ),
+                              content: SingleChildScrollView(
+                                child:Padding(
+                                    padding:EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
+                                    child: Text("Please enter your current password")
+                                ),
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text(
+                                    'Close',
+                                    style: TextStyle(
+                                      color: Colors.deepOrange,
+                                    ),
+                                  ),
+                                  onPressed: (){
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                      else{
+                        print("hello nce kaau");
+                      }
                     },
                     style: SleekButtonStyle.flat(
                       color: Colors.deepOrange,
