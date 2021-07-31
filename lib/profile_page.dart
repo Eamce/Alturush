@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'db_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'profile/changePassword.dart';
+import 'profile/addressMasterFile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -188,7 +190,7 @@ class _ProfilePage extends State<ProfilePage> {
                         padding: EdgeInsets.fromLTRB(0.0, 2.0, 0.0, 0.0),
                         child: InkWell(
                           onTap: (){
-                            print("hello");
+                            Navigator.of(context).push(addressMasterFileRoute());
                           },
                           child: Card(
                             elevation: 0.0,
@@ -209,8 +211,16 @@ class _ProfilePage extends State<ProfilePage> {
                       Padding(
                         padding: EdgeInsets.fromLTRB(0.0, 2.0, 0.0, 10.0),
                         child: InkWell(
-                          onTap: (){
-
+                          onTap: () async{
+                            SharedPreferences prefs = await SharedPreferences.getInstance();
+                            prefs.clear();
+                            // Navigator.of(context).pop();
+                            // Navigator.of(context).pop();
+                            // Navigator.of(context).pop();
+                            // Navigator.of(context).pop();
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pop();
+                            Navigator.of(context).push(createAccountSignInRoute());
                           },
                           child: Card(
                             elevation: 0.0,
@@ -239,6 +249,22 @@ class _ProfilePage extends State<ProfilePage> {
 Route changePassword() {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => ChangePassword(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route addressMasterFileRoute() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => AddressMasterFile(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1.0, 0.0);
       var end = Offset.zero;

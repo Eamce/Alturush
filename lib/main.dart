@@ -34,7 +34,7 @@ class _MyApp extends State<MyApp>{
   }
   _logOutUser() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.clear();
+    prefs.clear();
   }
 
   void _initializeTimer() {

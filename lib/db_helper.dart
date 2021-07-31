@@ -1350,6 +1350,21 @@ class RapidA {
     client.close();
     return dataUser;
   }
+
+  Future updatePassword(currentPass,oldPassword) async{
+    var client = http.Client();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var userID = prefs.getString('s_customerId');
+    print(userID);
+    final response = await client.post(Uri.parse("$server/updatePassword_r"),body:{
+      'userID':encrypt(userID),
+      'currentPass':encrypt(currentPass),
+      'oldPassword':encrypt(oldPassword)
+    });
+    client.close();
+    return response.body;
+  }
+
 }
 
 

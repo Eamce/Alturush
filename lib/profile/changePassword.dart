@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sleek_button/sleek_button.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:arush/db_helper.dart';
 import 'addNewAddress.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:arush/create_account_signin.dart';
 
 class ChangePassword extends StatefulWidget {
   @override
@@ -13,13 +14,112 @@ class ChangePassword extends StatefulWidget {
 
 class _ChangePassword extends State<ChangePassword> {
   final db = RapidA();
-
   TextEditingController currentPassword = TextEditingController();
   TextEditingController newPassword = TextEditingController();
+
+  changePassword() async{
+    var res = await db.updatePassword(currentPassword.text,newPassword.text);
+    if (!mounted) return;
+    setState(() {
+      if(res == 'wrongPass'){
+        showDialog<void>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(8.0))
+              ),
+              contentPadding:
+              EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
+              title: Text(
+                'Hello!',
+                style: TextStyle(fontSize: 18.0),
+              ),
+              content: SingleChildScrollView(
+                child:Padding(
+                    padding:EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
+                    child: Text("Your current password is incorrect")
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text(
+                    'Close',
+                    style: TextStyle(
+                      color: Colors.deepOrange,
+                    ),
+                  ),
+                  onPressed: (){
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }else{
+        showDialog<void>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(8.0))
+              ),
+              contentPadding:
+              EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
+              title: Text(
+                'Good job!',
+                style: TextStyle(fontSize: 18.0),
+              ),
+              content: SingleChildScrollView(
+                child:Padding(
+                    padding:EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
+                    child: Text("Your password was successfully updated you may log-out now",textAlign:TextAlign.center,)
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text(
+                    'Log-out',
+                    style: TextStyle(
+                      color: Colors.deepOrange,
+                    ),
+                  ),
+                  onPressed: () async{
+                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                    prefs.clear();
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(createAccountSignInRoute());
+                  },
+                ),
+                TextButton(
+                  child: Text(
+                    'Later',
+                    style: TextStyle(
+                      color: Colors.deepOrange,
+                    ),
+                  ),
+                  onPressed: (){
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+
   }
   @override
   void dispose() {
@@ -29,7 +129,6 @@ class _ChangePassword extends State<ChangePassword> {
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         brightness: Brightness.light,
@@ -68,7 +167,7 @@ class _ChangePassword extends State<ChangePassword> {
                             color: Colors.black12,
                             width: 2,
                           ),
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(8),
                         ),
 
                         style: TextStyle(fontSize: 15.0),
@@ -104,7 +203,7 @@ class _ChangePassword extends State<ChangePassword> {
                             color: Colors.black12,
                             width: 2,
                           ),
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         style: TextStyle(fontSize: 15.0),
                         keyboardType: TextInputType.text,
@@ -241,9 +340,45 @@ class _ChangePassword extends State<ChangePassword> {
                             );
                           },
                         );
+                      }else if(currentPassword.text == newPassword.text){
+                        showDialog<void>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(8.0))
+                              ),
+                              contentPadding:
+                              EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
+                              title: Text(
+                                'Hello!',
+                                style: TextStyle(fontSize: 18.0),
+                              ),
+                              content: SingleChildScrollView(
+                                child:Padding(
+                                    padding:EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
+                                    child: Text("Please don't use your old password",textAlign:TextAlign.center,)
+                                ),
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text(
+                                    'Close',
+                                    style: TextStyle(
+                                      color: Colors.deepOrange,
+                                    ),
+                                  ),
+                                  onPressed: (){
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
                       }
                       else{
-                        print("hello nce kaau");
+                        changePassword();
                       }
                     },
                     style: SleekButtonStyle.flat(
@@ -269,10 +404,9 @@ class _ChangePassword extends State<ChangePassword> {
 }
 
 
-
-Route addNewAddress() {
+Route createAccountSignInRoute() {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => AddNewAddress(),
+    pageBuilder: (context, animation, secondaryAnimation) => CreateAccountSignIn(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1.0, 0.0);
       var end = Offset.zero;

@@ -491,10 +491,9 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                   ],
                 ),
                 Icon(Icons.directions_car, size: 350),
-
               ],
             ),
-     ),
+          ),
       ),
     );
   }
