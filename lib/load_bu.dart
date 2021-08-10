@@ -6,7 +6,7 @@ import 'create_account_signin.dart';
 import 'load_tenants.dart';
 import 'db_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'track_order.dart';
+import 'package:arush/profile_page.dart';
 import 'load_cart.dart';
 import 'dart:async';
 import 'package:sleek_button/sleek_button.dart';
@@ -325,14 +325,26 @@ class _MyHomePageState extends State<MyHomePage>  {
                   listenCartCount();
                   loadProfile();
                 }else{
-                  await Navigator.of(context).push(_profilePage());
+                  await Navigator.of(context).push(profile());
                   listenCartCount();
                   loadProfile();
                 }
               }
           ),
         ],
-        title: Text("Order Food",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
+        // title: Text("Order Food",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Image.asset(
+              'assets/png/logo_raider8.2.png',
+              fit: BoxFit.contain,
+              height: 60,
+            ),
+            Container(
+                padding: const EdgeInsets.all(8.0), child: Text("Order Food",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),)
+          ],
+        ),
       ),
       drawer:Container(
         color: Colors.deepOrange,
@@ -353,9 +365,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                       SizedBox(
                         height: 30.0,
                       ),
-                      Center(
-                        child: Text("Sign up/Log in",style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 23.0),),
-                      ),
+
                       SizedBox(
                         height: 50.0,
                       ),
@@ -390,7 +400,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                             Navigator.of(context).pop();
                             SharedPreferences prefs = await SharedPreferences.getInstance();
                             String status  = prefs.getString('s_status');
-                            status != null ? await Navigator.of(context).push(_profilePage()) : await Navigator.of(context).push(_signIn());
+                            status != null ? await Navigator.of(context).push(profile()) : await Navigator.of(context).push(_signIn());
                             // await Navigator.of(context).push(_loadCart());
                             getCounter();
                             listenCartCount();
@@ -486,14 +496,6 @@ class _MyHomePageState extends State<MyHomePage>  {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(40, 10, 5, 15),
-                                child: new Text(
-                                  "You don't need a silver fork to eat good food.",
-                                  style: GoogleFonts.openSans(
-                                      fontStyle: FontStyle.normal,fontWeight: FontWeight.bold, fontSize: 45.0),
-                                ),
-                              ),
                               Padding(
                                 padding: EdgeInsets.fromLTRB(40, 10, 5, 5),
                                 child: new Text(
@@ -744,21 +746,7 @@ Route _gotoTenants(buLogo,buName,buCode) {
   );
 }
 
-Route _profilePage() {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => TrackOrder(),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      var begin = Offset(1.0, 0.0);
-      var end = Offset.zero;
-      var curve = Curves.decelerate;
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
-}
+
 
 Route _loadCart(){
   return PageRouteBuilder(
@@ -830,6 +818,23 @@ Route _groceryRoute(_groceryRoute) {
     pageBuilder: (context, animation, secondaryAnimation) => GroceryMain(groceryRoute:_groceryRoute),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+
+Route profile(){
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => ProfilePage(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
       var end = Offset.zero;
       var curve = Curves.decelerate;
       var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));

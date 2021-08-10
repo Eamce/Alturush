@@ -7,6 +7,7 @@ import 'package:sleek_button/sleek_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'create_account_signin.dart';
 import 'package:intl/intl.dart';
+import 'search.dart';
 
 class ViewItem extends StatefulWidget {
   final buCode;
@@ -224,6 +225,12 @@ class _ViewItem extends State<ViewItem>{
             onPressed: () => Navigator.of(context).pop(),
           ),
           actions: [
+            IconButton(
+                icon: Icon(Icons.search_outlined, color: Colors.black),
+                onPressed: () async {
+                  Navigator.of(context).push(_search());
+                }
+            ),
             IconButton(
                 icon: Icon(Icons.info_outline, color: Colors.black),
                 onPressed: () async {
@@ -623,6 +630,22 @@ Route _signIn() {
     pageBuilder: (context, animation, secondaryAnimation) => CreateAccountSignIn(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route _search() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => Search(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
       var end = Offset.zero;
       var curve = Curves.decelerate;
       var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));

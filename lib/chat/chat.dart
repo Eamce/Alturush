@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Chat extends StatefulWidget {
@@ -13,6 +14,7 @@ class Chat extends StatefulWidget {
 class _Chat extends State<Chat> {
 
   var isLoading = true;
+  final chat = TextEditingController();
 
   Future loadChat() async{
     isLoading = false;
@@ -51,16 +53,47 @@ class _Chat extends State<Chat> {
                 child: RefreshIndicator(
                   onRefresh: loadChat,
                     child: Scrollbar(
-                      child: ListView.builder(
-                        itemCount: 4,
-                            itemBuilder: (BuildContext context, int index) {
-                              return Container(
-
-                              );
-                            }
+                      child: Container(
+                        child: Column(
+                          children: [],
+                        ),
                       ),
                     ),
                 ),
+            ),
+            Container(
+              height: 60.0,
+              width: screenWidth,
+              child: Padding(
+                padding: EdgeInsets.only(left: 10,right: 10.0,bottom: 10.0),
+                child: CupertinoTextField(
+                  autofocus: true,
+                  style: TextStyle(fontSize: 15.0),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.black12,
+                      width: 2,
+                    ),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  keyboardType: TextInputType.text,
+                  controller: chat,
+                  // maxLines: 12,
+                  suffix: Container(
+                    width: 60.0,
+                    child: Padding(
+                      padding: EdgeInsets.all(1.0),
+                      child: GestureDetector(
+                          onTap: (){
+
+                          },
+                          child: Icon(Icons.send,color: Colors.blue,size: 32.0,)),
+                    ),
+                  ),
+                  cursorColor: Colors.black54,
+                  placeholder: "Enter message",
+                ),
+              ),
             ),
           ],
       ),

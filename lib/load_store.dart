@@ -16,6 +16,7 @@ import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'grocery/groceryMain.dart';
+import 'search.dart';
 
 class LoadStore extends StatefulWidget {
   final categoryName;
@@ -256,26 +257,15 @@ class _LoadStore extends State<LoadStore> {
           elevation: 0.1,
           iconTheme: new IconThemeData(color: Colors.black),
           title: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              Image.asset(
+                'assets/png/logo_raider8.2.png',
+                fit: BoxFit.contain,
+                height: 60,
+              ),
               Container(
-                width: 30.0,
-                height: 30.0,
-                decoration: new BoxDecoration(
-                  image: new DecorationImage(
-                    image: new NetworkImage(widget.storeLogo),
-                    fit: BoxFit.cover,
-                  ),
-                  borderRadius: new BorderRadius.all(new Radius.circular(50.0)),
-                  border: new Border.all(
-                    color: Colors.black54,
-                    width: 0.5,
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 5.0,
-              ),
-              Text("Menu",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
+                padding: const EdgeInsets.all(8.0), child: Text("Menu",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),)
             ],
           ),
           leading: IconButton(
@@ -283,6 +273,12 @@ class _LoadStore extends State<LoadStore> {
             onPressed: () => Navigator.of(context).pop(),
           ),
           actions: [
+            IconButton(
+                icon: Icon(Icons.search_outlined, color: Colors.black),
+                onPressed: () async {
+                  Navigator.of(context).push(_search());
+                }
+            ),
             status == null ? TextButton(
               onPressed: () async {
                 await Navigator.of(context).push(_signIn());
@@ -864,6 +860,22 @@ Route _signIn() {
     pageBuilder: (context, animation, secondaryAnimation) => CreateAccountSignIn(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route _search() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => Search(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
       var end = Offset.zero;
       var curve = Curves.decelerate;
       var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));

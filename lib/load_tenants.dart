@@ -203,26 +203,15 @@ class _LoadTenants extends State<LoadTenants> {
         elevation: 0.1,
         iconTheme: new IconThemeData(color: Colors.black),
         title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            Image.asset(
+              'assets/png/logo_raider8.2.png',
+              fit: BoxFit.contain,
+              height: 60,
+            ),
             Container(
-              width: 30.0,
-              height: 30.0,
-              decoration: new BoxDecoration(
-                image: new DecorationImage(
-                  image: new NetworkImage(widget.buLogo),
-                  fit: BoxFit.cover,
-                ),
-                borderRadius: new BorderRadius.all(new Radius.circular(50.0)),
-                border: new Border.all(
-                  color: Colors.black54,
-                  width: 0.5,
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 5.0,
-            ),
-            Text("Select tenant",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
+              padding: const EdgeInsets.all(8.0), child: Text("Tenants",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),)
           ],
         ),
         leading: IconButton(
