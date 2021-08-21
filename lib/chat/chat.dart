@@ -1,30 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:chat_bubbles/chat_bubbles.dart';
+import 'package:arush/db_helper.dart';
+import 'dart:async';
+
 
 class Chat extends StatefulWidget {
   final firstName;
   final lastName;
+  final riderId;
 
-  Chat({Key key, @required this.firstName,this.lastName}) : super(key: key);
+  Chat({Key key, @required this.firstName,this.lastName, this.riderId}) : super(key: key);
   @override
   _Chat createState() => _Chat();
 }
 
 class _Chat extends State<Chat> {
-
+  final db = RapidA();
   var isLoading = true;
+  List loadChatData;
+  Timer timer;
   final chat = TextEditingController();
 
   Future loadChat() async{
-    isLoading = false;
+    var res = await db.loadChat(widget.riderId);
+    if (!mounted) return;
+    setState(() {
+      loadChatData = res['user_details'];
+      print(loadChatData);
+      isLoading = false;
+    });
+  }
+  sendMessage() async{
+    await db.sendMessage(chat.text,widget.riderId);
+    chat.clear();
+    loadChat();
   }
 
   @override
-  void initState() {
-    super.initState();
-
+  void initState(){
     loadChat();
+    super.initState();
+    timer = Timer.periodic(Duration(seconds: 5), (Timer t) => loadChat());
+
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -54,8 +79,36 @@ class _Chat extends State<Chat> {
                   onRefresh: loadChat,
                     child: Scrollbar(
                       child: Container(
-                        child: Column(
-                          children: [],
+                        child:  ListView.builder(
+                          reverse: true,
+                          physics: BouncingScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: loadChatData == null ? 0 : loadChatData.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            bool isSender = false;
+                            Color chatColor = Colors.black12;
+                            if(loadChatData[index]['isSender'] == 'true'){
+                               isSender = true;
+                               chatColor = Colors.lightBlueAccent;
+                              }
+                              return Column(
+                                children: [
+                                  BubbleSpecialTwo(
+                                    text: loadChatData[index]['body'],
+                                    isSender: isSender,
+                                    color: chatColor,
+                                    textStyle: TextStyle(
+                                      fontSize: 17,
+                                      color: Colors.black,
+                                    ),
+                                    sent: true,
+                                  ),
+                                  SizedBox(
+                                      height: 10.0,
+                                  ),
+                                ],
+                              );
+                          }
                         ),
                       ),
                     ),
@@ -67,7 +120,7 @@ class _Chat extends State<Chat> {
               child: Padding(
                 padding: EdgeInsets.only(left: 10,right: 10.0,bottom: 10.0),
                 child: CupertinoTextField(
-                  autofocus: true,
+                  // autofocus: true,
                   style: TextStyle(fontSize: 15.0),
                   decoration: BoxDecoration(
                     border: Border.all(
@@ -85,7 +138,7 @@ class _Chat extends State<Chat> {
                       padding: EdgeInsets.all(1.0),
                       child: GestureDetector(
                           onTap: (){
-
+                              sendMessage();
                           },
                           child: Icon(Icons.send,color: Colors.blue,size: 32.0,)),
                     ),
@@ -99,6 +152,4 @@ class _Chat extends State<Chat> {
       ),
     );
   }
-
-
 }

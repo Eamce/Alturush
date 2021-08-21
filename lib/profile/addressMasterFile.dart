@@ -174,10 +174,10 @@ class _AddressMasterFile extends State<AddressMasterFile> {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text('$q.${loadIdList[index]['firstname']} ${loadIdList[index]['lastname']}',style: TextStyle(fontSize: 20,),),
-                                          Text('   ${loadIdList[index]['town_name']}, ${loadIdList[index]['brgy_name']}',style: TextStyle(fontSize: 20,),),
+                                          Text('   ${loadIdList[index]['d_townName']}, ${loadIdList[index]['d_brgName']}',style: TextStyle(fontSize: 20,),),
                                           Text('   ${loadIdList[index]['street_purok']}',style: TextStyle(fontSize: 20,),),
-                                          Text('   ${loadIdList[index]['mobile_number']}',style: TextStyle(fontSize: 20,),),
-                                          Text('   ${loadIdList[index]['buildingName']}',style: TextStyle(fontSize: 20,),),
+                                          Text('   ${loadIdList[index]['d_contact']}',style: TextStyle(fontSize: 20,),),
+                                          // Text('   ${loadIdList[index]['buildingName']}',style: TextStyle(fontSize: 20,),),
                                         ],
                                       ),
                                     ),

@@ -148,7 +148,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                           primary: Colors.black,
                           shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
                         ),
-                        onPressed: (){
+                        onPressed:(){
                           Navigator.pop(context);
                           Navigator.of(context).push(addNewAddress());
                         },

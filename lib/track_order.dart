@@ -25,6 +25,7 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
   var firstName;
   var lastName;
   var status;
+  var counter = "";
 
 
   Future getTicketNoFood() async{
@@ -32,7 +33,9 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
     if (!mounted) return;
     setState(() {
       listGetTicketNoFood = res['user_details'];
+      counter = listGetTicketNoFood[0]['count'].toString();
     });
+    print(counter);
   }
 
 
@@ -236,7 +239,7 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
               indicatorColor: Colors.deepOrange,
               labelColor: Colors.black87,
               tabs: [
-                Tab(child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('3',style: TextStyle(fontSize: 15.0),), child: Text("Pending",style: TextStyle(fontWeight: FontWeight.bold),))),
+                Tab(child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('$counter',style: TextStyle(fontSize: 15.0),), child: Text("Pending",style: TextStyle(fontWeight: FontWeight.bold),))),
                 Tab(child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('0',style: TextStyle(fontSize: 15.0),), child: Text("On transit",style: TextStyle(fontWeight: FontWeight.bold),))),
                 Tab(child: Text("Delivered",style: TextStyle(fontWeight: FontWeight.bold),)),
                 Tab(child: Text("Cancelled",style: TextStyle(fontWeight: FontWeight.bold),)),

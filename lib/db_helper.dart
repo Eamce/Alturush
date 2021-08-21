@@ -1355,7 +1355,6 @@ class RapidA {
     var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var userID = prefs.getString('s_customerId');
-    print(userID);
     final response = await client.post(Uri.parse("$server/updatePassword_r"),body:{
       'userID':encrypt(userID),
       'currentPass':encrypt(currentPass),
@@ -1363,6 +1362,34 @@ class RapidA {
     });
     client.close();
     return response.body;
+  }
+
+  Future loadChat(riderId) async{
+    var client = http.Client();
+    Map dataUser;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var userID = prefs.getString('s_customerId');
+    final response = await client.post(Uri.parse("$server/chat_r"),body:{
+      'userID':userID,
+      'riderId':riderId
+    });
+    dataUser = jsonDecode(response.body);
+    client.close();
+    return dataUser;
+  }
+
+  Future sendMessage(chat,riderId) async{
+    print(chat);
+    print(riderId);
+    var client = http.Client();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var userID = prefs.getString('s_customerId');
+    await client.post(Uri.parse("$server/send_chat_r"),body:{
+      'chat':chat,
+      'userID':userID,
+      'riderId':riderId
+    });
+    client.close();
   }
 
 }

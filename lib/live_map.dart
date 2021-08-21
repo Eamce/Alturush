@@ -33,6 +33,7 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
   String riderVehiclePhoto = "";
   String riderPlateNo = "";
   String riderMobileNo = "";
+  String riderId = "";
 
   Future loadRiderPage() async{
     _isGettingLocation = true;
@@ -49,6 +50,7 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
       riderVehiclePhoto = riderList[0]['rm_picture'];
       riderPlateNo = riderList[0]['rm_plate_no'];
       riderMobileNo = riderList[0]['rm_mobile_no'];
+      riderId = riderList[0]['rm_id'];
     });
   }
 
@@ -158,14 +160,14 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text("Rider detail",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
-        actions: [
-          IconButton(
-              icon: Icon(Icons.chat_bubble, color: Colors.black54),
-              onPressed: () {
-                Navigator.of(context).push(chartRoute(firstName,lastName));
-              }
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //       icon: Icon(Icons.chat_bubble, color: Colors.black54),
+        //       onPressed: () {
+        //
+        //       }
+        //   ),
+        // ],
       ),
       body:_isGettingLocation ? Center(
         child: CircularProgressIndicator(
@@ -236,6 +238,20 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
                           launch("tel://$riderMobileNo");
                         },
                         label:Text("Call rider",style: GoogleFonts.openSans(color:Colors.deepOrange,fontWeight: FontWeight.bold,fontSize: 15.0),),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(20, 0.0, 25, 5),
+                      child:OutlinedButton.icon(
+                        icon: Icon(Icons.chat_bubble,color: Colors.black87,),
+                        style: TextButton.styleFrom(
+                          primary: Colors.black,
+                          shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+                        ),
+                        onPressed: (){
+                          Navigator.of(context).push(chartRoute(firstName,lastName,riderId));
+                        },
+                        label:Text("Chat rider",style: GoogleFonts.openSans(color:Colors.deepOrange,fontWeight: FontWeight.bold,fontSize: 15.0),),
                       ),
                     ),
                     Padding(
@@ -344,9 +360,9 @@ class _ViewOrderStatus extends State<ViewOrderStatus>{
   }
 }
 
-Route chartRoute(firstName,lastName) {
+Route chartRoute(firstName,lastName,riderId) {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => Chat(firstName:firstName,lastName:lastName),
+    pageBuilder: (context, animation, secondaryAnimation) => Chat(firstName:firstName,lastName:lastName,riderId:riderId),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1.0, 0.0);
       var end = Offset.zero;
