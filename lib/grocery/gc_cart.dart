@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../track_order.dart';
 import '../create_account_signin.dart';
 import 'package:intl/intl.dart';
+import 'gc_delivery.dart';
 
 class GcLoadCart extends StatefulWidget {
   @override
@@ -53,80 +54,71 @@ class _GcLoadCart extends State<GcLoadCart> {
     });
   }
 
-//   void selectType(BuildContext context) async{
-//     showModalBottomSheet(
-//         isScrollControlled: true,
-//         isDismissible: true,
-//         context: context,
-//         shape: RoundedRectangleBorder(
-//           borderRadius: BorderRadius.only(topRight:  Radius.circular(10),topLeft:  Radius.circular(10)),
-//         ),
-//         builder: (ctx) {
-//           return Container(
-//             height: MediaQuery.of(context).size.height  * 0.4,
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children:[
-//                 SizedBox(height:10.0),
-//                 Padding(
-//                   padding: EdgeInsets.fromLTRB(25.0, 0.0, 20.0, 0.0),
-//                   child:Text("Select type",style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold),),
-//                 ),
-//                 SizedBox(
-//                   height: 30.0,
-//                 ),
-//                 Row(
-//                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//                   children:[
-//                     Column(
-//                       children: [
-//                         GestureDetector(
-//                           onTap: (){
-//                             Navigator.pop(context);
-// //                            submitPlaceOrder();
-//                           },
-//                           child: Container(
-//                             width:130,
-//                             height:130,
-//                             child: Padding(
-//                               padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
-//                               child: SvgPicture.asset("assets/svg/food-delivery.svg"),
-//                             ),
-//                           ),
-//                         ),
-//                         Text("Delivery",style: TextStyle(fontSize: 18.0,fontWeight:FontWeight.bold),),
-//                       ],
-//                     ),
-//
-//                     Column(
-//                       children: [
-//                         GestureDetector(
-//                           onTap: (){
-//                             Navigator.pop(context);
-//                             Navigator.of(context).push(_pickUp());
-//                           },
-//                           child: Container(
-//                             width:130,
-//                             height:130,
-//                             child: Padding(
-//                               padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
-//                               child: SvgPicture.asset("assets/svg/staff-picks.svg"),
-//                             ),
-//                           ),
-//                         ),
-//                         Text("Pick up",style: TextStyle(fontSize: 18.0,fontWeight:FontWeight.bold),),
-//                       ],
-//                     ),
-//                   ],
-//                 ),
-//               ],
-//             ),
-//           );
-//         });
-//   }
+  void selectType(BuildContext context) async{
+    showModalBottomSheet(
+        isScrollControlled: true,
+        isDismissible: true,
+        context: context,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(topRight:  Radius.circular(10),topLeft:  Radius.circular(10)),
+        ),
+        builder: (ctx) {
+          return Container(
+            height: MediaQuery.of(context).size.height/3.4,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children:[
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children:[
+                      GestureDetector(
+                        onTap: (){
+                          Navigator.pop(context);
+                          Navigator.of(context).push(_placeOrderDelivery());
+                        },
+                        child: Container(
+                          width:130,
+                          height:200,
+                          child: Column(
+                            children:[
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
+                                child: Image.asset("assets/png/delivery.png",),
+                              ),
+                              Text("Delivery",style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold),),
+                            ],
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: (){
+                          Navigator.pop(context);
+                          Navigator.of(context).push(_pickUp());
+                        },
+                        child: Container(
+                          width:130,
+                          height:200,
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
+                                child: Image.asset("assets/png/delivery-man.png",),
+                              ),
+                              Text("Pick-up",style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold),),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+  }
 
-
-//  StreamController _event =StreamController<int>.broadcast();
   updateCartQty(id,qty) async{
     await db.updateGcCartQty(id,qty);
 //    loadSubTotal();
@@ -434,7 +426,8 @@ class _GcLoadCart extends State<GcLoadCart> {
                           if(username == null){
                             Navigator.of(context).push(_signIn());
                           }else{
-                            Navigator.of(context).push(_pickUp());
+                            // Navigator.of(context).push(_pickUp());
+                            selectType(context);
                           }
                           // selectType(context);
                         },
@@ -456,7 +449,7 @@ class _GcLoadCart extends State<GcLoadCart> {
                                 valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
                               ),
                             ),
-                          ) : Text("₱ ${subTotal.toString()} Next", style:TextStyle(fontStyle: FontStyle.normal, fontWeight: FontWeight.bold, fontSize: 13.0),
+                           ) : Text("₱ ${subTotal.toString()} Next", style:TextStyle(fontStyle: FontStyle.normal, fontWeight: FontWeight.bold, fontSize: 13.0),
                           ),
                         ),
                       ),
@@ -476,6 +469,22 @@ class _GcLoadCart extends State<GcLoadCart> {
 Route _pickUp() {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => GcPickUp(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(0.0, 1.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route _placeOrderDelivery(){
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => GcDelivery(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;

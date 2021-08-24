@@ -25,17 +25,17 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
   var firstName;
   var lastName;
   var status;
-  var counter = "";
-
+  var pendingCounter = "";
+  var onTransitCounter = "";
+  var deliveredCounter = "";
 
   Future getTicketNoFood() async{
     var res = await db.getTicketNoFood();
     if (!mounted) return;
     setState(() {
       listGetTicketNoFood = res['user_details'];
-      counter = listGetTicketNoFood[0]['count'].toString();
+      pendingCounter = listGetTicketNoFood[0]['count'].toString();
     });
-    print(counter);
   }
 
 
@@ -44,6 +44,8 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
     if (!mounted) return;
     setState(() {
       listGetTicketOnTransit = res['user_details'];
+      onTransitCounter = listGetTicketOnTransit[0]['count'].toString();
+      print(onTransitCounter);
     });
   }
 
@@ -52,6 +54,7 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
     if (!mounted) return;
     setState(() {
       listGetTicketOnDelivered = res['user_details'];
+      deliveredCounter = listGetTicketOnDelivered[0]['count'].toString();
     });
   }
 
@@ -239,10 +242,10 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
               indicatorColor: Colors.deepOrange,
               labelColor: Colors.black87,
               tabs: [
-                Tab(child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('$counter',style: TextStyle(fontSize: 15.0),), child: Text("Pending",style: TextStyle(fontWeight: FontWeight.bold),))),
-                Tab(child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('0',style: TextStyle(fontSize: 15.0),), child: Text("On transit",style: TextStyle(fontWeight: FontWeight.bold),))),
-                Tab(child: Text("Delivered",style: TextStyle(fontWeight: FontWeight.bold),)),
-                Tab(child: Text("Cancelled",style: TextStyle(fontWeight: FontWeight.bold),)),
+                Tab(child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('$pendingCounter',style: TextStyle(fontSize: 15.0),), child: Text("Pending",style: TextStyle(fontWeight: FontWeight.bold),))),
+                Tab(child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('$onTransitCounter',style: TextStyle(fontSize: 15.0),), child: Text("On transit",style: TextStyle(fontWeight: FontWeight.bold),))),
+                Tab(child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('$deliveredCounter',style: TextStyle(fontSize: 15.0),), child: Text("Delivered",style: TextStyle(fontWeight: FontWeight.bold),))),
+                Tab(child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('$onTransitCounter',style: TextStyle(fontSize: 15.0),), child: Text("Cancelled",style: TextStyle(fontWeight: FontWeight.bold),))),
               ],
             ),
           ),

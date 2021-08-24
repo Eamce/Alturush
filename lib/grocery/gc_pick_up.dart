@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart';
 import '../db_helper.dart';
 import 'package:intl/intl.dart';
 import 'package:sleek_button/sleek_button.dart';
@@ -55,7 +54,6 @@ class _GcPickUp extends State<GcPickUp> {
     if (!mounted) return;
     setState(() {
       trueTime = res['user_details'];
-
     });
   }
 
@@ -203,8 +201,8 @@ class _GcPickUp extends State<GcPickUp> {
                   ),
                   InkWell(
                     onTap: () {
-                      // _modeOfPayment.text = "GCASH";
-                      // Navigator.of(context).pop();
+                      _modeOfPayment.text = "GCASH";
+                      Navigator.of(context).pop();
                     },
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
@@ -219,8 +217,8 @@ class _GcPickUp extends State<GcPickUp> {
 
                   InkWell(
                     onTap: () {
-                      // _modeOfPayment.text = "PAYMAYA";
-                      // Navigator.of(context).pop();
+                      _modeOfPayment.text = "PAYMAYA";
+                      Navigator.of(context).pop();
                     },
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
@@ -247,7 +245,6 @@ class _GcPickUp extends State<GcPickUp> {
     getTrueTime();
     gcGroupByBu();
     getBill();
-    _modeOfPayment.text = "Cash on pick-up";
   }
 
   @override
@@ -309,7 +306,7 @@ class _GcPickUp extends State<GcPickUp> {
                                 children:[
                                   Padding(
                                     padding:EdgeInsets.fromLTRB(20.0, 7.0, 5.0, 5.0),
-                                    child: new Text("Convenience Fee:", style: TextStyle(color: Colors.black87.withOpacity(0.8),fontStyle: FontStyle.normal,fontSize: 20.0),),
+                                    child: new Text("Picking Fee:", style: TextStyle(color: Colors.black87.withOpacity(0.8),fontStyle: FontStyle.normal,fontSize: 20.0),),
                                   ),
                                   Padding(
                                     padding:EdgeInsets.fromLTRB(20.0, 7.0, 20.0, 5.0),
@@ -361,7 +358,7 @@ class _GcPickUp extends State<GcPickUp> {
                             padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
                             child: InkWell(
                               onTap: (){
-                                // modeOfPayment(_modeOfPayment);
+                                 modeOfPayment(_modeOfPayment);
                               },
                               child: IgnorePointer(
                                 child: new TextFormField(
@@ -436,7 +433,7 @@ class _GcPickUp extends State<GcPickUp> {
                                     ),
                                     Padding(
                                       padding: EdgeInsets.fromLTRB(30, 0, 5, 5),
-                                      child: new Text("Convenience fee: "+conFee.toString(), style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 20.0),),
+                                      child: new Text("Picking fee: "+conFee.toString(), style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 20.0),),
                                     ),
                                     Padding(
                                       padding: EdgeInsets.fromLTRB(35, 10, 5, 5),
