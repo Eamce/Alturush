@@ -28,7 +28,7 @@ class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
         ),
         builder: (ctx) {
           return Container(
-            height: MediaQuery.of(context).size.height/3.4,
+            height: MediaQuery.of(context).size.height/2.8,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children:[

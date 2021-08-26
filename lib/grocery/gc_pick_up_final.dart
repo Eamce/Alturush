@@ -17,12 +17,13 @@ class GcPickUpFinal extends StatefulWidget {
   final deliveryDateData;
   final deliveryTimeData ;
   final buNameData;
-  final buData ;
+  final buData;
   final totalData ;
   final convenienceData;
   final placeRemarksData;
   final modeOfPayment;
-  GcPickUpFinal({Key key, @required this.groupValue,this.deliveryDateData,this.deliveryTimeData,this.buNameData,this.buData,this.totalData,this.convenienceData,this.placeRemarksData,this.modeOfPayment}) : super(key: key);
+  final pickUpOrDelivery;
+  GcPickUpFinal({Key key, @required this.groupValue,this.deliveryDateData,this.deliveryTimeData,this.buNameData,this.buData,this.totalData,this.convenienceData,this.placeRemarksData,this.modeOfPayment,this.pickUpOrDelivery}) : super(key: key);
   @override
   _GcPickUpFinal createState() => _GcPickUpFinal();
 }
@@ -81,7 +82,7 @@ class _GcPickUpFinal extends State<GcPickUpFinal> {
   }
 
   submitOrder() async{
-    await db.submitOrder(widget.groupValue,widget.deliveryDateData,widget.deliveryTimeData,widget.buData,widget.totalData,widget.convenienceData,widget.placeRemarksData);
+    await db.submitOrder(widget.groupValue,widget.deliveryDateData,widget.deliveryTimeData,widget.buData,widget.totalData,widget.convenienceData,widget.placeRemarksData,widget.pickUpOrDelivery);
   }
 
   getSuccessMessage() {
@@ -212,10 +213,9 @@ class _GcPickUpFinal extends State<GcPickUpFinal> {
                               padding:EdgeInsets.fromLTRB(20.0, 7.0, 20.0, 5.0),
                               child: new Text("₱ ${oCcy.format(grandTotal)}", style: TextStyle(color: Colors.black87.withOpacity(0.8),fontStyle: FontStyle.normal,fontSize: 20.0),),
                             ),
-                          ],
+                         ],
                         ),
-
-                        ],
+                       ],
                       ),
                       Divider(
                         color: Colors.black87.withOpacity(0.8),

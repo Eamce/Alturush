@@ -305,15 +305,17 @@ class RapidA {
     return dataUser;
   }
 
-  // Future getTicketNoGood() async{
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   Map dataUser;
-  //   final response = await http.post("$server/getTicketNoGood_r",body:{
-  //     'cusId':prefs.getString('s_customerId'),
-  //   });
-  //   dataUser = jsonDecode(response.body);
-  //   return dataUser;
-  // }
+  Future getTicketCancelled() async{
+    var client = http.Client();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map dataUser;
+    final response = await client.post(Uri.parse("$server/getTicket_cancelled_r"),body:{
+      'cusId':prefs.getString('s_customerId'),
+    });
+    dataUser = jsonDecode(response.body);
+    client.close();
+    return dataUser;
+  }
 
   Future loadProfile() async{
     var client = http.Client();
@@ -959,14 +961,9 @@ class RapidA {
     return dataUser;
   }
 
-  Future submitOrder(groupValue,deliveryDateData,deliveryTimeData,buData,totalData,convenienceData,placeRemarks) async{
-    // print(encrypt(groupValue.toString()));
-    // print(deliveryDateData);
-    // print(deliveryTimeData);
-    // print(buData);
-    // print(totalData);
-    // print(convenienceData);
-    // print(placeRemarks);
+  Future submitOrder(groupValue,deliveryDateData,deliveryTimeData,buData,totalData,convenienceData,placeRemarks,pickUpOrDelivery) async{
+
+    // print(pickUpOrDelivery);
     var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var userID = prefs.getString('s_customerId');
@@ -978,7 +975,8 @@ class RapidA {
       'buData':buData.toString(),
       'totalData':totalData.toString(),
       'convenienceData':convenienceData.toString(),
-      'placeRemarks':placeRemarks.toString()
+      'placeRemarks':placeRemarks.toString(),
+      'pickUpOrDelivery':pickUpOrDelivery.toString()
     });
     client.close();
   }

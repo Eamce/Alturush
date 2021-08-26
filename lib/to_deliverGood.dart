@@ -6,6 +6,9 @@ import 'package:intl/intl.dart';
 import 'load_bu.dart';
 import 'live_map.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:sleek_button/sleek_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'create_account_signin.dart';
 
 class ToDeliverGood extends StatefulWidget {
   final ticketNo;
@@ -18,9 +21,63 @@ class ToDeliverGood extends StatefulWidget {
 class _ToDeliver extends State<ToDeliverGood> {
   final db = RapidA();
   final oCcy = new NumberFormat("#,##0.00", "en_US");
+  List loadTotal,lGetAmountPerTenant;
   var isLoading = true;
   List loadItems;
-  List loadTotal;
+
+  void displayBottomSheet(BuildContext context) async{
+    var res = await db.lookItemsSegregate(widget.ticketNo);
+    if (!mounted) return;
+    setState(() {
+      isLoading = false;
+      lGetAmountPerTenant = res['user_details'];
+    });
+    showModalBottomSheet(
+        isScrollControlled: true,
+        isDismissible: true,
+        context: context,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(topRight:  Radius.circular(10),topLeft:  Radius.circular(10)),
+        ),
+        builder: (ctx) {
+          return Container(
+            height: MediaQuery.of(context).size.height  * 0.4,
+            child:Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children:[
+                SizedBox(height:10.0),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(25.0, 0.0, 20.0, 0.0),
+                  child:Text("Your stores",style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold),),
+                ),
+                Scrollbar(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: lGetAmountPerTenant == null ? 0 : lGetAmountPerTenant.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      var f = index;
+                      f++;
+                      return Padding(
+                        padding: EdgeInsets.fromLTRB(25.0, 15.0, 25.0, 5.0),
+                        child:Container(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('$f. ${lGetAmountPerTenant[index]['bu_name']} ${lGetAmountPerTenant[index]['tenant_name']} ',style: TextStyle(fontSize: 15.0,fontWeight: FontWeight.bold)),
+                              Text('₱${oCcy.format(int.parse(lGetAmountPerTenant[index]['sumpertenats'].toString()))}',style: TextStyle(fontSize: 15.0,fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ),
+//                          child: Text('$f. ${lGetAmountPerTenant[index]['d_bu_name']} - ${lGetAmountPerTenant[index]['d_tenant']}  ₱${oCcy.format(double.parse(lGetAmountPerTenant[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+  }
 
   Future cancelOrder(tomsId) async{
     showDialog<void>(
@@ -72,22 +129,22 @@ class _ToDeliver extends State<ToDeliverGood> {
   }
   var delCharge;
   var grandTotal;
-  // Future getTotal() async{
-  //   var res = await db.getTotal(widget.ticketNo);
-  //   if (!mounted) return;
-  //   setState(() {
-  //     loadTotal = res['user_details'];
-  //     if(loadTotal[0]['charge'] == null && loadTotal[0]['grand_total'] ){
-  //       delCharge = 0;
-  //       grandTotal = 0;
-  //       print("opps");
-  //     }else{
-  //       delCharge = loadTotal[0]['charge'];
-  //       grandTotal = loadTotal[0]['grand_total'];
-  //       print("naa");
-  //     }
-  //   });
-  // }
+  Future getTotal() async{
+    var res = await db.getTotal(widget.ticketNo);
+    if (!mounted) return;
+    setState(() {
+      loadTotal = res['user_details'];
+      if(loadTotal[0]['charge'] == null && loadTotal[0]['grand_total'] ){
+        delCharge = 0;
+        grandTotal = 0;
+        print("opps");
+      }else{
+        delCharge = loadTotal[0]['charge'];
+        grandTotal = loadTotal[0]['grand_total'];
+        print("naa");
+      }
+    });
+  }
 
   Future cancelOrderSingle(tomsId) async{
     // await db.cancelOrderSingleGood(tomsId);
@@ -148,8 +205,8 @@ class _ToDeliver extends State<ToDeliverGood> {
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
+    // double height = MediaQuery.of(context).size.height;
+    // double width = MediaQuery.of(context).size.width;
     return WillPopScope(
       onWillPop: () async {
         Navigator.pop(context);
@@ -164,27 +221,6 @@ class _ToDeliver extends State<ToDeliverGood> {
             icon: Icon(Icons.arrow_back, color: Colors.black,size: 23,),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          actions: [
-            checkIfExists == 'true' ?
-            IconButton(tooltip: "View on map",icon:Icon(Icons.map), color: Colors.green,
-              onPressed: (){
-                Navigator.of(context).push(_viewOrderStatus(widget.ticketNo));
-              },
-            ):
-            IconButton(tooltip: "View on map",icon:Icon(Icons.map), color: Colors.green,
-              onPressed: (){
-                Fluttertoast.showToast(
-                    msg: "This item must be serve before showing the rider in the map",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 2,
-                    backgroundColor: Colors.black.withOpacity(0.7),
-                    textColor: Colors.white,
-                    fontSize: 16.0
-                );
-              },
-            )
-          ],
           title: Text(widget.ticketNo,style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
         ),
         body: isLoading
@@ -286,11 +322,11 @@ class _ToDeliver extends State<ToDeliverGood> {
                                                   loadItems[index]['canceled_status'] == '1'?
                                                   Padding(
                                                     padding: EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 0.0),
-                                                    child: OutlineButton(
-                                                      borderSide: BorderSide(color: Colors.green),
-                                                      highlightedBorderColor: Colors.green,
-                                                      highlightColor: Colors.transparent,
-                                                      shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                                                    child: OutlinedButton(
+                                                      style: TextButton.styleFrom(
+                                                        primary: Colors.black, // foreground
+                                                        shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                                                      ),
                                                       onPressed: null,
                                                       child: Text("Cancelled"),
                                                     ),
@@ -298,21 +334,21 @@ class _ToDeliver extends State<ToDeliverGood> {
                                                   loadItems[index]['ifexists'] == 'true'?
                                                   Padding(
                                                     padding: EdgeInsets.fromLTRB(15, 0, 5, 0),
-                                                    child: OutlineButton(
-                                                      borderSide: BorderSide(color: Colors.green),
-                                                      highlightedBorderColor: Colors.green,
-                                                      highlightColor: Colors.transparent,
-                                                      shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                                                    child: OutlinedButton(
+                                                      style: TextButton.styleFrom(
+                                                        primary: Colors.black, // foreground
+                                                        shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                                                      ),
                                                       onPressed: null,
                                                       child: Text("Rider is tagged"),
                                                     ),
                                                   ):Padding(
                                                     padding: EdgeInsets.fromLTRB(15, 0, 5, 0),
-                                                    child: OutlineButton(
-                                                      borderSide: BorderSide(color: Colors.green),
-                                                      highlightedBorderColor: Colors.green,
-                                                      highlightColor: Colors.transparent,
-                                                      shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                                                    child: OutlinedButton(
+                                                      style: TextButton.styleFrom(
+                                                        primary: Colors.black, // foreground
+                                                        shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                                                      ),
                                                       onPressed: (){
                                                         // cancelOrder(loadItems[index]['gc_final_id']);
                                                       },
@@ -338,102 +374,64 @@ class _ToDeliver extends State<ToDeliverGood> {
                 ),
               ),
             ),
-            Divider(
-              color: Colors.black,
-            ),
-//                  Padding(
-//                    padding:EdgeInsets.fromLTRB(15.0, 7.0, 15.0, 5.0),
-//                    child: Row(
-//                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                      children: [
-//                        new Text("Status", style: TextStyle(fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 18.0),),
-//                        new Text("Pending", style: TextStyle(fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 18.0),),
-//                      ],
-//                    ),
-//                  ),
-
-
             // Padding(
-            //   padding:EdgeInsets.fromLTRB(15.0, 7.0, 15.0, 5.0),
+            //   padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
             //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //     children: [
-            //       new Text("Rider's charge", style: TextStyle(fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 18.0),),
-            //       delCharge == null ?
-            //       new Text('₱ 0.0', style: TextStyle(fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 18.0),)
-            //           :new Text('₱ $delCharge', style: TextStyle(fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 18.0),)
-            //     ],
-            //   ),
-            // ),
-            // Padding(
-            //   padding:EdgeInsets.fromLTRB(15.0, 7.0, 15.0, 5.0),
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //     children: [
-            //       new Text("GRAND TOTAL", style: TextStyle(color: Colors.deepOrange,fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 20.0),),
-            //       grandTotal == null ?
-            //       new Text('₱${ oCcy.format(0)}', style: TextStyle(color: Colors.deepOrange,fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 20.0),)
-            //           :new Text('₱${ oCcy.format(grandTotal)}', style: TextStyle(color: Colors.deepOrange,fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 20.0),),
+            //     children: <Widget>[
+            //       Container(
+            //         width: MediaQuery.of(context).size.width / 5.5,
+            //         child: SleekButton(
+            //           onTap: () async{
+            //             SharedPreferences prefs = await SharedPreferences.getInstance();
+            //             String status = prefs.getString('s_status');
+            //             status != null
+            //                 ?  displayBottomSheet(context)
+            //                 : Navigator.of(context).push(_signIn());
+            //           },
+            //           style: SleekButtonStyle.flat(
+            //             color: Colors.deepOrange,
+            //             inverted: false,
+            //             rounded: true,
+            //             size: SleekButtonSize.big,
+            //             context: context,
+            //           ),
+            //           child: Center(
+            //             child: Icon(
+            //               Icons.remove_red_eye,
+            //               size: 17.0,
+            //             ),
+            //           ),
+            //         ),
+            //       ),
+            //       SizedBox(
+            //         width: 2.0,
+            //       ),
+            //       Flexible(
+            //         child: SleekButton(
+            //           onTap: () async {
+            //
+            //           },
+            //           style: SleekButtonStyle.flat(
+            //             color: Colors.deepOrange,
+            //             inverted: true,
+            //             rounded: true,
+            //             size: SleekButtonSize.big,
+            //             context: context,
+            //           ),
+            //           child: Center(
+            //             // ₱${oCcy.format(int.parse(lGetAmountPerTenant[index]['sumpertenats'].toString()))}
+            //             child: Text("Total ₱ ${oCcy.format(int.parse(grandTotal.toString()))}", style:TextStyle(fontStyle: FontStyle.normal, fontWeight: FontWeight.bold, fontSize: 18.0),
+            //             ),
+            //           ),
+            //         ),
+            //       ),
             //     ],
             //   ),
             // ),
             Center(
               child:Column(
                 children: [
-//                        Padding(
-//                          padding: EdgeInsets.fromLTRB(10.0,0.0, 10.0,0.0),
-//                          child: SizedBox(
-//                            width: 400.0,
-//                            height: 50.0,
-//                            child:  OutlineButton(
-//                              highlightedBorderColor: Colors.deepOrange,
-//                              highlightColor: Colors.transparent,
-//                              shape: RoundedRectangleBorder(
-//                                  borderRadius: BorderRadius.circular(5.0),
-//                                  side: BorderSide(color: Colors.red)
-//                              ),
-//                              color: Colors.deepOrange,
-//                              onPressed: (){
-//                                cancelEntireOrder(widget.ticketNo);
-//                              },
-//                              child: Text("Cancel entire order", style: GoogleFonts.openSans(
-//                                  fontWeight: FontWeight.bold,
-//                                  fontStyle: FontStyle.normal,
-//                                  color: Colors.black,
-//                                  fontSize: 18.0),),
-//                            ),
-//                          ),
-//                        ),
-//                        SizedBox(
-//                          height: 5.0,
-//                        ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(10.0,0.0, 10.0,0.0),
-                    child: SizedBox(
-                      width: width-50,
-                      height: 50.0,
-                      child:  OutlineButton(
-                        highlightedBorderColor: Colors.deepOrange,
-                        highlightColor: Colors.transparent,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5.0),
-                            side: BorderSide(color: Colors.red)
-                        ),
-                        color: Colors.deepOrange,
-                        onPressed: (){
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => MyHomePage()),
-                          );
-                        },
-                        child: Text("Shop more", style: GoogleFonts.openSans(
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.normal,
-                            color: Colors.black,
-                            fontSize: 18.0),),
-                      ),
-                    ),
-                  ),
+
                 ],
               ),
             ),
@@ -448,9 +446,10 @@ class _ToDeliver extends State<ToDeliverGood> {
   }
 }
 
-Route _viewOrderStatus(ticketNo) {
+
+Route _signIn() {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => ViewOrderStatus(ticketNo:ticketNo),
+    pageBuilder: (context, animation, secondaryAnimation) => CreateAccountSignIn(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;

@@ -10,6 +10,8 @@ import 'package:badges/badges.dart';
 import 'profile/changePassword.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:arush/profile_page.dart';
+import 'to_deliverGood.dart';
+
 
 class TrackOrder extends StatefulWidget {
   @override
@@ -22,19 +24,21 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
   List listGetTicketNoFood = []; //pending list
   List listGetTicketOnTransit = [];
   List listGetTicketOnDelivered = [];
+  List listGetTicketOnCancelled = [];
   var firstName;
   var lastName;
   var status;
   var pendingCounter = "";
   var onTransitCounter = "";
   var deliveredCounter = "";
+  var cancelledCounter = "";
 
   Future getTicketNoFood() async{
     var res = await db.getTicketNoFood();
     if (!mounted) return;
     setState(() {
       listGetTicketNoFood = res['user_details'];
-      pendingCounter = listGetTicketNoFood[0]['count'].toString();
+      pendingCounter = listGetTicketNoFood.length.toString();
     });
   }
 
@@ -44,8 +48,7 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
     if (!mounted) return;
     setState(() {
       listGetTicketOnTransit = res['user_details'];
-      onTransitCounter = listGetTicketOnTransit[0]['count'].toString();
-      print(onTransitCounter);
+      onTransitCounter = listGetTicketOnTransit.length.toString();
     });
   }
 
@@ -54,17 +57,24 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
     if (!mounted) return;
     setState(() {
       listGetTicketOnDelivered = res['user_details'];
-      deliveredCounter = listGetTicketOnDelivered[0]['count'].toString();
+      deliveredCounter = listGetTicketOnDelivered.length.toString();
     });
   }
 
-
-
+  Future getTicketCancelled() async{
+    var res = await db.getTicketCancelled();
+    if (!mounted) return;
+    setState(() {
+      listGetTicketOnCancelled = res['user_details'];
+      cancelledCounter = listGetTicketOnCancelled.length.toString();
+    });
+  }
 
   Future toRefresh() async{
     getTicketNoFood(); //pending request
     getTicketNoFoodOnTransit(); //on transit request
-    getTicketNoFoodOnDelivered(); // on delivered
+    getTicketNoFoodOnDelivered(); // delivered
+    getTicketCancelled(); // cancelled
     isLoading = false;
   }
 
@@ -242,10 +252,18 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
               indicatorColor: Colors.deepOrange,
               labelColor: Colors.black87,
               tabs: [
-                Tab(child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('$pendingCounter',style: TextStyle(fontSize: 15.0),), child: Text("Pending",style: TextStyle(fontWeight: FontWeight.bold),))),
-                Tab(child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('$onTransitCounter',style: TextStyle(fontSize: 15.0),), child: Text("On transit",style: TextStyle(fontWeight: FontWeight.bold),))),
-                Tab(child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('$deliveredCounter',style: TextStyle(fontSize: 15.0),), child: Text("Delivered",style: TextStyle(fontWeight: FontWeight.bold),))),
-                Tab(child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('$onTransitCounter',style: TextStyle(fontSize: 15.0),), child: Text("Cancelled",style: TextStyle(fontWeight: FontWeight.bold),))),
+                Tab(
+                    child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('$pendingCounter',style: TextStyle(fontSize: 15.0),), child: Text("Pending",style: TextStyle(fontWeight: FontWeight.bold),))
+                ),
+                Tab(
+                    child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('$onTransitCounter',style: TextStyle(fontSize: 15.0),), child: Text("On transit",style: TextStyle(fontWeight: FontWeight.bold),))
+                ),
+                Tab(
+                    child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('$deliveredCounter',style: TextStyle(fontSize: 15.0),), child: Text("Delivered",style: TextStyle(fontWeight: FontWeight.bold),))
+                ),
+                Tab(
+                    child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('$cancelledCounter',style: TextStyle(fontSize: 15.0),), child: Text("Cancelled",style: TextStyle(fontWeight: FontWeight.bold),))
+                ),
               ],
             ),
           ),
@@ -254,7 +272,7 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
               child: CircularProgressIndicator(
                 valueColor: new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
               ),
-            ): TabBarView(
+            ):TabBarView(
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -286,9 +304,9 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                                             Navigator.of(context).push(viewUpComingFood(1,listGetTicketNoFood[index]['d_ticket_id'],listGetTicketNoFood[index]['d_mop'],listGetTicketNoFood[index]['order_type_stat']));
                                           }
                                           else{
-                                            Navigator.of(context).push(viewUpComingFood(1,listGetTicketNoFood[index]['d_ticket_id'],listGetTicketNoFood[index]['d_mop'],listGetTicketNoFood[index]['order_type_stat']));
+                                            print(listGetTicketNoFood[index]['d_ticket_id']);
+                                            Navigator.of(context).push(viewUpComingGood(listGetTicketNoFood[index]['d_ticket_id']));
                                           }
-                                          // viewInside(listGetTicketNoFood[index]['d_ticket_id'],listGetTicketNoFood[index]['d_customerId']);
                                         },
                                         child: Container(
                                           height: 80.0,
@@ -327,7 +345,6 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                                       ),
                                     );
                                   }),
-
                               ),
                             ],
                           ),
@@ -366,7 +383,8 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                                               Navigator.of(context).push(viewUpComingFood(0,listGetTicketOnTransit[index]['d_ticket_id'],listGetTicketOnTransit[index]['d_mop'],listGetTicketOnTransit[index]['order_type_stat']));
                                             }
                                             else{
-                                              Navigator.of(context).push(viewUpComingFood(0,listGetTicketOnTransit[index]['d_ticket_id'],listGetTicketOnTransit[index]['d_mop'],listGetTicketOnTransit[index]['order_type_stat']));
+                                              print(listGetTicketNoFood[index]['d_ticket_id']);
+                                              Navigator.of(context).push(viewUpComingGood(listGetTicketNoFood[index]['d_ticket_id']));
                                             }
                                             // viewInside(listGetTicketNoFood[index]['d_ticket_id'],listGetTicketNoFood[index]['d_customerId']);
                                           },
@@ -446,7 +464,8 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                                               Navigator.of(context).push(viewUpComingFood(0,listGetTicketOnDelivered[index]['d_ticket_id'],listGetTicketOnDelivered[index]['d_mop'],listGetTicketOnDelivered[index]['order_type_stat']));
                                             }
                                             else{
-                                              Navigator.of(context).push(viewUpComingFood(0,listGetTicketOnDelivered[index]['d_ticket_id'],listGetTicketOnDelivered[index]['d_mop'],listGetTicketOnDelivered[index]['order_type_stat']));
+                                              print(listGetTicketNoFood[index]['d_ticket_id']);
+                                              Navigator.of(context).push(viewUpComingGood(listGetTicketNoFood[index]['d_ticket_id']));
                                             }
                                             // viewInside(listGetTicketNoFood[index]['d_ticket_id'],listGetTicketNoFood[index]['d_customerId']);
                                           },
@@ -496,7 +515,85 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                     ),
                   ],
                 ),
-                Icon(Icons.directions_car, size: 350),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: toRefresh,
+                        child: Scrollbar(
+                          child: ListView(
+                            children: [
+                              Padding(
+                                padding:EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
+                                child:ListView.builder(
+                                    shrinkWrap: true,
+                                    physics: BouncingScrollPhysics(),
+                                    itemCount: listGetTicketOnCancelled == null ? 0 : listGetTicketOnCancelled.length,
+                                    itemBuilder: (BuildContext context, int index) {
+                                      String type = "";
+                                      if(listGetTicketNoFood[index]['order_type_stat'] == '0'){
+                                        type = "assets/svg/fast-food.svg";
+                                      }else{
+                                        type = "assets/svg/basket.svg";
+                                      }
+                                      return Padding(
+                                        padding:EdgeInsets.symmetric(horizontal: 2.0, vertical: 0.0),
+                                        child: InkWell(
+                                          onTap:(){
+                                            if(listGetTicketOnCancelled[index]['order_type_stat'] == '0'){
+                                              Navigator.of(context).push(viewUpComingFood(1,listGetTicketOnCancelled[index]['d_ticket_id'],listGetTicketOnCancelled[index]['d_mop'],listGetTicketOnCancelled[index]['order_type_stat']));
+                                            }
+                                            else{
+                                              print(listGetTicketOnCancelled[index]['d_ticket_id']);
+                                              Navigator.of(context).push(viewUpComingGood(listGetTicketOnCancelled[index]['d_ticket_id']));
+                                            }
+                                          },
+                                          child: Container(
+                                            height: 80.0,
+                                            child: Card(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(10.0),
+                                              ),
+                                              elevation: 0.0,
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: <Widget>[
+                                                  Padding(
+                                                    padding: EdgeInsets.fromLTRB(5.0, 10.0, 10.0, 5.0),
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children:<Widget>[
+                                                        Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: <Widget>[
+                                                            Text('${listGetTicketNoFood[index]['d_mop']}',style: TextStyle(color: Colors.black),),
+                                                            Text('Ticket # ${listGetTicketNoFood[index]['d_ticket_id']}',style: TextStyle(fontSize: 20.0,color: Colors.black54, fontWeight: FontWeight.bold)),
+                                                          ],
+                                                        ),
+                                                        Container(
+                                                          height: screenHeight/15,
+                                                          width: screenWidth/15,
+                                                          child: SvgPicture.asset(type),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -520,6 +617,23 @@ Route viewUpComingFood(pend,ticketNo,dmop,type) {
     },
   );
 }
+
+Route viewUpComingGood(ticketNo) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => ToDeliverGood(ticketNo:ticketNo),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
 
 Route viewIds() {
   return PageRouteBuilder(

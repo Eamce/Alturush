@@ -35,6 +35,7 @@ class _GcPickUp extends State<GcPickUp> {
   List<String> buData = [];
   List<String> buNameData = [];
   final _modeOfPayment = TextEditingController();
+  final _amountTender = TextEditingController();
   // final placeRemarks = TextEditingController();
   final discount = TextEditingController();
   var isLoading = true;
@@ -314,7 +315,6 @@ class _GcPickUp extends State<GcPickUp> {
                                   ),
                                 ],
                               ),
-
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
@@ -328,7 +328,6 @@ class _GcPickUp extends State<GcPickUp> {
                                   ),
                                 ],
                               ),
-
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
@@ -336,19 +335,43 @@ class _GcPickUp extends State<GcPickUp> {
                                     padding:EdgeInsets.fromLTRB(20.0, 7.0, 5.0, 5.0),
                                     child: new Text("Grand Total:", style: TextStyle(color: Colors.black87.withOpacity(0.8),fontStyle: FontStyle.normal,fontSize: 20.0),),
                                   ),
-
                                   Padding(
                                     padding:EdgeInsets.fromLTRB(20.0, 7.0, 20.0, 5.0),
                                     child: new Text("₱ ${oCcy.format(grandTotal)}", style: TextStyle(color: Colors.black87.withOpacity(0.8),fontStyle: FontStyle.normal,fontSize: 20.0),),
                                   ),
                                 ],
                               ),
-
                             ],
                           ),
-
                           Divider(
                             color: Colors.black87.withOpacity(0.8),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(35, 10, 5, 5),
+                            child: new Text("Amount tender*", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                          ),
+                          Padding(
+                            padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                            child: new TextFormField(
+                              keyboardType: TextInputType.number,
+                              textInputAction: TextInputAction.done,
+                              cursorColor: Colors.deepOrange,
+                              controller: _amountTender,
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Please enter amount tender';
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                prefixIcon: Icon(Icons.monetization_on,color: Colors.grey,),
+                                contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
+                                focusedBorder:OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
+                                ),
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
+                              ),
+                            ),
                           ),
                           Padding(
                             padding: EdgeInsets.fromLTRB(35, 10, 5, 5),
@@ -372,7 +395,7 @@ class _GcPickUp extends State<GcPickUp> {
                                     return null;
                                   },
                                   decoration: InputDecoration(
-                                    prefixIcon: Icon(Icons.date_range,color: Colors.grey,),
+                                    prefixIcon: Icon(Icons.payment_outlined,color: Colors.grey,),
                                     contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
                                     focusedBorder:OutlineInputBorder(
                                       borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
@@ -796,7 +819,7 @@ Widget _myRadioButton({String title, int value, Function onChanged}) {
 
 Route _gcPickUpFinal(groupValue,deliveryDateData,deliveryTimeData,buNameData,buData,totalData,convenienceData,placeRemarksData,_modeOfPayment){
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => GcPickUpFinal(groupValue:groupValue,deliveryDateData:deliveryDateData,deliveryTimeData:deliveryTimeData,buNameData:buNameData,buData:buData,totalData:totalData,convenienceData:convenienceData,placeRemarksData:placeRemarksData,modeOfPayment:_modeOfPayment),
+    pageBuilder: (context, animation, secondaryAnimation) => GcPickUpFinal(pickUpOrDelivery:'1',groupValue:groupValue,deliveryDateData:deliveryDateData,deliveryTimeData:deliveryTimeData,buNameData:buNameData,buData:buData,totalData:totalData,convenienceData:convenienceData,placeRemarksData:placeRemarksData,modeOfPayment:_modeOfPayment),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;
