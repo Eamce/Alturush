@@ -14,20 +14,28 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePage extends State<ProfilePage> {
   final db = RapidA();
-  var isLoading = false;
+  var isLoading = true;
+  List listProfile = [];
+  var firstName = "";
+  var profilePicture = "";
+  var lastName = "";
 
   Future loadProfile() async {
-
+    var res = await db.loadProfile();
+    if (!mounted) return;
+    setState(() {
+      listProfile = res['user_details'];
+      profilePicture =  listProfile[0]['d_photo'];
+      firstName = listProfile[0]['d_fname'];
+      lastName = listProfile[0]['d_lname'];
+      isLoading = false;
+    });
   }
 
-  Widget yourOrder(){
-    return Text("ad");
-  }
 
   @override
   void initState() {
-//    loadProfile();
-
+    loadProfile();
     super.initState();
   }
 
@@ -98,7 +106,7 @@ class _ProfilePage extends State<ProfilePage> {
                                             child: Padding(
                                               padding:EdgeInsets.all(5.0),
                                               child: CircleAvatar(
-                                                backgroundImage: NetworkImage("https://coachpennylove.com/wp-content/uploads/2019/08/facetune_29-07-2019-02-58-10.jpg"),
+                                                backgroundImage: NetworkImage(profilePicture),
                                               ),
                                             ),
                                           ),
@@ -112,7 +120,7 @@ class _ProfilePage extends State<ProfilePage> {
                                             children: <Widget>[
                                               GestureDetector(
                                                   onTap: () {
-
+                                                    print("change profile");
                                                   },
                                                   child: new CircleAvatar(
                                                     backgroundColor: Colors.white70,
@@ -131,8 +139,7 @@ class _ProfilePage extends State<ProfilePage> {
                                   child: new Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
-                                      Text(
-                                        "Paul jearic Niones",
+                                      Text('$firstName $lastName',
                                         style: GoogleFonts.openSans(
                                             fontWeight: FontWeight.bold,
                                             fontStyle: FontStyle.normal,

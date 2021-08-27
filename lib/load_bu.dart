@@ -33,12 +33,15 @@ class _MyHomePageState extends State<MyHomePage>  {
   List listSubtotal;
   List loadLocationData;
   List loadQuotesData;
+  List listProfile;
   var isLoading = true;
   var isVisible = true;
   var cartCount;
   var subtotal;
   var locationString;
   var cartLoading = true;
+  var profileLoading = true;
+  var profilePicture = "";
   String firstName="";
   String profilePhoto;
   String placeRemark;
@@ -71,6 +74,20 @@ class _MyHomePageState extends State<MyHomePage>  {
     }
   }
 
+  Future loadProfilePic() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    status  = prefs.getString('s_status');
+    if(status != null) {
+      var res = await db.loadProfile();
+      if (!mounted) return;
+      setState(() {
+        listProfile = res['user_details'];
+        profilePicture = listProfile[0]['d_photo'];
+        profileLoading = false;
+      });
+    }
+  }
+
   Future futureLoadQuotes() async{
     var res = await db.futureLoadQuotes();
     if (!mounted) return;
@@ -81,6 +98,7 @@ class _MyHomePageState extends State<MyHomePage>  {
   }
 
   String status;
+
   Future loadProfile() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     status  = prefs.getString('s_status');
@@ -284,6 +302,7 @@ class _MyHomePageState extends State<MyHomePage>  {
     listenCartCount();
     loadProfile();
     getGlobalCat();
+    loadProfilePic();
     // loadBu();
     super.initState();
   }
@@ -313,24 +332,56 @@ class _MyHomePageState extends State<MyHomePage>  {
               await Navigator.of(context).push(_signIn());
               listenCartCount();
               loadProfile();
+              loadProfilePic();
             },
             child: Text("Login",style: GoogleFonts.openSans(color:Colors.deepOrange,fontWeight: FontWeight.bold,fontSize: 18.0),),
-          ): IconButton(
-              icon: Icon(Icons.person, color: Colors.black),
-              onPressed: () async {
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                String username = prefs.getString('s_customerId');
-                if(username == null){
-                  await Navigator.of(context).push(_signIn());
-                  listenCartCount();
-                  loadProfile();
-                }else{
-                  await Navigator.of(context).push(profile());
-                  listenCartCount();
-                  loadProfile();
-                }
+          ):
+          InkWell(
+            customBorder: CircleBorder(),
+            onTap: () async{
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              String username = prefs.getString('s_customerId');
+              if(username == null){
+                await Navigator.of(context).push(_signIn());
+                listenCartCount();
+                loadProfile();
+                loadProfilePic();
+              }else{
+                await Navigator.of(context).push(profile());
+                listenCartCount();
+                loadProfile();
+                loadProfilePic();
               }
+            },
+            child: Container(
+              width: 70.0,
+              height: 70.0,
+              child: Padding(
+                padding:EdgeInsets.all(5.0),
+                child: profileLoading ? CircularProgressIndicator(
+                  valueColor: new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
+                ) : CircleAvatar(
+                  backgroundImage: NetworkImage(profilePicture),
+                ),
+              ),
+            ),
           ),
+          //   IconButton(
+          //     icon: Icon(Icons.person, color: Colors.black),
+          //     onPressed: () async {
+          //       SharedPreferences prefs = await SharedPreferences.getInstance();
+          //       String username = prefs.getString('s_customerId');
+          //       if(username == null){
+          //         await Navigator.of(context).push(_signIn());
+          //         listenCartCount();
+          //         loadProfile();
+          //       }else{
+          //         await Navigator.of(context).push(profile());
+          //         listenCartCount();
+          //         loadProfile();
+          //       }
+          //     }
+          // ),
         ],
         // title: Text("Order Food",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
         title: Row(
@@ -418,11 +469,13 @@ class _MyHomePageState extends State<MyHomePage>  {
                               getCounter();
                               listenCartCount();
                               loadProfile();
+                              loadProfilePic();
                             }else{
                               await Navigator.of(context).push(_loadCart());
                               getCounter();
                               listenCartCount();
                               loadProfile();
+                              loadProfilePic();
                             }
                           }
                       ),

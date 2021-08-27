@@ -24,12 +24,17 @@ class LoadTenants extends StatefulWidget {
 class _LoadTenants extends State<LoadTenants> {
   final oCcy = new NumberFormat("#,##0.00", "en_US");
   final db = RapidA();
+  List listProfile;
   List loadTenants;
   int gridCount;
   List listCounter;
+
   var isLoading = true;
   var cartLoading = true;
+  var profileLoading = true;
   var cartCount;
+  var profilePicture = "";
+
   List listSubtotal;
   var subtotal;
 
@@ -41,6 +46,20 @@ class _LoadTenants extends State<LoadTenants> {
       isLoading = false;
       loadTenants = res['user_details'];
     });
+  }
+
+  Future loadProfilePic() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    status  = prefs.getString('s_status');
+    if(status != null) {
+      var res = await db.loadProfile();
+      if (!mounted) return;
+      setState(() {
+        listProfile = res['user_details'];
+        profilePicture = listProfile[0]['d_photo'];
+        profileLoading = false;
+      });
+    }
   }
 
   Future getCounter() async {
@@ -180,6 +199,7 @@ class _LoadTenants extends State<LoadTenants> {
     getCounter();
     loadTenant();
     loadProfile();
+    loadProfilePic();
   }
 
   @override
@@ -232,22 +252,52 @@ class _LoadTenants extends State<LoadTenants> {
               loadProfile();
             },
             child: Text("Login",style: GoogleFonts.openSans(color:Colors.deepOrange,fontWeight: FontWeight.bold,fontSize: 18.0),),
-          ): IconButton(
-              icon: Icon(Icons.person, color: Colors.black),
-              onPressed: () async {
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                String username = prefs.getString('s_customerId');
-                if(username == null){
-                  await Navigator.of(context).push(_signIn());
-                  getCounter();
-                  loadProfile();
-                }else{
-                  await Navigator.of(context).push(_profilePage());
-                  getCounter();
-                  loadProfile();
-                }
+          ):        InkWell(
+            customBorder: CircleBorder(),
+            onTap: () async{
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              String username = prefs.getString('s_customerId');
+              if(username == null){
+                await Navigator.of(context).push(_signIn());
+                getCounter();
+                loadProfile();
+                loadProfilePic();
+              }else{
+                await Navigator.of(context).push(profile());
+                getCounter();
+                loadProfile();
+                loadProfilePic();
               }
+            },
+            child: Container(
+              width: 70.0,
+              height: 70.0,
+              child: Padding(
+                padding:EdgeInsets.all(5.0),
+                child: profileLoading ? CircularProgressIndicator(
+                  valueColor: new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
+                ) : CircleAvatar(
+                  backgroundImage: NetworkImage(profilePicture),
+                ),
+              ),
+            ),
           ),
+          // IconButton(
+          //     icon: Icon(Icons.person, color: Colors.black),
+          //     onPressed: () async {
+          //       SharedPreferences prefs = await SharedPreferences.getInstance();
+          //       String username = prefs.getString('s_customerId');
+          //       if(username == null){
+          //         await Navigator.of(context).push(_signIn());
+          //         getCounter();
+          //         loadProfile();
+          //       }else{
+          //         await Navigator.of(context).push(_profilePage());
+          //         getCounter();
+          //         loadProfile();
+          //       }
+          //     }
+          // ),
         ],
       ),
       body: isLoading

@@ -23,14 +23,17 @@ class _LoadCart extends State<LoadCart> {
   List loadCartData = [];
   List lGetAmountPerTenant;
   List loadSubtotal;
+  List listProfile;
   var isLoading = true;
   var checkOutLoading = true;
+  var profileLoading = true;
   var subTotal;
 
   var labelFlavor = "";
   var labelDrinks = "";
   var labelFries = "";
   var labelSides = "";
+  var profilePicture = "";
 
   int flavorGroupValue;
   int drinksGroupValue;
@@ -49,6 +52,7 @@ class _LoadCart extends State<LoadCart> {
   var boolSideId = false;
 
 
+
   List loadIMainItems;
   List loadChoices;
   List loadFlavors;
@@ -64,6 +68,20 @@ class _LoadCart extends State<LoadCart> {
       loadCartData = res['user_details'];
       loadIMainItems = loadCartData;
     });
+  }
+  String status;
+  Future loadProfilePic() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    status  = prefs.getString('s_status');
+    if(status != null) {
+      var res = await db.loadProfile();
+      if (!mounted) return;
+      setState(() {
+        listProfile = res['user_details'];
+        profilePicture = listProfile[0]['d_photo'];
+        profileLoading = false;
+      });
+    }
   }
 
   Future getBuSegregate() async{
@@ -462,6 +480,7 @@ bool ignorePointer = false;
     loadTotal();
     getBuSegregate();
     checkIfBf();
+    loadProfilePic();
   }
 
   @override
@@ -536,19 +555,35 @@ bool ignorePointer = false;
           ),
           title: Text("My cart",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
           actions: <Widget>[
-            // IconButton(
-            //     icon: Icon(Icons.search, color: Colors.black),
-            //     onPressed: () => {}
-            // ),
-            IconButton(
-                icon: Icon(Icons.person, color: Colors.black),
-                onPressed: () async {
-                  SharedPreferences prefs = await SharedPreferences.getInstance();
-                  String status = prefs.getString('s_status');
-                  status != null
-                      ? Navigator.of(context).push(_profilePage())
-                      : Navigator.of(context).push(_signIn());
+            InkWell(
+              customBorder: CircleBorder(),
+              onTap: () async{
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                String username = prefs.getString('s_customerId');
+                if(username == null){
+                  await Navigator.of(context).push(_signIn());
+                  // listenCartCount();
+                  // loadProfile();
+                  loadProfilePic();
+                }else{
+                  await Navigator.of(context).push(_profilePage());
+                  // listenCartCount();
+                  // loadProfile();
+                  loadProfilePic();
                 }
+              },
+              child: Container(
+                width: 70.0,
+                height: 70.0,
+                child: Padding(
+                  padding:EdgeInsets.all(5.0),
+                  child: profileLoading ? CircularProgressIndicator(
+                    valueColor: new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
+                  ) : CircleAvatar(
+                    backgroundImage: NetworkImage(profilePicture),
+                  ),
+                ),
+              ),
             ),
           ],
         ),

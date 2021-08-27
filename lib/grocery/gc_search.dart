@@ -84,7 +84,7 @@ class _Search extends State<GcSearch> {
                       child: Icon(Icons.close_rounded,color: Colors.black54,)),
                 ),
                 cursorColor: Colors.black54,
-                placeholder: "Search food",
+                placeholder: "Search here...",
               ),
             ),
             actions: [

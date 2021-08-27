@@ -37,6 +37,9 @@ class _LoadStore extends State<LoadStore> {
 //  bool _isLogged = false;
   List loadStoreData;
   List loadCategory;
+  List listProfile;
+  var profilePicture = "";
+  var profileLoading = false;
   var isLoading = false;
   var cartLoading = true;
   var cartCount;
@@ -86,11 +89,26 @@ class _LoadStore extends State<LoadStore> {
     status  = prefs.getString('s_status');
   }
 
+  Future loadProfilePic() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    status  = prefs.getString('s_status');
+    if(status != null) {
+      var res = await db.loadProfile();
+      if (!mounted) return;
+      setState(() {
+        listProfile = res['user_details'];
+        profilePicture = listProfile[0]['d_photo'];
+        profileLoading = false;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     getCounter();
     loadProfile();
+    loadProfilePic();
     if(widget.categoryName == 'All items'){
       getItemsByCategoriesAll();
     }else{
@@ -286,22 +304,52 @@ class _LoadStore extends State<LoadStore> {
                 loadProfile();
               },
               child: Text("Login",style: GoogleFonts.openSans(color:Colors.deepOrange,fontWeight: FontWeight.bold,fontSize: 18.0),),
-            ): IconButton(
-                icon: Icon(Icons.person, color: Colors.black),
-                onPressed: () async {
-                  SharedPreferences prefs = await SharedPreferences.getInstance();
-                  String username = prefs.getString('s_customerId');
-                  if(username == null){
-                    await Navigator.of(context).push(_signIn());
-                    getCounter();
-                    loadProfile();
-                  }else{
-                    await Navigator.of(context).push(_profilePage());
-                    getCounter();
-                    loadProfile();
-                  }
+            ): InkWell(
+              customBorder: CircleBorder(),
+              onTap: () async{
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                String username = prefs.getString('s_customerId');
+                if(username == null){
+                  await Navigator.of(context).push(_signIn());
+                  loadProfile();
+                  getCounter();
+                  loadProfilePic();
+                }else{
+                  await Navigator.of(context).push(_profilePage());
+                  loadProfile();
+                  getCounter();
+                  loadProfilePic();
                 }
+              },
+              child: Container(
+                width: 70.0,
+                height: 70.0,
+                child: Padding(
+                  padding:EdgeInsets.all(5.0),
+                  child: profileLoading ? CircularProgressIndicator(
+                    valueColor: new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
+                  ) : CircleAvatar(
+                    backgroundImage: NetworkImage(profilePicture),
+                  ),
+                ),
+              ),
             ),
+            // IconButton(
+            //     icon: Icon(Icons.person, color: Colors.black),
+            //     onPressed: () async {
+            //       SharedPreferences prefs = await SharedPreferences.getInstance();
+            //       String username = prefs.getString('s_customerId');
+            //       if(username == null){
+            //         await Navigator.of(context).push(_signIn());
+            //         getCounter();
+            //         loadProfile();
+            //       }else{
+            //         await Navigator.of(context).push(_profilePage());
+            //         getCounter();
+            //         loadProfile();
+            //       }
+            //     }
+            // ),
           ],
         ),
         body: isLoading

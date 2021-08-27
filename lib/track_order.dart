@@ -20,14 +20,17 @@ class TrackOrder extends StatefulWidget {
 
 class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
   var isLoading = true;
+  var profileLoading = true;
   final db = RapidA();
   List listGetTicketNoFood = []; //pending list
   List listGetTicketOnTransit = [];
   List listGetTicketOnDelivered = [];
   List listGetTicketOnCancelled = [];
+  List listProfile = [];
   var firstName;
   var lastName;
   var status;
+  var profilePicture = "";
   var pendingCounter = "";
   var onTransitCounter = "";
   var deliveredCounter = "";
@@ -42,6 +45,16 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
     });
   }
 
+
+  Future loadProfile() async {
+    var res = await db.loadProfile();
+    if (!mounted) return;
+    setState(() {
+      listProfile = res['user_details'];
+      profilePicture = listProfile[0]['d_photo'];
+      profileLoading = false;
+    });
+  }
 
   Future getTicketNoFoodOnTransit() async{
     var res = await db.getTicketNoFoodOnTransit();
@@ -71,10 +84,12 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
   }
 
   Future toRefresh() async{
+    loadProfile(); //load profile picture
     getTicketNoFood(); //pending request
     getTicketNoFoodOnTransit(); //on transit request
     getTicketNoFoodOnDelivered(); // delivered
     getTicketCancelled(); // cancelled
+
     isLoading = false;
   }
 
@@ -188,7 +203,7 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
   @override
   void initState() {
     getUserName();
-//    loadProfile();
+
     toRefresh();
     super.initState();
   }
@@ -233,8 +248,10 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                   height: 70.0,
                   child: Padding(
                     padding:EdgeInsets.all(5.0),
-                    child: CircleAvatar(
-                      backgroundImage: NetworkImage("https://coachpennylove.com/wp-content/uploads/2019/08/facetune_29-07-2019-02-58-10.jpg"),
+                    child: profileLoading ? CircularProgressIndicator(
+                      valueColor: new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
+                    ) : CircleAvatar(
+                      backgroundImage: NetworkImage(profilePicture),
                     ),
                   ),
                 ),

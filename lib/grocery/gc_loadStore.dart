@@ -29,6 +29,7 @@ class _GcLoadStore extends State<GcLoadStore> {
   final db = RapidA();
   final oCcy = new NumberFormat("#,##0.00", "en_US");
   // final _search = TextEditingController();
+  List listProfile;
   List loadStoreData = List();
   List loadStoreDataTemp = List();
   List getItemsByCategoriesListTemp = List();
@@ -38,6 +39,8 @@ class _GcLoadStore extends State<GcLoadStore> {
   var cartLoading = true;
   var cartCount;
   var subTotal;
+  var profilePicture ="";
+  var profileLoading = true;
   String categoryId = "";
   int gridCount;
   List listCounter;
@@ -45,10 +48,10 @@ class _GcLoadStore extends State<GcLoadStore> {
   var checkIfEmptyStore;
   var offset = 0;
   String categoryName = "";
-
   ScrollController scrollController;
-  // ScrollController  _categoryController;
   bool cat = false;
+
+
 
   AppBar buildAppBar(BuildContext context) {
     return AppBar(
@@ -87,26 +90,69 @@ class _GcLoadStore extends State<GcLoadStore> {
             getGcCounter();
           },
           child: Text("Login",style: GoogleFonts.openSans(color:Colors.deepOrange,fontWeight: FontWeight.bold,fontSize: 18.0),),
-        ): IconButton(
-            icon: Icon(Icons.person, color: Colors.black),
-            onPressed: () async {
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              String username = prefs.getString('s_customerId');
-              if(username == null){
-                await Navigator.of(context).push(_signIn());
-                loadProfile();
-                getGcCounter();
-              }else{
-                await Navigator.of(context).push(_profilePage());
-                loadProfile();
-                getGcCounter();
-              }
+        ): InkWell(
+          customBorder: CircleBorder(),
+          onTap: () async{
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            String username = prefs.getString('s_customerId');
+            if(username == null){
+              await Navigator.of(context).push(_signIn());
+              loadProfile();
+              getGcCounter();
+              loadProfilePic();
+            }else{
+              await Navigator.of(context).push(_profilePage());
+              loadProfile();
+              getGcCounter();
+              loadProfilePic();
             }
+          },
+          child: Container(
+            width: 70.0,
+            height: 70.0,
+            child: Padding(
+              padding:EdgeInsets.all(5.0),
+              child: profileLoading ? CircularProgressIndicator(
+                valueColor: new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
+              ) : CircleAvatar(
+                backgroundImage: NetworkImage(profilePicture),
+              ),
+            ),
+          ),
         ),
+        // IconButton(
+        //     icon: Icon(Icons.person, color: Colors.black),
+        //     onPressed: () async {
+        //       SharedPreferences prefs = await SharedPreferences.getInstance();
+        //       String username = prefs.getString('s_customerId');
+        //       if(username == null){
+        //         await Navigator.of(context).push(_signIn());
+        //         loadProfile();
+        //         getGcCounter();
+        //       }else{
+        //         await Navigator.of(context).push(_profilePage());
+        //         loadProfile();
+        //         getGcCounter();
+        //       }
+        //     }
+        // ),
       ],
     );
   }
 
+  Future loadProfilePic() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    status  = prefs.getString('s_status');
+    if(status != null) {
+      var res = await db.loadProfile();
+      if (!mounted) return;
+      setState(() {
+        listProfile = res['user_details'];
+        profilePicture = listProfile[0]['d_photo'];
+        profileLoading = false;
+      });
+    }
+  }
 
   Future loadStore() async{
     setState(() {
@@ -352,6 +398,7 @@ class _GcLoadStore extends State<GcLoadStore> {
     loadStore();
     getGcCounter();
     loadProfile();
+    loadProfilePic();
     isLoading = true;
     scrollController=ScrollController();
     scrollController.addListener(() {
