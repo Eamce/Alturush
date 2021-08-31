@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
 import 'db_helper.dart';
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'profile/changePassword.dart';
 import 'profile/addressMasterFile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image_picker/image_picker.dart';
+import 'create_account_signin.dart';
+
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -14,13 +18,17 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePage extends State<ProfilePage> {
   final db = RapidA();
+  File _imageCamera;
+  File _imageBooklet;
   var isLoading = true;
   List listProfile = [];
   var firstName = "";
   var profilePicture = "";
   var lastName = "";
+  String newFileName;
+  final picker = ImagePicker();
 
-  Future loadProfile() async {
+  Future loadProfile() async{
     var res = await db.loadProfile();
     if (!mounted) return;
     setState(() {
@@ -32,6 +40,166 @@ class _ProfilePage extends State<ProfilePage> {
     });
   }
 
+  camera() async{
+    final pickedFile = await picker.getImage(source: ImageSource.camera);
+    setState(() {
+      if (pickedFile != null){
+        _imageCamera = File(pickedFile.path);
+        newFileName = _imageCamera.toString();
+      }
+    });
+  }
+
+  browseGallery() async{
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    setState(() {
+      if (pickedFile != null){
+        _imageBooklet = File(pickedFile.path);
+        newFileName = _imageBooklet.toString();
+      }
+    });
+  }
+
+  Future uploadId() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String username = prefs.getString('s_customerId');
+    if(username == null){
+      await Navigator.of(context).push(_signIn());
+    }else{
+      loading();
+      // String base64Image = base64Encode(_image.readAsBytesSync());
+      // await db.uploadPic(discountId,_name.text,_idNumber.text,base64Image);
+      Navigator.of(context).pop();
+      successMessage();
+    }
+  }
+
+  successMessage(){
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8.0))
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
+          title: Text(
+            "Success!",
+            style: TextStyle(fontSize: 18.0),
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Padding(
+                  padding:EdgeInsets.fromLTRB(23.0, 0.0, 20.0, 0.0),
+                  child:Text(("Profile picture successfully updated")),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                'Close',
+                style: TextStyle(
+                  color: Colors.deepOrange,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  loading(){
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8.0))
+          ),
+          contentPadding:
+          EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
+          content: Container(
+            height:50.0, // Change as per your requirement
+            width: 10.0, // Change as per your requirement
+            child: Center(
+              child: CircularProgressIndicator(
+                valueColor:
+                new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void changeProfile(BuildContext context) async{
+    showModalBottomSheet(
+        isScrollControlled: true,
+        isDismissible: true,
+        context: context,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(topRight:  Radius.circular(10),topLeft:  Radius.circular(10)),
+        ),
+        builder: (ctx) {
+          return Container(
+            height: MediaQuery.of(context).size.height/7.0,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children:[
+
+                Expanded(
+                  child:Container(
+                    height: 400.0, // Change as per your requirement
+                    // width: 300.0, // Change as per your requirement
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                          InkWell(
+                            onTap: (){
+                              browseGallery();
+                            },
+                            child: Row(
+                              children: [
+                                Padding(
+                                    padding: EdgeInsets.fromLTRB(15, 15, 10, 15),
+                                    child: Text("Gallery",style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold),)
+                                ),
+                              ],
+                            ),
+                        ),
+                        InkWell(
+                          onTap: (){
+                            camera();
+                          },
+                          child: Row(
+                            children: [
+                              Padding(
+                                  padding: EdgeInsets.fromLTRB(15, 15, 10, 15),
+                                  child: Text("Camera",style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold),)
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+  }
 
   @override
   void initState() {
@@ -95,10 +263,8 @@ class _ProfilePage extends State<ProfilePage> {
                                     fit: StackFit.loose,
                                     children: <Widget>[
                                       new Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: <Widget>[
                                           new Container(
                                             width: 130.0,
@@ -120,7 +286,7 @@ class _ProfilePage extends State<ProfilePage> {
                                             children: <Widget>[
                                               GestureDetector(
                                                   onTap: () {
-                                                    print("change profile");
+                                                    changeProfile(context);
                                                   },
                                                   child: new CircleAvatar(
                                                     backgroundColor: Colors.white70,
@@ -274,6 +440,22 @@ Route addressMasterFileRoute() {
     pageBuilder: (context, animation, secondaryAnimation) => AddressMasterFile(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route _signIn() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => CreateAccountSignIn(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(0.0, 1.0);
       var end = Offset.zero;
       var curve = Curves.decelerate;
       var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
