@@ -578,25 +578,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(15, 20, 20, 2),
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20.0),
-                                  ),
-                                  elevation: 0.0,
-                                  child: Padding(
-                                    padding: EdgeInsets.fromLTRB(15, 20, 20, 20),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text("Paul Jearic Niones",style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),),
-                                        Text("Sender",style: TextStyle(color:Colors.deepOrange),),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
+
 
                               Padding(
                                 padding: EdgeInsets.fromLTRB(15, 2, 10, 2),

@@ -17,7 +17,7 @@ class RapidA {
     return _instance;
   }
 
-//  String server = "https://app1.alturush.com";
+ // String server = "https://app1.alturush.com";
     String server = "http://172.16.46.130/rapida";
 //  String server = "http://192.168.1.2:3333/rapida";
 //  String server = "http://203.177.223.59:8006/";
@@ -1377,8 +1377,6 @@ class RapidA {
   }
 
   Future sendMessage(chat,riderId) async{
-    print(chat);
-    print(riderId);
     var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var userID = prefs.getString('s_customerId');
@@ -1390,7 +1388,17 @@ class RapidA {
     client.close();
   }
 
-
+  Future uploadProfilePic(base64Image,newFileName) async{
+    print(base64Image);
+    var client = http.Client();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var userID = prefs.getString('s_customerId');
+    await client.post(Uri.parse("$server/uploadProfilePic_r"),body:{
+      'userID':userID,
+      'base64Image':base64Image
+    });
+    client.close();
+  }
 }
 
 

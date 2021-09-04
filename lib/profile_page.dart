@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
 import 'db_helper.dart';
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'profile/changePassword.dart';
 import 'profile/addressMasterFile.dart';
@@ -18,8 +19,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePage extends State<ProfilePage> {
   final db = RapidA();
-  File _imageCamera;
-  File _imageBooklet;
+  File _image;
   var isLoading = true;
   List listProfile = [];
   var firstName = "";
@@ -44,8 +44,10 @@ class _ProfilePage extends State<ProfilePage> {
     final pickedFile = await picker.getImage(source: ImageSource.camera);
     setState(() {
       if (pickedFile != null){
-        _imageCamera = File(pickedFile.path);
-        newFileName = _imageCamera.toString();
+        _image = File(pickedFile.path);
+        newFileName = _image.toString();
+        uploadId();
+        Navigator.pop(context);
       }
     });
   }
@@ -54,8 +56,10 @@ class _ProfilePage extends State<ProfilePage> {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
     setState(() {
       if (pickedFile != null){
-        _imageBooklet = File(pickedFile.path);
-        newFileName = _imageBooklet.toString();
+        _image = File(pickedFile.path);
+        newFileName = _image.toString();
+        uploadId();
+        Navigator.pop(context);
       }
     });
   }
@@ -67,8 +71,8 @@ class _ProfilePage extends State<ProfilePage> {
       await Navigator.of(context).push(_signIn());
     }else{
       loading();
-      // String base64Image = base64Encode(_image.readAsBytesSync());
-      // await db.uploadPic(discountId,_name.text,_idNumber.text,base64Image);
+       String base64Image = base64Encode(_image.readAsBytesSync());
+      await db.uploadProfilePic(base64Image,newFileName);
       Navigator.of(context).pop();
       successMessage();
     }
@@ -107,7 +111,6 @@ class _ProfilePage extends State<ProfilePage> {
                 ),
               ),
               onPressed: () {
-                Navigator.of(context).pop();
                 Navigator.of(context).pop();
               },
             ),
