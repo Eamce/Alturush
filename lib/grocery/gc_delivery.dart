@@ -43,6 +43,7 @@ class _GcDelivery extends State<GcDelivery> {
   var conFee = 0.0;
   var bill = 0.0;
   var lt = 0;
+  var devFee = 0.0;
   var minimumAmount = 0.0;
   var grandTotal = 0.0;
 
@@ -80,7 +81,8 @@ class _GcDelivery extends State<GcDelivery> {
       totalLoading = false;
       getBillList = res1['user_details'];
       bill = double.parse(getBillList[0]['d_subtotal']);
-      grandTotal = bill+(conFee*lt);
+      devFee = bill * 0.03;
+      grandTotal = bill + devFee + (conFee*lt);
     });
   }
 
@@ -258,6 +260,20 @@ class _GcDelivery extends State<GcDelivery> {
                                       children: [
                                         Padding(
                                           padding:EdgeInsets.fromLTRB(20.0, 7.0, 5.0, 5.0),
+                                          child: new Text("Delivery Fee:", style: TextStyle(color: Colors.black87.withOpacity(0.8),fontStyle: FontStyle.normal,fontSize: 20.0),),
+                                        ),
+                                        Padding(
+                                          padding:EdgeInsets.fromLTRB(20.0, 7.0, 20.0, 5.0),
+                                          child: new Text("₱ ${oCcy.format(devFee)}", style: TextStyle(color: Colors.black87.withOpacity(0.8),fontStyle: FontStyle.normal,fontSize: 20.0),),
+                                        ),
+                                      ],
+                                    ),
+
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:EdgeInsets.fromLTRB(20.0, 7.0, 5.0, 5.0),
                                           child: new Text("Total:", style: TextStyle(color: Colors.black87.withOpacity(0.8),fontStyle: FontStyle.normal,fontSize: 20.0),),
                                         ),
                                         Padding(
@@ -311,41 +327,41 @@ class _GcDelivery extends State<GcDelivery> {
                                     ),
                                   ),
                                 ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(35, 15, 5, 5),
-                                  child: new Text("Avail Discount(Optional)", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
-                                ),
+                                // Padding(
+                                //   padding: EdgeInsets.fromLTRB(35, 15, 5, 5),
+                                //   child: new Text("Avail Discount(Optional)", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                                // ),
 
-                                Padding(
-                                  padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
-                                  child: InkWell(
-                                    onTap: () async{
-                                      FocusScope.of(context).requestFocus(FocusNode());
-                                      SharedPreferences prefs = await SharedPreferences.getInstance();
-                                      String username = prefs.getString('s_customerId');
-                                      if(username == null){
-                                        Navigator.of(context).push(_signIn());
-                                      }else{
-                                        await Navigator.of(context).push(_showDiscountPerson());
-                                        countDiscount();
-                                      }
-                                    },
-                                    child: IgnorePointer(
-                                      child: new TextFormField(
-                                        textInputAction: TextInputAction.done,
-                                        cursorColor: Colors.deepOrange,
-                                        controller: discount,
-                                        decoration: InputDecoration(
-                                          contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
-                                          focusedBorder:OutlineInputBorder(
-                                            borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
-                                          ),
-                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                                // Padding(
+                                //   padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                //   child: InkWell(
+                                //     onTap: () async{
+                                //       FocusScope.of(context).requestFocus(FocusNode());
+                                //       SharedPreferences prefs = await SharedPreferences.getInstance();
+                                //       String username = prefs.getString('s_customerId');
+                                //       if(username == null){
+                                //         Navigator.of(context).push(_signIn());
+                                //       }else{
+                                //         await Navigator.of(context).push(_showDiscountPerson());
+                                //         countDiscount();
+                                //       }
+                                //     },
+                                //     child: IgnorePointer(
+                                //       child: new TextFormField(
+                                //         textInputAction: TextInputAction.done,
+                                //         cursorColor: Colors.deepOrange,
+                                //         controller: discount,
+                                //         decoration: InputDecoration(
+                                //           contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
+                                //           focusedBorder:OutlineInputBorder(
+                                //             borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
+                                //           ),
+                                //           border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
+                                //         ),
+                                //       ),
+                                //     ),
+                                //   ),
+                                // ),
 
                                 Padding(
                                   padding: EdgeInsets.fromLTRB(35, 10, 5, 5),
