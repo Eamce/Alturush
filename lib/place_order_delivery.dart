@@ -683,6 +683,8 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                 padding: EdgeInsets.fromLTRB(35, 15, 5, 5),
                                 child: new Text("Barangay *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                               ),
+
+                              
                               Padding(
                                 padding:EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
                                 child: InkWell(

@@ -20,6 +20,8 @@ class _GcDelivery extends State<GcDelivery> {
   List<TextEditingController> _deliveryDate = new List();
   List<TextEditingController> _deliveryTime = new List();
   List<TextEditingController> placeRemarks = new List();
+  final placeOrderTown = TextEditingController();
+  final placeOrderBrg = TextEditingController();
   final _modeOfPayment = TextEditingController();
   final deliveryDate = TextEditingController();
   final deliveryTime = TextEditingController();
@@ -299,6 +301,100 @@ class _GcDelivery extends State<GcDelivery> {
                                 ),
                                 Divider(
                                   color: Colors.black87.withOpacity(0.8),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(35, 15, 5, 5),
+                                  child: new Text("Town *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                                ),
+                                Padding(
+                                  padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                  child: InkWell(
+                                    onTap: (){
+                                      FocusScope.of(context).requestFocus(FocusNode());
+// //                                    placeOrderBrg.clear();
+//                                       selectTown();
+                                    },
+                                    child: IgnorePointer(
+                                      child: new TextFormField(
+                                        textInputAction: TextInputAction.done,
+                                        cursorColor: Colors.deepOrange,
+                                        controller: placeOrderTown,
+                                        validator: (value) {
+                                          if (value.isEmpty) {
+                                            return 'Please enter some value';
+                                          }
+                                          return null;
+                                        },
+                                        decoration: InputDecoration(
+                                          contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
+                                          focusedBorder:OutlineInputBorder(
+                                            borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
+                                          ),
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(35, 15, 5, 5),
+                                  child: new Text("Barangay *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                                ),
+                                Padding(
+                                  padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                  child: InkWell(
+                                    onTap: (){
+                                      FocusScope.of(context).requestFocus(FocusNode());
+                                      // placeOrderTown.text.isEmpty ? print('no town selected') : selectBarrio();
+                                    },
+                                    child: IgnorePointer(
+                                      child: new TextFormField(
+                                        textInputAction: TextInputAction.done,
+                                        cursorColor: Colors.deepOrange,
+                                        controller: placeOrderBrg,
+                                        validator: (value) {
+                                          if (value.isEmpty) {
+                                            return 'Please enter some value';
+                                          }
+                                          return null;
+                                        },
+                                        decoration: InputDecoration(
+                                          contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
+                                          focusedBorder:OutlineInputBorder(
+                                            borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
+                                          ),
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(35, 15, 5, 5),
+                                  child: new Text("Amount Tender *", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                                ),
+                                Padding(
+                                  padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                                  child: new TextFormField(
+                                    keyboardType: TextInputType.number,
+                                    textInputAction: TextInputAction.done,
+                                    cursorColor: Colors.deepOrange,
+                                    controller: _amountTender,
+                                    validator: (value) {
+                                      if (value.isEmpty) {
+                                        return 'Please enter amount tender';
+                                      }
+                                      return null;
+                                    },
+                                    decoration: InputDecoration(
+                                      prefixIcon: Icon(Icons.monetization_on,color: Colors.grey,),
+                                      contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
+                                      focusedBorder:OutlineInputBorder(
+                                        borderSide: BorderSide(color: Colors.deepOrange, width: 2.0),
+                                      ),
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(3.0)),
+                                    ),
+                                  ),
                                 ),
                                 Padding(
                                   padding: EdgeInsets.fromLTRB(35, 10, 5, 5),
