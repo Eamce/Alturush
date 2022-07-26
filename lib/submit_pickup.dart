@@ -34,7 +34,7 @@ class _SubmitPickUp extends State<SubmitPickUp>  {
   List getItemsData;
 
   _placeOrderPickUp() async{
-    await db.savePickup(widget.deliveryDateData,widget.deliveryTimeData,widget.subtotal,'1250');
+    await db.savePickup(widget.deliveryDateData,widget.deliveryTimeData,widget.subtotal);
   }
   void displayBottomSheet(BuildContext context,tenantId,buName,tenantName) async{
     var res = await db.displayOrder(tenantId);
@@ -283,7 +283,7 @@ class _SubmitPickUp extends State<SubmitPickUp>  {
                   children: <Widget>[
                     Padding(
                       padding: EdgeInsets.fromLTRB(17.0,10.0, 0.0,10.0),
-                      child: Text('$num. ${getBu[index0]['d_bu_name'].toString()}',style: TextStyle(color: Colors.deepOrange,fontWeight: FontWeight.bold ,fontSize: 15.0)),
+                      child: Text('$num. ${getBu[index0]['d_bu_name'].toString()}',style: TextStyle(color: Colors.deepOrange,fontWeight: FontWeight.bold ,fontSize: 18.0)),
                     ),
                     ListView.builder(
                         physics: BouncingScrollPhysics(),
@@ -297,7 +297,7 @@ class _SubmitPickUp extends State<SubmitPickUp>  {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   Padding(
-                                    padding: EdgeInsets.fromLTRB(15.0,0.0, 0.0,1.0),
+                                    padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 5.0),
                                     child: OutlineButton(
                                       borderSide: BorderSide(color: Colors.transparent),
                                       highlightedBorderColor: Colors.deepOrange,
@@ -305,17 +305,13 @@ class _SubmitPickUp extends State<SubmitPickUp>  {
                                       child:Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Icon(
-                                                Icons.more_vert,
-                                                color: Colors.black26,
-                                                size: 25.0,
-                                              ),
+                                              // Icon(
+                                              //   Icons.more_vert,
+                                              //   color: Colors.black26,
+                                              //   size: 25.0,
+                                              // ),
                                               Text('${getTenant[index]['tenant_name']}'),
-                                            ],
-                                          ),
+
                                           Text('₱${oCcy.format(int.parse(getTenant[index]['total'].toString()))}'),
                                         ],
                                       ),
@@ -325,7 +321,7 @@ class _SubmitPickUp extends State<SubmitPickUp>  {
                               ),
                             ),
                           );
-                            }
+                        }
                         ),
 
                       ],

@@ -14,6 +14,9 @@ import 'profile/addNewAddress.dart';
 import 'create_account_signin.dart';
 
 class PlaceOrderDelivery extends StatefulWidget {
+  final List cartItems;
+
+  const PlaceOrderDelivery({Key key, this.cartItems}) : super(key: key);
   @override
   _PlaceOrderDelivery createState() => _PlaceOrderDelivery();
 }
@@ -67,8 +70,11 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
     });
 
     var res1 = await db.getPlaceOrderData();
+
     if (!mounted) return;
     setState(() {
+      print("res1");
+  print(res1);
       placeOrder = res1['user_details'];
 
       deliveryCharge = double.parse(placeOrder[0]['d_charge_amt']);
@@ -82,7 +88,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
       // houseNo.text = placeOrder[0]['complete_address'];
       deliveryCharge = double.parse(placeOrder[0]['d_charge_amt']);
       grandTotal = deliveryCharge + subtotal;
-      userName.text = placeOrder[0]['firstname']+" "+placeOrder[0]['lastname'];
+      userName.text = placeOrder[0]['firstname']; placeOrder[0]['lastname'];
       minimumAmount = double.parse(placeOrder[0]['minimum_order_amount']);
       getTenantSegregate();
       isLoading = false;
@@ -168,16 +174,16 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                       return InkWell(
                         onTap: (){
                           placeOrderTown.text = getItemsData[index]['d_townName'];
-                          placeOrderBrg.text = getItemsData[index]['d_brgName'];
+                          placeOrderBrg.text  = getItemsData[index]['d_brgName'];
                           placeContactNo.text = getItemsData[index]['d_contact'];
-                          placeRemarks.text = getItemsData[index]['land_mark'];
-                          street.text = getItemsData[index]['street_purok'];
-                          userName.text = getItemsData[index]['firstname']+" "+getItemsData[index]['lastname'];
-                          barrioId = getItemsData[index]['d_townId'];
-                          townId = getItemsData[index]['d_brgId'];
-                          deliveryCharge = double.parse(getItemsData[index]['d_charge_amt']);
-                          grandTotal = deliveryCharge + subtotal;
-                          minimumAmount = double.parse(getItemsData[index]['minimum_order_amount']);
+                          placeRemarks.text   = getItemsData[index]['land_mark'];
+                          street.text         = getItemsData[index]['street_purok'];
+                          userName.text       = getItemsData[index]['firstname']+" "+getItemsData[index]['lastname'];
+                          barrioId            = getItemsData[index]['d_townId'];
+                          townId              = getItemsData[index]['d_brgId'];
+                          deliveryCharge      = double.parse(getItemsData[index]['d_charge_amt']);
+                          grandTotal          = deliveryCharge + subtotal;
+                          minimumAmount       = double.parse(getItemsData[index]['minimum_order_amount']);
                           updateDefaultShipping(getItemsData[index]['id'],getItemsData[index]['d_customerId']);
                           Navigator.pop(context);
                         },
@@ -220,7 +226,6 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
     if (!mounted) return;
     setState(() {
       getTenant = res['user_details'];
-
      for(int q=0;q<getTenant.length;q++){
        print(minimumAmount);
        bool result = getTenant[q]['total'] < minimumAmount;
@@ -496,7 +501,7 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
        if(username == null){
          Navigator.of(context).push(_signIn());
        }else{
-         Navigator.of(context).push(_submitOrder(changeFor.text,int.parse(townId),int.parse(barrioId),placeContactNo.text,placeOrderTown.text,placeOrderBrg.text,street.text,houseNo.text,placeRemarks.text,specialInstruction.text,deliveryCharge,grandTotal,deliveryDate.text,deliveryTime.text,groupValue));
+         Navigator.of(context).push(_submitOrder(changeFor.text,int.parse(townId),int.parse(barrioId),placeContactNo.text,placeOrderTown.text,placeOrderBrg.text,street.text,houseNo.text,placeRemarks.text,specialInstruction.text,deliveryCharge,grandTotal,deliveryDate.text,deliveryTime.text,groupValue,widget.cartItems));
        }
     }
   }
@@ -930,14 +935,13 @@ class _PlaceOrderDelivery extends State<PlaceOrderDelivery> with SingleTickerPro
                                       getTrueTime();
                                       if(deliveryDate.text.isEmpty){
                                         Fluttertoast.showToast(
-                                            msg: "Please select a pick-up date",
+                                            msg: "Please select a delivery date",
                                             toastLength: Toast.LENGTH_SHORT,
                                             gravity: ToastGravity.BOTTOM,
                                             timeInSecForIosWeb: 2,
                                             backgroundColor: Colors.black.withOpacity(0.7),
                                             textColor: Colors.white,
-                                            fontSize: 16.0
-                                        );
+                                            fontSize: 16.0);
                                       }
                                       else{
                                         FocusScope.of(context).requestFocus(FocusNode());
@@ -1296,9 +1300,9 @@ Widget _myRadioButton({String title, int value, Function onChanged}) {
   );
 }
 
-Route _submitOrder(changeForText,townId,barrioId,contactNo,placeOrderTown,placeOrderBrg,street,houseNo,placeRemark,specialInstruction,deliveryCharge,grandTotal,deliveryDate,deliveryTime,groupValue) {
+Route _submitOrder(changeForText,townId,barrioId,contactNo,placeOrderTown,placeOrderBrg,street,houseNo,placeRemark,specialInstruction,deliveryCharge,grandTotal,deliveryDate,deliveryTime,groupValue, cartItems) {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => SubmitOrder(changeForText:changeForText,townId:townId,barrioId:barrioId,contactNo:contactNo,placeOrderTown:placeOrderTown,placeOrderBrg:placeOrderBrg,street:street,houseNo:houseNo,placeRemark:placeRemark,specialInstruction:specialInstruction,deliveryCharge:deliveryCharge,grandTotal:grandTotal,deliveryDate:deliveryDate,deliveryTime:deliveryTime,groupValue:groupValue),
+    pageBuilder: (context, animation, secondaryAnimation) => SubmitOrder(changeForText:changeForText,townId:townId,barrioId:barrioId,contactNo:contactNo,placeOrderTown:placeOrderTown,placeOrderBrg:placeOrderBrg,street:street,houseNo:houseNo,placeRemark:placeRemark,specialInstruction:specialInstruction,deliveryCharge:deliveryCharge,grandTotal:grandTotal,deliveryDate:deliveryDate,deliveryTime:deliveryTime,groupValue:groupValue,cartItems: cartItems,),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;

@@ -25,7 +25,7 @@ class _ToDeliver extends State<ToDeliverFood> {
   final db = RapidA();
   final oCcy = new NumberFormat("#,##0.00", "en_US");
   var isLoading = true;
-  List loadItems,lookItemsSegregateList;
+  List loadItems, lookItemsSegregateList, loadItems1;
   List loadTotal,lGetAmountPerTenant;
 
 
@@ -194,6 +194,24 @@ class _ToDeliver extends State<ToDeliverFood> {
                       shrinkWrap: true,
                       itemCount: loadItems[mainItemIndex]['add_ons'].length == null ? 0 : loadItems[mainItemIndex]['add_ons'].length,
                       itemBuilder: (BuildContext context, int index) {
+                        if(loadItems[mainItemIndex]['add_ons'][index]['unit_measure'] == null){
+                          return Padding(
+                            padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 5.0),
+                            child:Container(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:[
+                                  Expanded(
+                                      child: Text(
+                                        ' + ${loadItems[mainItemIndex]['add_ons'][index]['product_name'].toString()} - ₱ ${loadItems[mainItemIndex]['add_ons'][index]['addon_price'].toString()}',
+                                        style: TextStyle(fontSize: 18.0,),maxLines: 6, overflow: TextOverflow.ellipsis,
+                                      )
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
                             return Padding(
                               padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 5.0),
                               child:Container(
@@ -201,7 +219,10 @@ class _ToDeliver extends State<ToDeliverFood> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children:[
                                     Expanded(
-                                        child: Text(' + ${loadItems[mainItemIndex]['add_ons'][index]['product_name'].toString()} - ${loadItems[mainItemIndex]['add_ons'][index]['addon_price'].toString()}',style: TextStyle(fontSize: 18.0,),maxLines: 6, overflow: TextOverflow.ellipsis,)
+                                        child: Text(
+                                          ' + ${loadItems[mainItemIndex]['add_ons'][index]['product_name'].toString()} ${loadItems[mainItemIndex]['add_ons'][index]['unit_measure'].toString()} - ₱ ${loadItems[mainItemIndex]['add_ons'][index]['addon_price'].toString()}',
+                                          style: TextStyle(fontSize: 18.0,),maxLines: 6, overflow: TextOverflow.ellipsis,
+                                        )
                                     ),
                                   ],
                                 ),
@@ -215,6 +236,7 @@ class _ToDeliver extends State<ToDeliverFood> {
                       shrinkWrap: true,
                       itemCount: loadItems[mainItemIndex]['choices'] == null ? 0 : loadItems[mainItemIndex]['choices'].length,
                       itemBuilder: (BuildContext context, int index) {
+                        if(loadItems[mainItemIndex]['choices'][index]['unit_measure'] == null){
                           return Padding(
                             padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 5.0),
                             child:Container(
@@ -222,12 +244,47 @@ class _ToDeliver extends State<ToDeliverFood> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children:[
                                   Expanded(
-                                      child: Text(' + ${loadItems[mainItemIndex]['choices'][index]['product_name'].toString()} - ${loadItems[mainItemIndex]['choices'][index]['addon_price'].toString()}',style: TextStyle(fontSize: 18.0,),maxLines: 6, overflow: TextOverflow.ellipsis,)
+                                      child: Text(' + ${loadItems[mainItemIndex]['choices'][index]['product_name'].toString()} - ₱ ${loadItems[mainItemIndex]['choices'][index]['addon_price'].toString()}',style: TextStyle(fontSize: 18.0,),maxLines: 6, overflow: TextOverflow.ellipsis,)
                                   ),
                                 ],
                               ),
                             ),
                           );
+                        }
+                          return Padding(
+                            padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 5.0),
+                            child:Container(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:[
+                                  Expanded(
+                                      child: Text(' + ${loadItems[mainItemIndex]['choices'][index]['product_name'].toString()} ${loadItems[mainItemIndex]['choices'][index]['unit_measure'].toString()} - ₱ ${loadItems[mainItemIndex]['choices'][index]['addon_price'].toString()}',style: TextStyle(fontSize: 18.0,),maxLines: 6, overflow: TextOverflow.ellipsis,)
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                      },
+                    ),
+
+                    ListView.builder(
+                      physics: BouncingScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: loadItems[mainItemIndex]['flavors'] == null ? 0 : loadItems[mainItemIndex]['flavors'].length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Padding(
+                          padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 5.0),
+                          child:Container(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children:[
+                                Expanded(
+                                    child: Text(' + ${loadItems[mainItemIndex]['flavors'][index]['flavor'].toString()} - ₱ ${loadItems[mainItemIndex]['flavors'][index]['addon_price'].toString()}',style: TextStyle(fontSize: 18.0,),maxLines: 6, overflow: TextOverflow.ellipsis,)
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
                       },
                     ),
 //                     ListView.builder(
@@ -308,7 +365,7 @@ class _ToDeliver extends State<ToDeliverFood> {
     if (!mounted) return;
     setState(() {
       isLoading = false;
-      loadItems = res['user_details'];
+      loadItems1 = res['user_details'];
     });
   }
 
@@ -561,7 +618,8 @@ class _ToDeliver extends State<ToDeliverFood> {
                                                                     ],
                                                                   ),
                                                                   Visibility(
-                                                                    visible: loadItems[index]['addon_length'] <= 0? false : true,
+                                                                    // visible: loadItems[index]['addon_length'] == 0 ? false : true,
+                                                                    visible: loadItems[index]['addon_length'] > 0 ? true : false,
                                                                     child: Padding(
                                                                       padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
                                                                       child:Container(
@@ -637,8 +695,8 @@ class _ToDeliver extends State<ToDeliverFood> {
                         Flexible(
                           child: SleekButton(
                             onTap: () async {
-
                             },
+
                             style: SleekButtonStyle.flat(
                               color: Colors.deepOrange,
                               inverted: true,

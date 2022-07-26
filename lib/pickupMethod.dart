@@ -480,7 +480,7 @@ class _PlaceOrderPickUp extends State<PlaceOrderPickUp>    with SingleTickerProv
                                                                     controller: _deliveryDate[index],
                                                                     validator: (value) {
                                                                       if (value.isEmpty) {
-                                                                        return 'Please select delivery date';
+                                                                        return 'Please select pick-up date';
                                                                       }
                                                                       return null;
                                                                     },
@@ -498,7 +498,7 @@ class _PlaceOrderPickUp extends State<PlaceOrderPickUp>    with SingleTickerProv
                                                             ),
                                                             Padding(
                                                               padding: EdgeInsets.fromLTRB(35, 10, 5, 5),
-                                                              child: new Text("Delivery time", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
+                                                              child: new Text("Pick-up time", style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                                                             ),
                                                             Padding(
                                                               padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
@@ -508,7 +508,7 @@ class _PlaceOrderPickUp extends State<PlaceOrderPickUp>    with SingleTickerProv
                                                                   getTrueTime();
                                                                   if(_deliveryDate[index].text.isEmpty){
                                                                     Fluttertoast.showToast(
-                                                                        msg: "Please select a delivery date",
+                                                                        msg: "Please select a pick-up date",
                                                                         toastLength: Toast.LENGTH_SHORT,
                                                                         gravity: ToastGravity.BOTTOM,
                                                                         timeInSecForIosWeb: 2,
@@ -526,7 +526,7 @@ class _PlaceOrderPickUp extends State<PlaceOrderPickUp>    with SingleTickerProv
                                                                           shape: RoundedRectangleBorder(
                                                                               borderRadius: BorderRadius.all(Radius.circular(8.0))
                                                                           ),
-                                                                          title: Text("Set time for this delivery",style: TextStyle(fontSize: 20.0),),
+                                                                          title: Text("Set time for this pick-up",style: TextStyle(fontSize: 20.0),),
                                                                           contentPadding:
                                                                           EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
                                                                           content: Container(
@@ -600,7 +600,7 @@ class _PlaceOrderPickUp extends State<PlaceOrderPickUp>    with SingleTickerProv
                                                                     controller: _deliveryTime[index],
                                                                     validator: (value) {
                                                                       if (value.isEmpty) {
-                                                                        return 'Please select delivery time';
+                                                                        return 'Please select pick-up time';
                                                                       }
                                                                       return null;
                                                                     },

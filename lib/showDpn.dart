@@ -52,6 +52,14 @@ class _ShowDpn extends State<ShowDpn> {
         brightness: Brightness.light,
         backgroundColor: Colors.white,
         elevation: 0.1,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+            size: 23,
+          ),
+          onPressed: () => Navigator.of(context).maybePop(),
+        ),
         automaticallyImplyLeading: false,
         title: Text("Data privacy notice",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
       ),
@@ -584,7 +592,6 @@ class _ShowDpn extends State<ShowDpn> {
                     padding:EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
                     child:Text("(038) 501-3000, local 1120, (038) 501-3015",style: TextStyle(fontSize: 17,),),
                   ),
-
                 ],
               ),
             ),
@@ -621,7 +628,6 @@ class _ShowDpn extends State<ShowDpn> {
     );
   }
 }
-
 
 Route success() {
   return PageRouteBuilder(

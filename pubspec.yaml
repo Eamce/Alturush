@@ -23,6 +23,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  platform: ^3.1.0
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -38,7 +39,7 @@ dependencies:
   carousel_pro: ^1.0.0
   expansion_tile_card: ^2.0.0
   flutter_rounded_date_picker: ^2.0.2
-  shared_preferences: ^2.0.5
+  shared_preferences:
   flutter_svg: ^0.22.0
   timeline_tile: ^2.0.0
   slide_to_confirm: ^0.0.6
@@ -58,6 +59,9 @@ dependencies:
   simple_connection_checker: ^0.1.1
   badges: ^2.0.1
   chat_bubbles: ^1.1.0
+
+  paymaya_flutter: ^0.1.0
+  webview_flutter: ^2.0.2
 
 
 

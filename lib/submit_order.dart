@@ -1,6 +1,8 @@
+import 'package:arush/submit_order_paymaya.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
 import 'db_helper.dart';
@@ -28,33 +30,63 @@ class SubmitOrder extends StatefulWidget {
   final groupValue;
   final deliveryDate;
   final deliveryTime;
+  final List cartItems;
 
-  SubmitOrder({Key key, @required this.changeForText, this.townId, this.barrioId, this.contactNo,this.placeRemark,this.specialInstruction,this.placeOrderTown,this.placeOrderBrg,this.street,this.houseNo,this.deliveryCharge,this.grandTotal,this.groupValue,this.deliveryDate,this.deliveryTime}) : super(key: key);
+  SubmitOrder(
+      {Key key,
+      @required this.changeForText,
+      this.townId,
+      this.barrioId,
+      this.contactNo,
+      this.placeRemark,
+      this.specialInstruction,
+      this.placeOrderTown,
+      this.placeOrderBrg,
+      this.street,
+      this.houseNo,
+      this.deliveryCharge,
+      this.grandTotal,
+      this.groupValue,
+      this.deliveryDate,
+      this.deliveryTime,
+      this.cartItems})
+      : super(key: key);
 
   @override
   _SubmitOrder createState() => _SubmitOrder();
 }
 
-class _SubmitOrder extends State<SubmitOrder>  {
+class _SubmitOrder extends State<SubmitOrder> {
   final db = RapidA();
   final oCcy = new NumberFormat("#,##0.00", "en_US");
   var isLoading = true;
   String comma;
   String separator;
 
-
   List getBu;
   List getTenant;
   List getItemsData;
 
-  _placeOrder() async{
+  _placeOrder() async {
     // SharedPreferences prefs = await SharedPreferences.getInstance();
     // prefs.setString('street', widget.street);
     // prefs.setString('houseNo', widget.houseNo);
     // prefs.setString('houseNo', widget.houseNo);
     // prefs.setString('placeRemark', widget.placeRemark);
 
-    await db.placeOrder(widget.townId.toString(),widget.barrioId.toString(),widget.contactNo,widget.placeRemark,widget.specialInstruction,widget.houseNo,widget.changeForText,widget.street,widget.deliveryCharge.toString(),widget.deliveryDate.toString(),widget.deliveryTime.toString(),widget.groupValue.toString());
+    await db.placeOrder(
+        widget.townId.toString(),
+        widget.barrioId.toString(),
+        widget.contactNo,
+        widget.placeRemark,
+        widget.specialInstruction,
+        widget.houseNo,
+        widget.changeForText,
+        widget.street,
+        widget.deliveryCharge.toString(),
+        widget.deliveryDate.toString(),
+        widget.deliveryTime.toString(),
+        widget.groupValue.toString());
     //
     // print(widget.townId.toString());
     // print(widget.barrioId.toString());
@@ -67,33 +99,37 @@ class _SubmitOrder extends State<SubmitOrder>  {
     // print(widget.deliveryDate.toString());
     // print(widget.deliveryTime.toString());
     // print(widget.groupValue.toString());
-
   }
 
-  void displayBottomSheet(BuildContext context,tenantId,buName,tenantName) async{
+  void displayBottomSheet(
+      BuildContext context, tenantId, buName, tenantName) async {
     var res = await db.displayOrder(tenantId);
     if (!mounted) return;
     setState(() {
       getItemsData = res['user_details'];
-
     });
     showModalBottomSheet(
         isScrollControlled: true,
         isDismissible: true,
         context: context,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(topRight:  Radius.circular(10),topLeft:  Radius.circular(10)),
+          borderRadius: BorderRadius.only(
+              topRight: Radius.circular(10), topLeft: Radius.circular(10)),
         ),
         builder: (ctx) {
           return Container(
-            height: MediaQuery.of(context).size.height  * 0.4,
+            height: MediaQuery.of(context).size.height * 0.4,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children:[
-                SizedBox(height:10.0),
+              children: [
+                SizedBox(height: 10.0),
                 Padding(
                   padding: EdgeInsets.fromLTRB(25.0, 0.0, 20.0, 0.0),
-                  child:Text(buName+"-"+tenantName,style: TextStyle(fontSize: 15.0,fontWeight: FontWeight.bold),),
+                  child: Text(
+                    buName + "-" + tenantName,
+                    style:
+                        TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold),
+                  ),
                 ),
                 Scrollbar(
                   child: ListView.builder(
@@ -105,14 +141,21 @@ class _SubmitOrder extends State<SubmitOrder>  {
                       f++;
                       return Padding(
                         padding: EdgeInsets.fromLTRB(25.0, 15.0, 25.0, 5.0),
-                        child:Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
 //                            Text('$f. ${getItemsData[index]['d_bu_name']} - ${getItemsData[index]['d_tenant']} ',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
 //                            Text('₱${oCcy.format(double.parse(getItemsData[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
-                            Text('$f. ${getItemsData[index]['d_prodName']} ',style: TextStyle(fontSize: 13.0,fontWeight: FontWeight.bold)),
+                            Text('$f. ${getItemsData[index]['d_prodName']} ',
+                                style: TextStyle(
+                                    fontSize: 13.0,
+                                    fontWeight: FontWeight.bold)),
 //                            Text('₱${getItemsData[index]['prod_price']}',style: TextStyle(fontSize: 13.0,fontWeight: FontWeight.bold)),
-                            Text('₱${getItemsData[index]['prod_price']} x ${getItemsData[index]['d_quantity']}',style: TextStyle(fontSize: 13.0,fontWeight: FontWeight.bold)),
+                            Text(
+                                '₱${getItemsData[index]['prod_price']} x ${getItemsData[index]['d_quantity']}',
+                                style: TextStyle(
+                                    fontSize: 13.0,
+                                    fontWeight: FontWeight.bold)),
                           ],
                         ),
 //                          child: Text('$f. ${lGetAmountPerTenant[index]['d_bu_name']} - ${lGetAmountPerTenant[index]['d_tenant']}  ₱${oCcy.format(double.parse(lGetAmountPerTenant[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
@@ -126,12 +169,12 @@ class _SubmitOrder extends State<SubmitOrder>  {
         });
   }
 
-  placeOrder() async{
+  placeOrder() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String username = prefs.getString('s_customerId');
-    if(username == null){
+    if (username == null) {
       Navigator.of(context).push(_signIn());
-    }else{
+    } else {
       _placeOrder();
       CoolAlert.show(
         context: context,
@@ -139,17 +182,18 @@ class _SubmitOrder extends State<SubmitOrder>  {
         text: "Thank you for using Alturush",
         confirmBtnColor: Colors.deepOrangeAccent,
         backgroundColor: Colors.deepOrangeAccent,
-        barrierDismissible:false,
-        onConfirmBtnTap: () async{
+        barrierDismissible: false,
+        onConfirmBtnTap: () async {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           String username = prefs.getString('s_customerId');
-          if(username == null){
+          if (username == null) {
             Navigator.of(context).push(_signIn());
-          }if(username != null){
+          }
+          if (username != null) {
             Navigator.of(context).pop();
-            Navigator.of(context).pop();
-            Navigator.of(context).pop();
-            Navigator.of(context).pop();
+            // Navigator.of(context).pop();
+            // Navigator.of(context).pop();
+            // Navigator.of(context).pop();
             Navigator.of(context).push(_profilePageRoute());
           }
         },
@@ -157,7 +201,7 @@ class _SubmitOrder extends State<SubmitOrder>  {
     }
   }
 
-  Future getLastOrder() async{
+  Future getLastOrder() async {
 //    await db.placeOrder(widget.townId.toString(),widget.barrioId.toString(),widget.contactNo,widget.placeRemark,widget.houseNo,widget.changeFor,widget.street);
 //    var res = await model.getLastOrder();
 //    if (!mounted) return;
@@ -177,7 +221,7 @@ class _SubmitOrder extends State<SubmitOrder>  {
     widget.deliveryTime.toString() == '' ? separator = '' : separator = ':';
   }
 
-  Future getBuSegregate() async{
+  Future getBuSegregate() async {
     var res = await db.getBuSegregate();
     if (!mounted) return;
     setState(() {
@@ -185,23 +229,22 @@ class _SubmitOrder extends State<SubmitOrder>  {
     });
   }
 
-  void displayOrder(tenantId) async{
+  void displayOrder(tenantId) async {
     showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8.0))
-          ),
-          contentPadding:
-          EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
+              borderRadius: BorderRadius.all(Radius.circular(8.0))),
+          contentPadding: EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
           content: Container(
-            height:50.0, // Change as per your requirement
+            height: 50.0, // Change as per your requirement
             width: 10.0, // Change as per your requirement
             child: Center(
               child: CircularProgressIndicator(
-                valueColor: new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
+                valueColor:
+                    new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
               ),
             ),
           ),
@@ -222,27 +265,27 @@ class _SubmitOrder extends State<SubmitOrder>  {
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8.0))
-          ),
+              borderRadius: BorderRadius.all(Radius.circular(8.0))),
           contentPadding: EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
           content: Container(
             height: 250.0, // Change as per your requirement
             width: 310.0, // Change as per your requirement
-              child: Scrollbar(
-                child: ListView.builder(
+            child: Scrollbar(
+              child: ListView.builder(
 //                  physics: BouncingScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: getItemsData == null ? 0 : getItemsData.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    var f = index;
-                    f++;
-                    return ListTile(
-                      title: Text('$f. ${getItemsData[index]['d_prodName']} ₱${getItemsData[index]['d_price']} x ${getItemsData[index]['d_quantity']}',style: TextStyle(fontSize: 15.0)),
-                    );
-                  },
-                ),
+                shrinkWrap: true,
+                itemCount: getItemsData == null ? 0 : getItemsData.length,
+                itemBuilder: (BuildContext context, int index) {
+                  var f = index;
+                  f++;
+                  return ListTile(
+                    title: Text(
+                        '$f. ${getItemsData[index]['d_prodName']} ₱${getItemsData[index]['d_price']} x ${getItemsData[index]['d_quantity']}',
+                        style: TextStyle(fontSize: 15.0)),
+                  );
+                },
               ),
-
+            ),
           ),
           actions: <Widget>[
             TextButton(
@@ -262,7 +305,7 @@ class _SubmitOrder extends State<SubmitOrder>  {
     );
   }
 
-  Future getTenantSegregate() async{
+  Future getTenantSegregate() async {
     var res = await db.getTenantSegregate();
     if (!mounted) return;
     setState(() {
@@ -272,7 +315,7 @@ class _SubmitOrder extends State<SubmitOrder>  {
   }
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     getLastOrder();
     getTenantSegregate();
@@ -289,7 +332,6 @@ class _SubmitOrder extends State<SubmitOrder>  {
   }
 
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
-
     return true;
   }
 
@@ -298,7 +340,7 @@ class _SubmitOrder extends State<SubmitOrder>  {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return WillPopScope(
-      onWillPop: () async{
+      onWillPop: () async {
         Navigator.pop(context);
         return true;
       },
@@ -308,84 +350,145 @@ class _SubmitOrder extends State<SubmitOrder>  {
           backgroundColor: Colors.white,
           elevation: 0.1,
           leading: IconButton(
-            icon: Icon(Icons.close, color: Colors.black),
-            onPressed: () {
-              Navigator.pop(context);
+              icon: Icon(Icons.close, color: Colors.black),
+              onPressed: () {
+                Navigator.pop(context);
 //              Navigator.pop(context);
 //              Navigator.pop(context);
-            }
+              }),
+          title: Text(
+            "Summary",
+            style: GoogleFonts.openSans(
+                color: Colors.black54,
+                fontWeight: FontWeight.bold,
+                fontSize: 18.0),
           ),
-          title: Text("Summary",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
         ),
         body: isLoading
             ? Center(
-          child: CircularProgressIndicator(
-            valueColor: new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
-          ),
-        ) : Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Expanded(
-              child:Scrollbar(
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(17.0,10.0, 0.0,0.0),
-                          child: new Text("*Edit delivery details on previous page*", style: GoogleFonts.openSans(color: Colors.deepOrange, fontStyle: FontStyle.normal,fontSize: 14.0),),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(10.0, 30.0, 10.0, 5.0),
-                          child: Text("Delivery address",style: GoogleFonts.openSans(fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 17.0),),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(20.0, 5.0, 10.0, 5.0),
-                          child: Text("${widget.houseNo.toString()}${comma.toString()} ${widget.street.toString()}, ${widget.placeOrderBrg.toString()}, ${widget.placeOrderTown.toString()}",style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 17.0),),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 5.0),
-                          child: Text("Delivery date & time",style: GoogleFonts.openSans(fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 17.0),),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(20.0, 5.0, 10.0, 5.0),
-                          child: Text("${widget.deliveryDate.toString()}${separator.toString()}${widget.deliveryTime.toString()}",style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 17.0),),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 5.0),
-                          child: Text("Contact Number",style: GoogleFonts.openSans(fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 17.0),),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(20.0, 5.0, 10.0, 5.0),
-                          child: Text("+63${widget.contactNo.toString()}",style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 17.0),),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(10, 10, 10, 5),
-                          child: Text("Landmark",style: GoogleFonts.openSans(fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 17.0),),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(20, 5, 10, 5),
-                          child: Text("${widget.placeRemark.toString()}",style: GoogleFonts.openSans(fontSize: 17.0),),
-                        ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(10, 10, 10, 5),
-                        child: Text("Special instruction",style: GoogleFonts.openSans(fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 17.0),),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(20, 5, 10, 5),
-                        child: Text("${widget.specialInstruction.toString()}",style: GoogleFonts.openSans(fontSize: 17.0),),
-                      ),
+                child: CircularProgressIndicator(
+                  valueColor:
+                      new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
+                ),
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Expanded(
+                    child: Scrollbar(
+                      child: ListView(
+                        padding: EdgeInsets.zero,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(17.0, 10.0, 0.0, 0.0),
+                            child: new Text(
+                              "*Edit delivery details on previous page*",
+                              style: GoogleFonts.openSans(
+                                  color: Colors.deepOrange,
+                                  fontStyle: FontStyle.normal,
+                                  fontSize: 14.0),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(10.0, 30.0, 10.0, 5.0),
+                            child: Text(
+                              "Delivery Address",
+                              style: GoogleFonts.openSans(
+                                  fontWeight: FontWeight.bold,
+                                  fontStyle: FontStyle.normal,
+                                  fontSize: 17.0),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(20.0, 5.0, 10.0, 5.0),
+                            child: Text(
+                              "${widget.houseNo.toString()}${comma.toString()} ${widget.street.toString()}, ${widget.placeOrderBrg.toString()}, ${widget.placeOrderTown.toString()}",
+                              style: GoogleFonts.openSans(
+                                  fontStyle: FontStyle.normal, fontSize: 17.0),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 5.0),
+                            child: Text(
+                              "Delivery Date & Time",
+                              style: GoogleFonts.openSans(
+                                  fontWeight: FontWeight.bold,
+                                  fontStyle: FontStyle.normal,
+                                  fontSize: 17.0),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(20.0, 5.0, 10.0, 5.0),
+                            child: Text(
+                              "${widget.deliveryDate.toString()}${separator.toString()}${widget.deliveryTime.toString()}",
+                              style: GoogleFonts.openSans(
+                                  fontStyle: FontStyle.normal, fontSize: 17.0),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 5.0),
+                            child: Text(
+                              "Contact Number",
+                              style: GoogleFonts.openSans(
+                                  fontWeight: FontWeight.bold,
+                                  fontStyle: FontStyle.normal,
+                                  fontSize: 17.0),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(20.0, 5.0, 10.0, 5.0),
+                            child: Text(
+                              "+63${widget.contactNo.toString()}",
+                              style: GoogleFonts.openSans(
+                                  fontStyle: FontStyle.normal, fontSize: 17.0),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(10, 10, 10, 5),
+                            child: Text(
+                              "Landmark",
+                              style: GoogleFonts.openSans(
+                                  fontWeight: FontWeight.bold,
+                                  fontStyle: FontStyle.normal,
+                                  fontSize: 17.0),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(20, 5, 10, 5),
+                            child: Text(
+                              "${widget.placeRemark.toString()}",
+                              style: GoogleFonts.openSans(fontSize: 17.0),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(10, 10, 10, 5),
+                            child: Text(
+                              "Special Instruction",
+                              style: GoogleFonts.openSans(
+                                  fontWeight: FontWeight.bold,
+                                  fontStyle: FontStyle.normal,
+                                  fontSize: 17.0),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(20, 5, 10, 5),
+                            child: Text(
+                              "${widget.specialInstruction.toString()}",
+                              style: GoogleFonts.openSans(fontSize: 17.0),
+                            ),
+                          ),
 
 //                        Padding(
 //                          padding: EdgeInsets.fromLTRB(10, 10, 10, 5),
 //                            child: Text("Ticket #: ${list[0]['d_ticket_id']}",style: GoogleFonts.openSans(fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 17.0),),
 //                        ),
 
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(10, 0, 10, 5),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Divider(),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(10, 0, 10, 5),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Divider(),
 //                             Row(
 //                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
 //                               children: <Widget>[
@@ -403,62 +506,76 @@ class _SubmitOrder extends State<SubmitOrder>  {
 //
 //                               ],
 //                             ),
-                            ListView.builder(
-                                physics: BouncingScrollPhysics(),
-                                shrinkWrap: true,
-                                itemCount:  getBu == null ? 0 : getBu.length,
-                                itemBuilder: (BuildContext context, int index0) {
-                                  int num = index0;
-                                  num++;
-                                  return Container(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Padding(
-                                          padding: EdgeInsets.fromLTRB(17.0,10.0, 0.0,10.0),
-                                          child: Text('$num. ${getBu[index0]['d_bu_name'].toString()}',style: TextStyle(color: Colors.deepOrange,fontWeight: FontWeight.bold ,fontSize: 15.0)),
-                                        ),
+                                ListView.builder(
+                                    physics: BouncingScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount: getBu == null ? 0 : getBu.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index0) {
+                                      int num = index0;
+                                      num++;
+                                      return Container(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Padding(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  17.0, 10.0, 0.0, 10.0),
+                                              child: Text(
+                                                  '$num. ${getBu[index0]['d_bu_name'].toString()}',
+                                                  style: TextStyle(
+                                                      color: Colors.deepOrange,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 18.0)),
+                                            ),
 //                                              Padding(
 //                                                padding: EdgeInsets.fromLTRB(17.0,0.0, 0.0,10.0),
 //                                                child: Text('${getBu[index0]['d_tenant'].toString()}',style: TextStyle(fontSize: 15.0)),
 //                                              ),
-                                        ListView.builder(
-                                            physics: BouncingScrollPhysics(),
-                                            shrinkWrap: true,
-                                            itemCount:  getTenant == null ? 0 : getTenant.length,
-                                            itemBuilder: (BuildContext context, int index) {
-                                              return Visibility(
-                                                visible: getTenant[index]['bu_id'] != getBu[index0]['d_bu_id'] ? false : true,
-                                                child: Container(
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: <Widget>[
-                                                      Padding(
-                                                        padding: EdgeInsets.fromLTRB(15.0,0.0, 0.0,1.0),
-                                                        child: OutlineButton(
-                                                          borderSide: BorderSide(color: Colors.transparent),
-                                                          highlightedBorderColor: Colors.deepOrange,
-                                                          highlightColor: Colors.transparent,
-                                                          child:Row(
-                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                            children: [
-                                                              Text('${getTenant[index]['tenant_name']}'),
-                                                              Text('₱${oCcy.format(int.parse(getTenant[index]['total'].toString()))}'),
-                                                            ],
+                                            ListView.builder(
+                                                physics:
+                                                    BouncingScrollPhysics(),
+                                                shrinkWrap: true,
+                                                itemCount: getTenant == null
+                                                    ? 0
+                                                    : getTenant.length,
+                                                itemBuilder:
+                                                    (BuildContext context,
+                                                        int index) {
+                                                  return Visibility(
+                                                    visible: getTenant[index]['bu_id'] != getBu[index0]['d_bu_id'] ? false : true,
+                                                    child: Container(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: <Widget>[
+                                                          Padding(
+                                                            padding: EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 1.0),
+                                                            child: OutlineButton(borderSide: BorderSide(color: Colors.transparent),
+                                                              highlightedBorderColor: Colors.deepOrange,
+                                                              highlightColor: Colors.transparent,
+                                                              child: Row(
+                                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                children: [
+                                                                  Text('${getTenant[index]['tenant_name']}'),
+                                                                  Text('₱${oCcy.format(int.parse(getTenant[index]['total'].toString()))}'),
+                                                                ],
+                                                              ),
+                                                            ),
                                                           ),
-                                                        ),
+                                                        ],
                                                       ),
-                                                    ],
-                                                  ),
+                                                    ),
+                                                  );
+                                                }
                                                 ),
-                                              );
-                                            }
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                  );
-                                }
-                            ),
+                                      );
+                                    }),
 //                            ListView.builder(
 //                                physics: BouncingScrollPhysics(),
 //                                shrinkWrap: true,
@@ -480,65 +597,135 @@ class _SubmitOrder extends State<SubmitOrder>  {
 //                              }
 //                            ),
 
-                            Divider(),
-                            Row(
-                              children: <Widget>[
-                                Flexible(
-                                  child: new Text("Rider's fee: ₱${oCcy.format(widget.deliveryCharge)}", style: TextStyle(fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 20.0),),
+                                Divider(),
+                                Row(
+                                  children: <Widget>[
+                                    Flexible(
+                                      child: new Text(
+                                        "Rider's Fee: ₱${oCcy.format(widget.deliveryCharge)}",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontStyle: FontStyle.normal,
+                                            fontSize: 20.0),
+                                      ),
+                                    ),
+                                  ],
                                 ),
+                                Divider(),
+                                Row(
+                                  children: <Widget>[
+                                    Flexible(
+                                      child: new Text(
+                                        "GRAND TOTAL: ₱${oCcy.format(widget.grandTotal)}",
+                                        style: TextStyle(
+                                            color: Colors.deepOrange,
+                                            fontWeight: FontWeight.bold,
+                                            fontStyle: FontStyle.normal,
+                                            fontSize: 23.0),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Divider(),
+                                SizedBox(height: 15),
+                                GestureDetector(
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          "Paymaya/GCash/Card",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontStyle: FontStyle.normal,
+                                              fontSize: 20.0),
+                                        ),
+                                      ),
+                                      Icon(CupertinoIcons.right_chevron),
+                                    ],
+                                  ),
+                                  onTap: () {
+                                    //paymaya function here
+                                    Fluttertoast.showToast(
+                                        msg: "Soon to be available",
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.BOTTOM,
+                                        timeInSecForIosWeb: 2,
+                                        backgroundColor: Colors.black.withOpacity(0.7),
+                                        textColor: Colors.white,
+                                        fontSize: 16.0);
+
+                                    // Navigator.push(
+                                    //   context,
+                                    //   MaterialPageRoute(
+                                    //       builder: (context) =>
+                                    //           SubmitOrderPaymaya(
+                                    //               cart: widget.cartItems)),
+                                    // );
+                                  },
+                                ),
+                                SizedBox(height: 15),
+                                Divider(),
+                                SizedBox(height: 15),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        "Cash",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontStyle: FontStyle.normal,
+                                            fontSize: 20.0),
+                                      ),
+                                    ),
+                                    Radio(
+                                        activeColor: Colors.deepOrange,
+                                        value: 1,
+                                        groupValue: 1,
+                                        onChanged: (index) {}),
+                                  ],
+                                ),
+                                SizedBox(height: 15),
+                                Divider(),
                               ],
                             ),
-                            Divider(),
-                            Row(
-                              children: <Widget>[
-                                Flexible(
-                                  child: new Text("GRAND TOTAL: ₱${oCcy.format(widget.grandTotal)}", style: TextStyle(color: Colors.deepOrange,fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 23.0),),
-                                ),
-                              ],
-                            ),
-                            Divider(),
-
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-
-              ),
-            ),
-
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
-              child: Row(
-                children: <Widget>[
-                  Flexible(
-                    child: SleekButton(
-                      onTap: () async {
-                        placeOrder();
-                      },
-                      style: SleekButtonStyle.flat(
-                        color: Colors.deepOrange,
-                        inverted: false,
-                        rounded: true,
-                        size: SleekButtonSize.big,
-                        context: context,
-                      ),
-                      child: Center(
-                          child: Text(
-                            "Confirm order",
-                            style: GoogleFonts.openSans(
-                                fontStyle: FontStyle.normal,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13.0),
                           ),
+                        ],
                       ),
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
+                    child: Row(
+                      children: <Widget>[
+                        Flexible(
+                          child: SleekButton(
+                            onTap: () async {
+                              placeOrder();
+                            },
+                            style: SleekButtonStyle.flat(
+                              color: Colors.deepOrange,
+                              inverted: false,
+                              rounded: true,
+                              size: SleekButtonSize.big,
+                              context: context,
+                            ),
+                            child: Center(
+                              child: Text(
+                                "Confirm order",
+                                style: GoogleFonts.openSans(
+                                    fontStyle: FontStyle.normal,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13.0),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -562,7 +749,8 @@ Route _profilePageRoute() {
 
 Route _signIn() {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => CreateAccountSignIn(),
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        CreateAccountSignIn(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;
@@ -575,4 +763,3 @@ Route _signIn() {
     },
   );
 }
-

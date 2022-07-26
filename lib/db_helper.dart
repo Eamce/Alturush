@@ -17,8 +17,9 @@ class RapidA {
     return _instance;
   }
 
- // String server = "https://app1.alturush.com";
-    String server = "http://172.16.46.130/rapida";
+  // String server = "https://app1.alturush.com";
+  String server = "http://172.16.43.147/rapida";
+     // String server = "http://172.16.46.130/rapida";
 //  String server = "http://192.168.1.2:3333/rapida";
 //  String server = "http://203.177.223.59:8006/";
 
@@ -26,6 +27,8 @@ class RapidA {
   final iv = IV.fromUtf8('T1g994xo2UAqG81M'); //16 chars
 
   //mysql query code
+
+
 
   Future loadCartData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -87,16 +90,17 @@ class RapidA {
     return dataUser;
   }
 
-
   Future getPlaceOrderData() async{
     var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var userID = prefs.getString('s_customerId');
+    var userID =  prefs.getString('s_customerId');
     print(userID);
     Map dataUser;
     final response = await client.post(Uri.parse("$server/getPlaceOrderData_r"),body:{
       'cusId':encrypt(userID)
     });
+    print("json");
+    print(response.body);
     dataUser = jsonDecode(response.body);
     client.close();
     return dataUser;
@@ -149,7 +153,8 @@ class RapidA {
     return dataUser;
   }
 
-  Future placeOrder(townId,barrioId,contact,landmark,specialInstruction,houseNo,changeFor,street,deliveryCharge,deliveryDate,deliveryTime,groupValue) async{
+  Future placeOrder(townId,barrioId,contact,landmark,specialInstruction,houseNo,changeFor,
+      street,deliveryCharge,deliveryDate,deliveryTime,groupValue) async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var client = http.Client();
      await client.post(Uri.parse("$server/placeOrder_r"),body:{
@@ -317,18 +322,6 @@ class RapidA {
     return dataUser;
   }
 
-  Future loadProfile() async{
-    var client = http.Client();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    Map dataUser;
-    final response = await client.post(Uri.parse("$server/loadProfile_r"),body:{
-      'cusId':prefs.getString('s_customerId'),
-    });
-    dataUser = jsonDecode(response.body);
-    client.close();
-    return dataUser;
-  }
-
   Future lookItems(ticketNo) async{
     var client = http.Client();
     Map dataUser;
@@ -383,8 +376,6 @@ class RapidA {
     return response.body;
   }
 
-
-
   Future removeItemFromCart(cartId) async{
     var client = http.Client();
     // SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -419,24 +410,33 @@ class RapidA {
     return dataUser;
   }
 
-  //node
-  Future getBusinessUnitsCi(unitGroupId,globalCatID) async{
+  Future getGlobalCat() async{
     var client = http.Client();
     Map dataUser;
-    final response = await client.post(Uri.parse("$server/display_store_r"),body:{
-      'unitGroupId':'$unitGroupId',
-      'globalCatID': '$globalCatID',
+    final response = await client.post(Uri.parse("$server/getglobalcat_r"),body:{
     });
     dataUser = jsonDecode(response.body);
     client.close();
     return dataUser;
   }
 
-  Future getTenantsCi(buCode) async{
+  //node
+  Future getBusinessUnitsCi() async{
+    var client = http.Client();
+    Map dataUser;
+    final response = await client.post(Uri.parse("$server/display_store_r"),body:{
+    });
+    dataUser = jsonDecode(response.body);
+    client.close();
+    return dataUser;
+  }
+
+  Future getTenantsCi(buCode , globalID) async{
     var client = http.Client();
     Map dataUser;
     final response = await client.post(Uri.parse("$server/display_tenant_r"),body:{
-      'buCode':buCode
+      'buCode':buCode,
+      'globalID':globalID
     });
     dataUser = jsonDecode(response.body);
     client.close();
@@ -487,7 +487,6 @@ class RapidA {
     client.close();
   }
 
-
   Future addToCartCiTest(buCode,tenantCode,prodId,productUom,flavorId,drinkId,drinkUom,friesId,friesUom,sideId,sideUom,selectedSideItems,selectedSideItemsUom,selectedDessertItems,selectedDessertItemsUom,boolFlavorId,boolDrinkId,boolFriesId,boolSideId,_counter) async{
     var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -513,7 +512,8 @@ class RapidA {
     client.close();
   }
 
-  Future addToCartNew(prodId,uomId,_counter,uomPrice,choiceUomId,choiceId,choicePrice,flavorId ,flavorPrice,selectedSideOnPrice,selectedSideItems ,selectedSideItemsUom) async{
+  Future addToCartNew(prodId,uomId,_counter,uomPrice,choiceUomId,choiceId,choicePrice,flavorId,
+      flavorPrice,selectedSideOnPrice,selectedSideItems ,selectedSideItemsUom) async{
     var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String userID = prefs.getString('s_customerId');
@@ -521,21 +521,19 @@ class RapidA {
       'userID':userID,
       'prodId':prodId,
       'uomId':uomId.toString(),
+      '_counter':_counter.toString(),
       'uomPrice':uomPrice,
       'choiceUomId':choiceUomId.toString(),
       'choiceId':choiceId.toString(),
       'choicePrice':choicePrice.toString(),
       'flavorId':flavorId.toString(),
       'flavorPrice':flavorPrice.toString(),
-      '_counter':_counter.toString(),
       'selectedSideOnPrice':selectedSideOnPrice.toString(),
       'selectedSideItems':selectedSideItems.toString(),
       'selectedSideItemsUom':selectedSideItemsUom.toString()
     });
     client.close();
   }
-
-
   Future selectSuffixCi() async{
     var client = http.Client();
     Map dataUser;
@@ -593,12 +591,10 @@ class RapidA {
     return dataUser;
   }
 
-  Future savePickup(deliveryDateData,deliveryTimeData,subtotal,tender) async{
-
+  Future savePickup(deliveryDateData,deliveryTimeData,subtotal,) async{
    print(deliveryDateData);
    print(deliveryTimeData);
    print(subtotal);
-   print(tender);
     var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await client.post(Uri.parse("$server/savePickup_r"),body:{
@@ -606,7 +602,6 @@ class RapidA {
        'deliveryDateData':deliveryDateData.toString(),
        'deliveryTimeData':deliveryTimeData.toString(),
        'subtotal':encrypt(subtotal.toString()),
-       'tender':encrypt(tender.toString()),
        'selectedDiscountType':encrypt(selectedDiscountType.toString()),
     });
     client.close();
@@ -923,7 +918,6 @@ class RapidA {
     });
     client.close();
   }
-
   Future getBill() async{
     var client = http.Client();
     Map dataUser;
@@ -936,7 +930,6 @@ class RapidA {
     client.close();
     return dataUser;
   }
-
   Future gcGroupByBu() async{
     var client = http.Client();
     Map dataUser;
@@ -949,20 +942,16 @@ class RapidA {
     client.close();
     return dataUser;
   }
-
   Future getConFee() async{
     var client = http.Client();
     Map dataUser;
     final response = await client.post(Uri.parse("$server/getConFee_r"),body:{
-
     });
     dataUser = jsonDecode(response.body);
     client.close();
     return dataUser;
   }
-
   Future submitOrder(groupValue,deliveryDateData,deliveryTimeData,buData,totalData,convenienceData,placeRemarks,pickUpOrDelivery) async{
-
     // print(pickUpOrDelivery);
     var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -980,7 +969,6 @@ class RapidA {
     });
     client.close();
   }
-
   Future getUom(itemCode) async{
     var client = http.Client();
     Map dataUser;
@@ -991,7 +979,6 @@ class RapidA {
     client.close();
     return dataUser;
   }
-
   Future showDiscount() async{
     var client = http.Client();
     Map dataUser;
@@ -1002,7 +989,6 @@ class RapidA {
     client.close();
     return dataUser;
   }
-
   // Future uploadId1(discountIdType,name,idNumber,base64Image,base64Booklet) async{
   //   var client = http.Client();
   //   int imageName = DateTime.now().microsecondsSinceEpoch;
@@ -1023,31 +1009,6 @@ class RapidA {
   //   client.close();
   // }
 
-  Future uploadId(discountIdType,name,idNumber,base64Image) async{
-    var client = http.Client();
-    int imageName = DateTime.now().microsecondsSinceEpoch;
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    var userID = prefs.getString('s_customerId');
-    await client.post(Uri.parse("$server/uploadId_r"),body:{
-      'userID':encrypt(userID),
-      'discountId':encrypt(discountIdType),
-      'name':encrypt(name),
-      'idNumber':encrypt(idNumber),
-      'imageName':encrypt(imageName.toString())
-    });
-    uploadImage(base64Image,imageName);
-    client.close();
-  }
-
-  Future uploadImage(_image,imageName) async{
-    var client = http.Client();
-    await client.post(Uri.parse("$server/upLoadImage_r"),body:{
-      '_image':_image,
-      '_imageName':imageName.toString()
-    });
-    client.close();
-  }
 
   Future uploadBookletImage(_image,imageName) async{
     var client = http.Client();
@@ -1168,7 +1129,12 @@ class RapidA {
     Map dataUser;
     final response = await client.post(Uri.parse("$server/getProvince_r"),body:{
     });
-    dataUser = jsonDecode(response.body);
+    try {
+      dataUser = jsonDecode(response.body);
+    } catch(e){
+      print(e);
+    }
+
     client.close();
     return dataUser;
   }
@@ -1179,7 +1145,12 @@ class RapidA {
     final response = await client.post(Uri.parse("$server/getTown_r"),body:{
       'provinceId':encrypt(provinceId)
     });
-    dataUser = jsonDecode(response.body);
+    try {
+      dataUser = jsonDecode(response.body);
+    } catch(e) {
+      print(e);
+    }
+
     client.close();
     return dataUser;
   }
@@ -1313,16 +1284,6 @@ class RapidA {
     return dataUser;
   }
 
-  Future getGlobalCat() async{
-    var client = http.Client();
-    Map dataUser;
-    final response = await client.post(Uri.parse("$server/getglobalcat_r"),body:{
-
-    });
-    dataUser = jsonDecode(response.body);
-    client.close();
-    return dataUser;
-  }
 
 
   Future searchProd(search,unitGroupId) async{
@@ -1388,14 +1349,64 @@ class RapidA {
     client.close();
   }
 
-  Future uploadProfilePic(base64Image,newFileName) async{
-    print(base64Image);
+  Future loadProfile() async{
     var client = http.Client();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map dataUser;
+    final response = await client.post(Uri.parse("$server/loadProfile_r"),body:{
+      'cusId':prefs.getString('s_customerId'),
+    });
+    dataUser = jsonDecode(response.body);
+    client.close();
+    return dataUser;
+  }
+
+  Future uploadProfilePic(base64Image) async{
+    var client = http.Client();
+    int picName = DateTime.now().microsecondsSinceEpoch;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var userID = prefs.getString('s_customerId');
     await client.post(Uri.parse("$server/uploadProfilePic_r"),body:{
-      'userID':userID,
-      'base64Image':base64Image
+      'userID':encrypt(userID),
+      'picName': encrypt(picName.toString())
+
+    });
+    print("id no: "+ userID);
+    print("pic name: " + picName.toString());
+    uploadPic(base64Image,picName);
+    client.close();
+  }
+
+  Future uploadId(discountIdType,name,idNumber,base64Image) async{
+    var client = http.Client();
+    int imageName = DateTime.now().microsecondsSinceEpoch;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var userID = prefs.getString('s_customerId');
+    await client.post(Uri.parse("$server/uploadId_r"),body:{
+      'userID':encrypt(userID),
+      'discountId':encrypt(discountIdType),
+      'name':encrypt(name),
+      'idNumber':encrypt(idNumber),
+      'imageName':encrypt(imageName.toString())
+    });
+    uploadImage(base64Image,imageName);
+    client.close();
+  }
+
+  Future uploadImage(_image,imageName) async{
+    var client = http.Client();
+    await client.post(Uri.parse("$server/upLoadImage_r"),body:{
+      '_image':_image,
+      '_imageName':imageName.toString()
+    });
+    client.close();
+  }
+
+  Future uploadPic(_image,imageName) async{
+    var client = http.Client();
+    await client.post(Uri.parse("$server/upLoadPic_r"),body:{
+      '_image':_image,
+      '_imageName':imageName.toString()
     });
     client.close();
   }

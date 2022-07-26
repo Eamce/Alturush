@@ -118,12 +118,13 @@ class _AddressMasterFile extends State<AddressMasterFile> {
         ),
         title: Text("Your Addresses",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
       ),
-      body: isLoading
-          ? Center(
+      body: isLoading ?
+      Center(
         child: CircularProgressIndicator(
           valueColor: new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
          ),
-        ):Column(
+        ):
+      Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Expanded(
@@ -162,47 +163,75 @@ class _AddressMasterFile extends State<AddressMasterFile> {
 
                             },
                             child: Padding(
-                              padding:EdgeInsets.fromLTRB(0.0, 5.0, 0.0, 5.0),
+                              padding:EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
                               child: Padding(
-                                padding:EdgeInsets.fromLTRB(10.0, 5.0, 0.0, 5.0),
+                                padding:EdgeInsets.fromLTRB(5.0, 0.0, 0.0, 5.0),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Padding(
-                                      padding:EdgeInsets.fromLTRB(10.0, 5.0, 0.0, 5.0),
+                                      padding:EdgeInsets.fromLTRB(5.0, 5.0, 0.0, 0.0),
                                       child:Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Text('$q.${loadIdList[index]['firstname']} ${loadIdList[index]['lastname']}',style: TextStyle(fontSize: 20,),),
-                                          Text('   ${loadIdList[index]['d_townName']}, ${loadIdList[index]['d_brgName']}',style: TextStyle(fontSize: 20,),),
-                                          Text('   ${loadIdList[index]['street_purok']}',style: TextStyle(fontSize: 20,),),
-                                          Text('   ${loadIdList[index]['d_contact']}',style: TextStyle(fontSize: 20,),),
+
+                                          Text('$q. ${loadIdList[index]['firstname']} ${loadIdList[index]['lastname']}',style: TextStyle(fontSize: 20,),),
+                                          Text('    ${loadIdList[index]['d_townName']}, ${loadIdList[index]['d_brgName']}',style: TextStyle(fontSize: 20,),),
+                                          Text('    ${loadIdList[index]['street_purok']}',style: TextStyle(fontSize: 20,),),
+                                          Text('    ${loadIdList[index]['d_contact']}',style: TextStyle(fontSize: 20,),),
                                           // Text('   ${loadIdList[index]['buildingName']}',style: TextStyle(fontSize: 20,),),
+                                          ButtonBar(
+                                            children: <Widget>[
+                                              OutlineButton(
+                                                child: Stack(
+                                                  children: <Widget>[
+                                                    Align(
+                                                        alignment: Alignment.topRight,
+                                                        child: Icon(Icons.delete_outline_outlined,color: Colors.black)
+                                                    )
+                                                  ],
+                                                ),
+                                                highlightedBorderColor: Colors.black,
+                                                highlightColor: Colors.transparent,
+                                                shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                                                onPressed: () {
+                                                  deleteAddress(loadIdList[index]['id']);
+                                                },
+                                              ),
+                                            ],
+                                          ),
                                         ],
                                       ),
                                     ),
-                                    ButtonBar(
-                                      children: <Widget>[
-                                        // OutlineButton(
-                                        //   highlightedBorderColor: Colors.black,
-                                        //   highlightColor: Colors.transparent,
-                                        //   shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
-                                        //   child: Icon(Icons.edit_outlined,color: Colors.black,),
-                                        //   onPressed: () {
-                                        //
-                                        //   },
-                                        // ),
-                                        OutlineButton(
-                                          highlightedBorderColor: Colors.black,
-                                          highlightColor: Colors.transparent,
-                                          shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
-                                          child: Icon(Icons.delete_outline_outlined,color: Colors.black),
-                                          onPressed: () {
-                                             deleteAddress(loadIdList[index]['id']);
-                                          },
-                                        ),
-                                      ],
-                                    ),
+                                    // ButtonBar(
+                                    //   children: <Widget>[
+                                    //     // OutlineButton(
+                                    //     //   highlightedBorderColor: Colors.black,
+                                    //     //   highlightColor: Colors.transparent,
+                                    //     //   shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                                    //     //   child: Icon(Icons.edit_outlined,color: Colors.black,),
+                                    //     //   onPressed: () {
+                                    //     //
+                                    //     //   },
+                                    //     // ),
+                                    //     OutlineButton(
+                                    //       child: Stack(
+                                    //         children: <Widget>[
+                                    //           Align(
+                                    //             alignment: Alignment.topRight,
+                                    //               child: Icon(Icons.delete_outline_outlined,color: Colors.black)
+                                    //           )
+                                    //         ],
+                                    //       ),
+                                    //       highlightedBorderColor: Colors.black,
+                                    //       highlightColor: Colors.transparent,
+                                    //       shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                                    //       onPressed: () {
+                                    //          deleteAddress(loadIdList[index]['id']);
+                                    //       },
+                                    //     ),
+                                    //   ],
+                                    // ),
                                   ],
                                 ),
                               ),

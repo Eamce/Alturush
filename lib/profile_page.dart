@@ -1,9 +1,11 @@
+import 'package:arush/track_order.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
 import 'db_helper.dart';
 import 'dart:io';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'profile/changePassword.dart';
 import 'profile/addressMasterFile.dart';
@@ -20,6 +22,8 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePage extends State<ProfilePage> {
   final db = RapidA();
   File _image;
+  var cartCount;
+  List listCounter;
   var isLoading = true;
   List listProfile = [];
   var firstName = "";
@@ -27,6 +31,7 @@ class _ProfilePage extends State<ProfilePage> {
   var lastName = "";
   String newFileName;
   final picker = ImagePicker();
+  var cartLoading = true;
 
   Future loadProfile() async{
     var res = await db.loadProfile();
@@ -40,12 +45,24 @@ class _ProfilePage extends State<ProfilePage> {
     });
   }
 
+  Future listenCartCount() async{
+    var res = await db.getCounter();
+    if (!mounted) return;
+    setState(() {
+      isLoading = false;
+      cartLoading = false;
+      listCounter = res['user_details'];
+      cartCount = listCounter[0]['num'];
+    });
+  }
+
   camera() async{
     final pickedFile = await picker.getImage(source: ImageSource.camera);
     setState(() {
       if (pickedFile != null){
         _image = File(pickedFile.path);
-        newFileName = _image.toString();
+        newFileName = _image.toString().split('/').last;
+        print("picname: "+ newFileName);
         uploadId();
         Navigator.pop(context);
       }
@@ -71,8 +88,8 @@ class _ProfilePage extends State<ProfilePage> {
       await Navigator.of(context).push(_signIn());
     }else{
       loading();
-       String base64Image = base64Encode(_image.readAsBytesSync());
-      await db.uploadProfilePic(base64Image,newFileName);
+      String base64Image = base64Encode(_image.readAsBytesSync());
+      await db.uploadProfilePic(base64Image);
       Navigator.of(context).pop();
       successMessage();
     }
@@ -235,6 +252,24 @@ class _ProfilePage extends State<ProfilePage> {
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: Text("Profile",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
+          actions: <Widget>[
+            IconButton(
+                icon: Icon(Icons.receipt_long_rounded, color: Colors.black,
+                size: 30.0,),
+                onPressed: () async {
+                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                  String username = prefs.getString('s_customerId');
+                  if(username == null){
+                    await Navigator.of(context).push(_signIn());
+                    listenCartCount();
+                  }else{
+                    await Navigator.of(context).push(_profilePage());
+                    listenCartCount();
+                    loadProfile();
+                  }
+                }
+            ),
+          ],
         ),
         body: isLoading
             ? Center(
@@ -457,6 +492,22 @@ Route addressMasterFileRoute() {
 Route _signIn() {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => CreateAccountSignIn(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(0.0, 1.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route _profilePage() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => TrackOrder(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;

@@ -16,8 +16,9 @@ class ViewItem extends StatefulWidget {
   final productUom;
   final unitOfMeasure;
   final price;
+  final globalID;
 
-  ViewItem({Key key, @required this.buCode, this.tenantCode,this.prodId,this.productUom, this.unitOfMeasure, this.price}) : super(key: key);
+  ViewItem({Key key, @required this.buCode, this.tenantCode,this.prodId,this.productUom, this.unitOfMeasure, this.price, this.globalID}) : super(key: key);
   @override
   _ViewItem createState() => _ViewItem();
 }
@@ -123,7 +124,7 @@ class _ViewItem extends State<ViewItem>{
           // print(q);
         }
       }
-
+      print(loadItemData);
     });
   }
 
@@ -176,7 +177,6 @@ class _ViewItem extends State<ViewItem>{
     }
   }
 
-
   void _decrementCounter() {
     setState(() {
       _counter--;
@@ -206,6 +206,7 @@ class _ViewItem extends State<ViewItem>{
     super.dispose();
     itemCount.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -332,13 +333,14 @@ class _ViewItem extends State<ViewItem>{
                                                           selectedSideOnPrice.add(addonData[index1]['addon_price']);
                                                           selectedSideItems.add(addonData[index1]['sub_productid']);
                                                           selectedSideItemsUom.add(addonData[index1]['uom_id']);
-                                                        }
-                                                        else{
+
+                                                        }else{
                                                           selectedSideOnPrice.remove(addonData[index1]['addon_price']);
                                                           selectedSideItems.remove(addonData[index1]['sub_productid']);
                                                           selectedSideItemsUom.remove(addonData[index1]['uom_id']);
+
                                                         }
-                                                        print(selectedSideItems);
+                                                        print(selectedSideItemsUom);
                                                       });
                                                     },
                                                     controlAffinity: ListTileControlAffinity.leading,
@@ -403,7 +405,7 @@ class _ViewItem extends State<ViewItem>{
                                                               choiceUomId = choicesData[index2]['uom_id'];
                                                               choiceId = choicesData[index2]['sub_productid'];
                                                               choicePrice = choicesData[index2]['addon_price'];
-                                                              print(choiceId);
+                                                              print('${choicesData[index2]['sud_producname'].toString()}');
                                                             });
                                                           },
                                                         ),
@@ -593,6 +595,7 @@ class _ViewItem extends State<ViewItem>{
                       child: SleekButton(
                         onTap: () async{
                           addToCart();
+                          print(flavorPrice);
                         },
                         style: SleekButtonStyle.flat(
                           color: Colors.deepOrange,

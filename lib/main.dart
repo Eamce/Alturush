@@ -65,6 +65,7 @@ class _MyApp extends State<MyApp>{
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: handleUserInteraction,
+
       onPanDown: handleUserInteraction,
       child: MaterialApp(
           debugShowCheckedModeBanner: false,

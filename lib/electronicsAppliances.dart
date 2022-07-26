@@ -1,59 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter/services.dart';
-import 'create_account_signin.dart';
-import 'load_tenants.dart';
-import 'db_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:arush/profile_page.dart';
-import 'load_cart.dart';
+import 'package:flutter/services.dart';
 import 'dart:async';
-import 'package:sleek_button/sleek_button.dart';
+import '../db_helper.dart';
 import 'package:intl/intl.dart';
-import 'grocery/groceryMain.dart';
+import '../create_account_signin.dart';
+import '../track_order.dart';
+import 'package:sleek_button/sleek_button.dart';
+// import 'gc_loadStore.dart';
+// import 'gc_cart.dart';
 import 'package:arush/idmasterfile.dart';
-class MyHomePage extends StatefulWidget {
-  final globalCatID;
-  MyHomePage({Key key, @required this.globalCatID,}) : super(key: key);
+import 'package:arush/showDpn2.dart';
+import '../load_bu.dart';
+import 'package:arush/profile_page.dart';
+
+import 'grocery/gc_cart.dart';
+import 'grocery/gc_loadStore.dart';
+import 'grocery/groceryMain.dart';
+import 'load_tenants.dart';
+
+class ElectronicsApp extends StatefulWidget {
+  final electronicsRoute;
+  ElectronicsApp({Key key, @required this.electronicsRoute,}) : super(key: key);
+
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _ElectronicsApp createState() => _ElectronicsApp();
+
 }
-class _MyHomePageState extends State<MyHomePage>  {
-  final oCcy = new NumberFormat("#,##0.00", "en_US");
+class _ElectronicsApp extends State<ElectronicsApp> with SingleTickerProviderStateMixin{
   final db = RapidA();
+  final oCcy = new NumberFormat("#,##0.00", "en_US");
   final province = TextEditingController();
   final town = TextEditingController();
-  List listCounter;
-  List buData;
   List loadProfileData;
-  List listSubtotal;
-  List loadLocationData;
-  List loadQuotesData;
-  List listProfile;
-  var isLoading = true;
-  var isVisible = true;
-  var cartCount;
-  var subtotal;
-  var locationString;
-  var cartLoading = true;
-  var profileLoading = true;
-  var profilePicture = "";
-  String firstName="";
-  String profilePhoto;
-  String placeRemark;
+  List buData;
+  List loadSubtotal;
+  List listCounter;
+  String firstName = "";
   String quotes = "";
   String author = "";
-  int counter;
+  String profilePhoto;
+  String status;
+  var cartLoading = true;
+  var isLoading1 = true;
+  var cartCount = 0;
+  var subTotal ;
   int provinceId;
   int townID;
-  int globalCatID = 2;
 
 
   // Future loadBu() async{
-  //   print(unitGroupId);
-  //   print(widget.globalCatID);
-  //   var res = await db.getBusinessUnitsCi(unitGroupId,widget.globalCatID);
+  //   var res = await db.getBusinessUnitsCi(unitGroupId,1);
   //   if (!mounted) return;
   //   setState(() {
   //     buData = res['user_details'];
@@ -72,17 +71,55 @@ class _MyHomePageState extends State<MyHomePage>  {
     }
   }
 
-  Future loadProfilePic() async {
+  Future getCounter() async {
+    var res = await db.getGcCounter();
+    if (!mounted) return;
+    setState(() {
+      listCounter = res['user_details'];
+    });
+  }
+
+  Future listenCartCount() async{
+    var res = await db.getGcCounter();
+    if (!mounted) return;
+    setState(() {
+      cartLoading = false;
+      listCounter = res['user_details'];
+      cartCount = listCounter[0]['num'];
+    });
+  }
+
+  Future loadGcSubTotal() async{
+    var res = await db.loadGcSubTotal();
+    if (!mounted) return;
+    setState(() {
+      isLoading1 = false;
+      loadSubtotal = res['user_details'];
+      if(loadSubtotal[0]['d_subtotal'] == null){
+        subTotal = 0;
+      }else{
+        subTotal = loadSubtotal[0]['d_subtotal'].toString();
+      }
+    });
+  }
+
+  Future loadProfile() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     status  = prefs.getString('s_status');
     if(status != null) {
       var res = await db.loadProfile();
+      loadGcSubTotal();
+      // getCounter();
+      // timer = Timer.periodic(Duration(seconds: 5), (Timer t) => loadGcSubTotal());
       if (!mounted) return;
       setState(() {
-        listProfile = res['user_details'];
-        profilePicture = listProfile[0]['d_photo'];
-        profileLoading = false;
+        loadProfileData = res['user_details'];
+        firstName = loadProfileData[0]['d_fname'];
       });
+    }
+    else{
+      firstName = "";
+      profilePhoto = "";
     }
   }
 
@@ -95,50 +132,7 @@ class _MyHomePageState extends State<MyHomePage>  {
     });
   }
 
-  String status;
-  Future loadProfile() async{
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    status  = prefs.getString('s_status');
-    if(status != null) {
-      var res = await db.loadProfile();
-      if (!mounted) return;
-      setState(() {
-        loadProfileData = res['user_details'];
-        firstName = loadProfileData[0]['d_fname'];
-        isLoading = false;
-        isVisible = true;
-      });
-    }
-    else{
-      locationString = "Location";
-      firstName = "";
-      profilePhoto = "";
-      isVisible = false;
-      isLoading = false;
-    }
-  }
-
-  Future getCounter() async {
-    var res = await db.getCounter();
-    if (!mounted) return;
-    setState(() {
-      isLoading = false;
-      listCounter = res['user_details'];
-    });
-  }
-
-  Future listenCartCount() async{
-    var res = await db.getCounter();
-    if (!mounted) return;
-    setState(() {
-      isLoading = false;
-      cartLoading = false;
-      listCounter = res['user_details'];
-      cartCount = listCounter[0]['num'];
-    });
-  }
-
- List getProvinceData;
+  List getProvinceData;
   selectProvince() async{
     var res = await db.getProvince();
     if (!mounted) return;
@@ -280,6 +274,96 @@ class _MyHomePageState extends State<MyHomePage>  {
     );
   }
 
+  void selectGcCategory(BuildContext context,logo,businessUnit,bUnitCode) async{
+    List categoryData;
+    var res = await db.getGcCategories();
+    if (!mounted) return;
+    setState(() {
+      categoryData = res['user_details'];
+      print(categoryData);
+    });
+    showModalBottomSheet(
+        isScrollControlled: true,
+        isDismissible: true,
+        context: context,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(topRight:  Radius.circular(10),topLeft:  Radius.circular(10)),
+        ),
+        builder: (ctx) {
+          return Container(
+            height: MediaQuery.of(context).size.height/1.5,
+            child: Scrollbar(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(25.0, 20.0, 20.0, 20.0),
+                    child:Text("Category",style: TextStyle(fontSize: 25.0,fontWeight: FontWeight.bold),),
+                  ),
+
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children:[
+                            ListView.builder(
+                                physics: BouncingScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: categoryData.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return InkWell(
+                                    onTap: () async{
+                                      await Navigator.of(context).push(_gotoTenants(buData[index]['logo'],buData[index]['business_unit'],buData[index]['bunit_code']));
+                                      getCounter();
+                                      listenCartCount();
+                                    },
+                                    child:Container(
+                                      height: 120.0,
+                                      width: 30.0,
+                                      child: Card(
+                                        color: Colors.white,
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            ListTile(
+                                              leading:Container(
+                                                width: 60.0,
+                                                height: 60.0,
+                                                decoration: new BoxDecoration(
+                                                  image: new DecorationImage(
+                                                    image: new NetworkImage(buData[index]['logo']),
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                  borderRadius: new BorderRadius.all(new Radius.circular(50.0)),
+                                                  border: new Border.all(
+                                                    color: Colors.black54,
+                                                    width: 0.5,
+                                                  ),
+                                                ),
+                                              ),
+                                              title: Text(buData[index]['business_unit'],style: GoogleFonts.openSans(color: Colors.black54,fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 22.0),),
+                                            ),
+                                          ],
+                                        ),
+                                        elevation: 0.0,
+                                        margin: EdgeInsets.all(3),
+                                      ),
+                                    ),
+                                  );
+                                }),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
   ScrollController _scrollController = new ScrollController();
   bool _needsScroll = false;
   final _formKey = GlobalKey<FormState>();
@@ -294,20 +378,16 @@ class _MyHomePageState extends State<MyHomePage>  {
   }
 
   @override
-  void initState(){
-    futureLoadQuotes();
-    listenCartCount();
-    loadProfile();
-    getGlobalCat();
-    loadProfilePic();
-    // loadBu();
+  void initState() {
     super.initState();
+    futureLoadQuotes();
+    loadProfile();
+    listenCartCount();
+    getGlobalCat();
   }
-
-
-
   @override
   void dispose() {
+    // Clean up the controller when the Widget is disposed
     super.dispose();
   }
 
@@ -321,67 +401,34 @@ class _MyHomePageState extends State<MyHomePage>  {
         iconTheme: new IconThemeData(color: Colors.black),
         actions: [
           status == null ? TextButton(
-            style: TextButton.styleFrom(
-              primary: Colors.red,
-              onSurface: Colors.red,
-            ),
             onPressed: () async {
               await Navigator.of(context).push(_signIn());
-              listenCartCount();
               loadProfile();
-              loadProfilePic();
+              getCounter();
+              listenCartCount();
             },
             child: Text("Login",style: GoogleFonts.openSans(color:Colors.deepOrange,fontWeight: FontWeight.bold,fontSize: 18.0),),
-          ):
-          InkWell(
-            customBorder: CircleBorder(),
-            onTap: () async{
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              String username = prefs.getString('s_customerId');
-              if(username == null){
-                await Navigator.of(context).push(_signIn());
-                listenCartCount();
-                loadProfile();
-                loadProfilePic();
-              }else{
-                await Navigator.of(context).push(profile());
-                listenCartCount();
-                loadProfile();
-                loadProfilePic();
+          ): IconButton(
+              icon: Icon(Icons.person, color: Colors.black),
+              onPressed: () async {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                String username = prefs.getString('s_customerId');
+                if(username == null){
+                  await Navigator.of(context).push(_signIn());
+                  loadProfile();
+                  getCounter();
+                  listenCartCount();
+                }else{
+                  await Navigator.of(context).push(_profilePage());
+                  loadProfile();
+                  getCounter();
+                  listenCartCount();
+                }
               }
-            },
-            child: Container(
-              width: 70.0,
-              height: 70.0,
-              child: Padding(
-                padding:EdgeInsets.all(5.0),
-                child: profileLoading ? CircularProgressIndicator(
-                  valueColor: new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
-                ) : CircleAvatar(
-                  backgroundImage: NetworkImage(profilePicture),
-                ),
-              ),
-            ),
           ),
-          //   IconButton(
-          //     icon: Icon(Icons.person, color: Colors.black),
-          //     onPressed: () async {
-          //       SharedPreferences prefs = await SharedPreferences.getInstance();
-          //       String username = prefs.getString('s_customerId');
-          //       if(username == null){
-          //         await Navigator.of(context).push(_signIn());
-          //         listenCartCount();
-          //         loadProfile();
-          //       }else{
-          //         await Navigator.of(context).push(profile());
-          //         listenCartCount();
-          //         loadProfile();
-          //       }
-          //     }
-          // ),
         ],
-        // title: Text("Order Food",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
-        title: Row(
+        // title: Text("Grocery Home",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
+        title:Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Image.asset(
@@ -390,7 +437,7 @@ class _MyHomePageState extends State<MyHomePage>  {
               height: 60,
             ),
             Container(
-                padding: const EdgeInsets.all(8.0), child: Text("Order Food",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),)
+              padding: const EdgeInsets.all(8.0), child: Text("Electronics & Appliances",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),)
           ],
         ),
       ),
@@ -411,35 +458,35 @@ class _MyHomePageState extends State<MyHomePage>  {
                         height: 70.0,
                       ),
                       SizedBox(
-                        height: 30.0,
+                        height: 35.0,
                       ),
 
                       SizedBox(
                         height: 50.0,
                       ),
                       ListView.builder(
-                        shrinkWrap: true,
-                        physics: BouncingScrollPhysics(),
-                        itemCount:  globalCat == null ? 0 : globalCat.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: Colors.transparent,
-                                child: Image.network(globalCat[index]['cat_picture']),
-                              ),
-                              title: Text(globalCat[index]['category'],style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 16.0),),
-                              onTap: () async{
-                                Navigator.pop(context);
-                                if(globalCat[index]['id'] == '1'){
-                                  Navigator.of(context).push(_foodRoute(globalCat[index]['id']));
-                                }if(globalCat[index]['id'] == '2'){
-                                  Navigator.of(context).push(_groceryRoute(globalCat[index]['id']));
-                                }if(globalCat[index]['id'] == '3'){
-                                  Navigator.of(context).push(_foodRoute(globalCat[index]['id']));
+                          shrinkWrap: true,
+                          physics: BouncingScrollPhysics(),
+                          itemCount:  globalCat == null ? 0 : globalCat.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor: Colors.transparent,
+                                  child: Image.network(globalCat[index]['cat_picture']),
+                                ),
+                                title: Text(globalCat[index]['category'],style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 16.0),),
+                                onTap: () async{
+                                  Navigator.pop(context);
+                                  if(globalCat[index]['id'] == '1'){
+                                    Navigator.of(context).push(_foodRoute(globalCat[index]['id']));
+                                  }if(globalCat[index]['id'] == '2'){
+                                    Navigator.of(context).push(_groceryRoute(globalCat[index]['id']));
+                                  }if(globalCat[index]['id'] == '3'){
+                                    Navigator.of(context).push(_foodRoute(globalCat[index]['id']));
+                                  }
                                 }
-                              }
-                          );
-                         }
+                            );
+                          }
                       ),
                       ListTile(
                           leading: Icon(Icons.person,size: 30.0,),
@@ -447,16 +494,23 @@ class _MyHomePageState extends State<MyHomePage>  {
                           onTap: () async{
                             Navigator.of(context).pop();
                             SharedPreferences prefs = await SharedPreferences.getInstance();
-                            String status  = prefs.getString('s_status');
-                            status != null ? await Navigator.of(context).push(profile()) : await Navigator.of(context).push(_signIn());
-                            // await Navigator.of(context).push(_loadCart());
-                            getCounter();
-                            listenCartCount();
+                            String username = prefs.getString('s_customerId');
+                            if(username != null){
+                              await Navigator.of(context).push(profile());
+                              getCounter();
+                              listenCartCount();
+                              loadProfile();
+                            }else{
+                              await Navigator.of(context).push(_signIn());
+                              getCounter();
+                              listenCartCount();
+                              loadProfile();
+                            }
                           }
                       ),
                       ListTile(
                           leading: Icon(Icons.add,size: 30.0,),
-                          title: Text('Manage discount',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 16.0),),
+                          title: Text('Add discount',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 16.0),),
                           onTap: () async{
                             Navigator.of(context).pop();
                             SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -466,20 +520,14 @@ class _MyHomePageState extends State<MyHomePage>  {
                               getCounter();
                               listenCartCount();
                               loadProfile();
-                              loadProfilePic();
                             }else{
-                              await Navigator.of(context).push(_loadCart());
+                              await Navigator.of(context).push(_signIn());
                               getCounter();
                               listenCartCount();
                               loadProfile();
-                              loadProfilePic();
                             }
                           }
                       ),
-                      // ListTile(
-                      //   leading: Icon(Icons.info_outline,size: 30.0,color: Colors.deepOrange,),
-                      //   title: Text('About',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 16.0),),
-                      // ),
                       ListTile(
                           leading: Icon(Icons.info_outline,size: 30.0,),
                           title: Text('Data privacy',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 16.0),),
@@ -488,17 +536,6 @@ class _MyHomePageState extends State<MyHomePage>  {
                             Navigator.of(context).push(showDpn2());
                           }
                       ),
-
-//                      ListTile(
-//                            leading: Icon(Icons.help_outline,size: 30.0,color: Colors.deepOrange,),
-//                            title: Text('Log out',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 16.0),),
-//                            onTap: () async{
-//                                Navigator.of(context).pop();
-//                                _googleSignIn.signOut();
-//                                SharedPreferences prefs = await SharedPreferences.getInstance();
-//                                prefs.clear();
-//                            }
-//                        ),
                     ],
                   ),
                 ),
@@ -507,14 +544,10 @@ class _MyHomePageState extends State<MyHomePage>  {
           ),
         ),
       ),
-      body: isLoading
-          ? Center(
-        child: CircularProgressIndicator(
-          valueColor: new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
-        ),
-      ):  Container(
+      body:  Container(
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Expanded(
               child: Scrollbar(
@@ -535,7 +568,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                       child:Text(author,style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
                     ),
                     SizedBox(
-                      height: 20.0,
+                      height: 50.0,
                     ),
                     Padding(
                       padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
@@ -573,14 +606,12 @@ class _MyHomePageState extends State<MyHomePage>  {
                                           return null;
                                         },
                                         decoration: InputDecoration(
-
                                           contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
                                           focusedBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                                 color: Colors.deepOrange.withOpacity(0.8),
                                                 width: 2.0),
                                           ),
-
                                           border: OutlineInputBorder(
                                               borderRadius: BorderRadius.circular(30.0)),
                                         )
@@ -658,7 +689,6 @@ class _MyHomePageState extends State<MyHomePage>  {
                         ),
                       ),
                     ),
-
                     ListView.builder(
                         physics: BouncingScrollPhysics(),
                         shrinkWrap: true,
@@ -709,30 +739,31 @@ class _MyHomePageState extends State<MyHomePage>  {
                 ),
               ),
             ),
+            Padding(
+              padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
+              child: Row(
+                children: <Widget>[
 
-            Visibility(
-              visible:cartCount == 0 ? false : true,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
-                child: Row(
-                  children: <Widget>[
-                    Flexible(
+                  Visibility(
+                    visible: cartCount == 0 ? false : true,
+                    child: Flexible(
                       child: SleekButton(
-                        onTap: () async{
+                        onTap: () async {
                           SharedPreferences prefs = await SharedPreferences.getInstance();
                           String username = prefs.getString('s_customerId');
                           if(username == null){
                             await Navigator.of(context).push(_signIn());
-                            getCounter();
                             listenCartCount();
+                            loadProfile();
                           }else{
-                            await Navigator.of(context).push(_loadCart());
-                            getCounter();
+                            await Navigator.of(context).push(_gcViewCart());
                             listenCartCount();
+                            loadProfile();
                           }
+
                         },
                         style: SleekButtonStyle.flat(
-                          color: Colors.deepOrange,
+                          color: Colors.green,
                           inverted: false,
                           rounded: true,
                           size: SleekButtonSize.big,
@@ -763,14 +794,37 @@ class _MyHomePageState extends State<MyHomePage>  {
                                   ],
                                   fontStyle: FontStyle.normal,
                                   fontWeight: FontWeight.bold,
+                                  fontSize: 13.0),
+                              ),
+                              isLoading1
+                                  ? Center(
+                                child:Container(
+                                  height:16.0 ,
+                                  width: 16.0,
+                                  child: CircularProgressIndicator(
+//                                          strokeWidth: 1,
+                                    valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
+                                  ),
+                                ),
+                              ) :
+                              Text("₱ ${subTotal.toString()}",style: TextStyle(
+                                  shadows: [
+                                    Shadow(
+                                      blurRadius: 1.0,
+                                      color: Colors.black54,
+                                      offset: Offset(1.0, 1.0),
+                                    ),
+                                  ],
+                                  fontStyle: FontStyle.normal,
+                                  fontWeight: FontWeight.bold,
                                   fontSize: 13.0),),
                             ],
                           ),
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -780,62 +834,43 @@ class _MyHomePageState extends State<MyHomePage>  {
   }
 }
 
-Route _gotoTenants(buLogo,buName,buCode) {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => LoadTenants(buLogo:buLogo, buName:buName, buCode:buCode),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      var begin = Offset(1.0, 0.0);
-      var end = Offset.zero;
-      var curve = Curves.decelerate;
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
-}
-
-
-
-Route _loadCart(){
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => LoadCart(),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      var begin = Offset(0.0, 1.0);
-      var end = Offset.zero;
-      var curve = Curves.decelerate;
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
-}
-
-
-Route viewIds() {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => IdMasterFile(),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      var begin = Offset(1.0, 0.0);
-      var end = Offset.zero;
-      var curve = Curves.decelerate;
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
-}
-
 Route _signIn() {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => CreateAccountSignIn(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route _loadGC(logo,categoryName,categoryNo,businessUnit,bUnitCode){
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => GcLoadStore(logo:logo,categoryName:categoryName,categoryNo:categoryNo,businessUnit:businessUnit,bUnitCode:bUnitCode),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(0.0, 1.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route _profilePage() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => TrackOrder(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
       var end = Offset.zero;
       var curve = Curves.decelerate;
       var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
@@ -879,7 +914,6 @@ Route _groceryRoute(_groceryRoute) {
   );
 }
 
-
 Route profile(){
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => ProfilePage(),
@@ -895,3 +929,39 @@ Route profile(){
     },
   );
 }
+
+Route _gcViewCart(){
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => GcLoadCart(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(0.0, 1.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route _gotoTenants(buLogo,buName,buCode) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => LoadTenants(buLogo:buLogo,buName:buName,buCode:buCode),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+
+
+

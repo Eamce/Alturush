@@ -1,3 +1,4 @@
+import 'package:arush/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
@@ -13,10 +14,14 @@ import 'package:intl/intl.dart';
 import 'search.dart';
 
 class LoadTenants extends StatefulWidget {
+  final globalID;
+  final globalCat;
+  final globalPic;
   final buCode;
   final buLogo;
   final buName;
-  LoadTenants({Key key, @required this.buLogo,this.buName,this.buCode}) : super(key: key);
+
+  LoadTenants({Key key, @required this.buLogo, this.buName, this.buCode, this.globalPic, this.globalCat,  this.globalID }) : super(key: key);
   @override
   _LoadTenants createState() => _LoadTenants();
 }
@@ -28,6 +33,7 @@ class _LoadTenants extends State<LoadTenants> {
   List loadTenants;
   int gridCount;
   List listCounter;
+  List globalCat;
 
   var isLoading = true;
   var cartLoading = true;
@@ -40,7 +46,7 @@ class _LoadTenants extends State<LoadTenants> {
 
   Future loadTenant() async {
 //    var res = await db.getTenants(widget.buCode);
-    var res = await db.getTenantsCi(widget.buCode);
+    var res = await db.getTenantsCi(widget.buCode, widget.globalID);
     if (!mounted) return;
     setState(() {
       isLoading = false;
@@ -78,14 +84,13 @@ class _LoadTenants extends State<LoadTenants> {
     status  = prefs.getString('s_status');
   }
 
-  void selectCategory(BuildContext context ,buCode,logo,tenantId, tenantName) async{
+  void selectCategory(BuildContext context ,buCode,logo,tenantId, tenantName, globalID) async{
     List categoryData;
     var res = await db.selectCategory(tenantId);
     if (!mounted) return;
     setState(() {
       categoryData = res['user_details'];
     });
-
     showModalBottomSheet(
         isScrollControlled: true,
         isDismissible: true,
@@ -104,7 +109,6 @@ class _LoadTenants extends State<LoadTenants> {
                     padding: EdgeInsets.fromLTRB(25.0, 20.0, 20.0, 20.0),
                     child:Text("Category",style: TextStyle(fontSize: 25.0,fontWeight: FontWeight.bold),),
                   ),
-
                   Expanded(
                     child: ListView(
                       children: [
@@ -118,17 +122,15 @@ class _LoadTenants extends State<LoadTenants> {
                                 itemBuilder: (BuildContext context, int index) {
                                   return InkWell(
                                     onTap: () async{
-
                                       if(index == 0){
-                                        await Navigator.of(context).push(_loadStore('All items',categoryData[index]['category_id'],buCode,logo,tenantId,tenantName));
+                                        await Navigator.of(context).push(_loadStore('All items', categoryData[index]['category_id'], buCode, logo, tenantId, tenantName, globalID));
                                         getCounter();
                                         loadProfile();
                                       }else{
-                                        await Navigator.of(context).push(_loadStore(categoryData[index]['category'],categoryData[index]['category_id'],buCode,logo,tenantId,tenantName));
+                                        await Navigator.of(context).push(_loadStore(categoryData[index]['category'],categoryData[index]['category_id'],buCode,logo,tenantId,tenantName, globalID));
                                         getCounter();
                                         loadProfile();
                                       }
-
                                       },
                                     child:Container(
                                       height: 120.0,
@@ -192,7 +194,6 @@ class _LoadTenants extends State<LoadTenants> {
           );
         });
   }
-
   @override
   void initState() {
     super.initState();
@@ -209,6 +210,8 @@ class _LoadTenants extends State<LoadTenants> {
 
   @override
   Widget build(BuildContext context) {
+
+
     double screenWidth = MediaQuery.of(context).size.width;
     screenWidth <= 400 ? gridCount = 2 : gridCount = 3;
     return WillPopScope(
@@ -231,7 +234,7 @@ class _LoadTenants extends State<LoadTenants> {
               height: 60,
             ),
             Container(
-              padding: const EdgeInsets.all(8.0), child: Text("Tenants",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),)
+              padding: const EdgeInsets.all(8.0), child: Text("Participating Businesses",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),)
           ],
         ),
         leading: IconButton(
@@ -282,22 +285,22 @@ class _LoadTenants extends State<LoadTenants> {
               ),
             ),
           ),
-          // IconButton(
-          //     icon: Icon(Icons.person, color: Colors.black),
-          //     onPressed: () async {
-          //       SharedPreferences prefs = await SharedPreferences.getInstance();
-          //       String username = prefs.getString('s_customerId');
-          //       if(username == null){
-          //         await Navigator.of(context).push(_signIn());
-          //         getCounter();
-          //         loadProfile();
-          //       }else{
-          //         await Navigator.of(context).push(_profilePage());
-          //         getCounter();
-          //         loadProfile();
-          //       }
-          //     }
-          // ),
+          IconButton(
+              icon: Icon(Icons.receipt_long_rounded, color: Colors.black, size: 30.0,),
+              onPressed: () async {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                String username = prefs.getString('s_customerId');
+                if(username == null){
+                  await Navigator.of(context).push(_signIn());
+                  getCounter();
+                  loadProfile();
+                }else{
+                  await Navigator.of(context).push(_profilePage());
+                  getCounter();
+                  loadProfile();
+                }
+              }
+          ),
         ],
       ),
       body: isLoading
@@ -348,7 +351,7 @@ class _LoadTenants extends State<LoadTenants> {
                                         fontSize: 15.0),
                                   ),
                                   subtitle: Text(
-                                    'Select from our top tenants below',
+                                    'Select from our participating businesses',
                                     style: GoogleFonts.openSans(
                                         color: Colors.black,
                                         fontStyle: FontStyle.normal,
@@ -375,7 +378,7 @@ class _LoadTenants extends State<LoadTenants> {
                           itemBuilder: (BuildContext context, int index) {
                             return InkWell(
                               onTap: () {
-                                selectCategory(context,widget.buCode,loadTenants[index]['logo'], loadTenants[index]['tenant_id'], loadTenants[index]['d_tenant_name']);
+                                selectCategory(context,widget.buCode,loadTenants[index]['logo'], loadTenants[index]['tenant_id'], loadTenants[index]['d_tenant_name'], widget.globalID);
                               },
                               child:Container(
                                 height: 120.0,
@@ -533,9 +536,9 @@ Route _profilePage() {
   );
 }
 
-Route _loadStore(categoryName,categoryId,buCode, storeLogo, tenantCode, tenantName) {
+Route _loadStore(categoryName,categoryId,buCode, storeLogo, tenantCode, tenantName, globalID) {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => LoadStore(categoryName:categoryName,categoryId:categoryId, buCode:buCode, storeLogo:storeLogo, tenantCode:tenantCode, tenantName:tenantName),
+    pageBuilder: (context, animation, secondaryAnimation) => LoadStore(categoryName:categoryName,categoryId:categoryId, buCode:buCode, storeLogo:storeLogo, tenantCode:tenantCode, tenantName:tenantName, globalID:globalID),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;
@@ -581,3 +584,18 @@ Route _search() {
   );
 }
 
+Route profile(){
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => ProfilePage(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}

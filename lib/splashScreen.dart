@@ -1,7 +1,10 @@
+import 'package:arush/homePage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:carousel_pro/carousel_pro.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'electronicsAppliances.dart';
 import 'grocery/groceryMain.dart';
 import 'load_bu.dart';
 import 'package:root_check/root_check.dart';
@@ -16,64 +19,72 @@ class Splash extends StatefulWidget {
 class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
   final db = RapidA();
   List globalCat;
+  List loadProfileData;
+  String firstName="";
+  var isLoading = true;
+  var isVisible = true;
+  var locationString;
+  String profilePhoto;
 
-  void selectType(BuildContext context ,width ,height) async{
-    getGlobalCat();
-    showModalBottomSheet(
-        isScrollControlled: true,
-        isDismissible: true,
-        context: context,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(topRight:  Radius.circular(10),topLeft:  Radius.circular(10)),
-        ),
-        builder: (ctx) {
-          return Container(
-            height: MediaQuery.of(context).size.height/2.0,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children:[
-                Padding(
-                    padding: EdgeInsets.fromLTRB(12, 10, 10, 5),
-                    child: Text("Please select",style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold),)
-                ),
-                Expanded(
-                  child:Container(
-                    height: 400.0, // Change as per your requirement
-                    // width: 300.0, // Change as per your requirement
-                    child: Scrollbar(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount:  globalCat == null ? 0 : globalCat.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return InkWell(
-                            onTap: () {
-                              Navigator.pop(context);
-                              if(globalCat[index]['id'] == '1'){
-                                Navigator.of(context).push(_foodRoute(globalCat[index]['id']));
-                              }if(globalCat[index]['id'] == '2'){
-                                Navigator.of(context).push(_groceryRoute(globalCat[index]['id']));
-                              }if(globalCat[index]['id'] == '3'){
-                                Navigator.of(context).push(_foodRoute(globalCat[index]['id']));
-                              }
-                            },
-                            child: ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: Colors.transparent,
-                                child: Image.network(globalCat[index]['cat_picture']),
-                              ),
-                              title: Text(globalCat[index]['category'],style: TextStyle(color: Colors.black87,fontSize: 17,fontWeight: FontWeight.bold),),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        });
-  }
+  // void selectType(BuildContext context ,width ,height) async{
+  //   getGlobalCat();
+  //   showModalBottomSheet(
+  //       isScrollControlled: true,
+  //       isDismissible: true,
+  //       context: context,
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.only(topRight:  Radius.circular(10),topLeft:  Radius.circular(10)),
+  //       ),
+  //       builder: (ctx) {
+  //         return Container(
+  //           height: MediaQuery.of(context).size.height/2.0,
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children:[
+  //               Padding(
+  //                   padding: EdgeInsets.fromLTRB(12, 10, 10, 5),
+  //                   child: Text("Please select",style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold),)
+  //               ),
+  //               Expanded(
+  //                 child:Container(
+  //                   height: 400.0, // Change as per your requirement
+  //                   // width: 300.0, // Change as per your requirement
+  //                   child: Scrollbar(
+  //                     child: ListView.builder(
+  //                       shrinkWrap: true,
+  //                       itemCount:  globalCat == null ? 0 : globalCat.length,
+  //                       itemBuilder: (BuildContext context, int index) {
+  //                         return InkWell(
+  //                           onTap: () {
+  //                             Navigator.pop(context);
+  //                             if(globalCat[index]['id'] == '1'){
+  //                               Navigator.of(context).push(_foodRoute(globalCat[index]['id']));
+  //                             }if(globalCat[index]['id'] == '2'){
+  //                               Navigator.of(context).push(_groceryRoute(globalCat[index]['id']));
+  //                             }if(globalCat[index]['id'] == '3'){
+  //                               Navigator.of(context).push(_electronicsRoute(globalCat[index]['id']));
+  //                             }if(globalCat[index]['id'] == '4') {
+  //                               Navigator.of(context).push(_groceryRoute(globalCat[index]['id']));
+  //                             }
+  //                           },
+  //                           child: ListTile(
+  //                             leading: CircleAvatar(
+  //                               backgroundColor: Colors.transparent,
+  //                               child: Image.network(globalCat[index]['cat_picture']),
+  //                             ),
+  //                             title: Text(globalCat[index]['category'],style: TextStyle(color: Colors.black87,fontSize: 17,fontWeight: FontWeight.bold),),
+  //                           ),
+  //                         );
+  //                       },
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         );
+  //       });
+  // }
 
   Future initPlatformState() async {
     bool isRooted = await RootCheck.isRooted;
@@ -129,9 +140,32 @@ class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
     });
   }
 
+  Future loadProfile() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var status  = prefs.getString('s_status');
+    if(status != null) {
+      var res = await db.loadProfile();
+      if (!mounted) return;
+      setState(() {
+        loadProfileData = res['user_details'];
+        firstName = loadProfileData[0]['d_fname'];
+        isLoading = false;
+        isVisible = true;
+      });
+    }
+    else{
+      locationString = "Location";
+      firstName = "";
+      profilePhoto = "";
+      isVisible = false;
+      isLoading = false;
+    }
+  }
+
   @override
   void initState() {
     getGlobalCat();
+    loadProfile();
     initPlatformState();
     super.initState();
   }
@@ -140,14 +174,12 @@ class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
     // Clean up the controller when the Widget is disposed
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
       body: Container(
-
         decoration: BoxDecoration(
           color: Colors.white,
           image: DecorationImage(
@@ -215,7 +247,6 @@ class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
                                     fontSize: 18.0),),
                               ],
                             ),
-
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -271,7 +302,11 @@ class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
                       shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
                     ),
                     onPressed: (){
-                      selectType(context ,width, height);
+                       // selectType(context ,width, height);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomePage()),
+                      );
                     },
                     child: Text("Get started", style: GoogleFonts.openSans(
                         fontWeight: FontWeight.bold,
@@ -308,6 +343,21 @@ Route _foodRoute(_globalCatID) {
 Route _groceryRoute(_groceryRoute) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => GroceryMain(groceryRoute:_groceryRoute),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(0.0, 1.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+Route _electronicsRoute(_electronicsRoute) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => ElectronicsApp(electronicsRoute:_electronicsRoute),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;

@@ -218,16 +218,12 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
     double screenWidth = MediaQuery.of(context).size.width;
     return WillPopScope(
       onWillPop: () async {
-        Navigator.pop(context, () {
-          setState(() {
-
-          });
-        });
-        return true;
+        return Navigator.canPop(context);
       },
       child: DefaultTabController(
         length: 4,
         child: Scaffold(
+          resizeToAvoidBottomInset: false,
           appBar: AppBar(
             brightness: Brightness.light,
             backgroundColor: Colors.white,
@@ -236,7 +232,7 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
               icon: Icon(Icons.arrow_back, color: Colors.black,size: 23,),
               onPressed: () => Navigator.of(context).pop(),
             ),
-            title: Text("Profile",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
+            title: Text("My Orders",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
             actions: [
               InkWell(
                 customBorder: CircleBorder(),
@@ -244,8 +240,8 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                   Navigator.of(context).push(profile());
                 },
                 child: Container(
-                  width: 70.0,
-                  height: 70.0,
+                  width: 85.0,
+                  height: 85.0,
                   child: Padding(
                     padding:EdgeInsets.all(5.0),
                     child: profileLoading ? CircularProgressIndicator(
@@ -293,77 +289,77 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
+                  children: <Widget>[
                     Expanded(
                       child: RefreshIndicator(
-                        onRefresh: toRefresh,
+                        onRefresh: getTicketNoFood,
                         child: Scrollbar(
                           child: ListView(
                             children: [
-                            Padding(
-                                padding:EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
-                              child:ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: BouncingScrollPhysics(),
-                                  itemCount: listGetTicketNoFood == null ? 0 : listGetTicketNoFood.length,
-                                  itemBuilder: (BuildContext context, int index) {
-                                    String type = "";
-                                    if(listGetTicketNoFood[index]['order_type_stat'] == '0'){
-                                      type = "assets/svg/fast-food.svg";
-                                    }else{
-                                      type = "assets/svg/basket.svg";
-                                    }
-                                    return Padding(
-                                      padding:EdgeInsets.symmetric(horizontal: 2.0, vertical: 0.0),
-                                      child: InkWell(
-                                        onTap:(){
-                                          if(listGetTicketNoFood[index]['order_type_stat'] == '0'){
-                                            Navigator.of(context).push(viewUpComingFood(1,listGetTicketNoFood[index]['d_ticket_id'],listGetTicketNoFood[index]['d_mop'],listGetTicketNoFood[index]['order_type_stat']));
-                                          }
-                                          else{
-                                            print(listGetTicketNoFood[index]['d_ticket_id']);
-                                            Navigator.of(context).push(viewUpComingGood(listGetTicketNoFood[index]['d_ticket_id']));
-                                          }
-                                        },
-                                        child: Container(
-                                          height: 80.0,
-                                          child: Card(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(10.0),
-                                            ),
-                                            elevation: 0.0,
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                Padding(
-                                                  padding: EdgeInsets.fromLTRB(5.0, 10.0, 10.0, 5.0),
-                                                  child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                    children:<Widget>[
-                                                      Column(
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children: <Widget>[
-                                                          Text('${listGetTicketNoFood[index]['d_mop']}',style: TextStyle(color: Colors.black),),
-                                                          Text('Ticket # ${listGetTicketNoFood[index]['d_ticket_id']}',style: TextStyle(fontSize: 20.0,color: Colors.black54, fontWeight: FontWeight.bold)),
-                                                        ],
-                                                      ),
-                                                      Container(
-                                                        height: screenHeight/15,
-                                                        width: screenWidth/15,
-                                                        child: SvgPicture.asset(type),
-                                                      ),
-                                                    ],
+                                Padding(
+                                  padding:EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
+                                child:ListView.builder(
+                                    shrinkWrap: true,
+                                    physics: BouncingScrollPhysics(),
+                                    itemCount: listGetTicketNoFood == null ? 0 : listGetTicketNoFood.length,
+                                    itemBuilder: (BuildContext context, int index) {
+                                      // String type = "";
+                                      // if(listGetTicketNoFood[index]['order_type_stat'] == '0'){
+                                      //   type = "assets/svg/fast-food.svg";
+                                      // }else{
+                                      //   type = "assets/svg/basket.svg";
+                                      // }
+                                      return Padding(
+                                        padding:EdgeInsets.symmetric(horizontal: 2.0, vertical: 0.0),
+                                        child: InkWell(
+                                          onTap:(){
+                                            // if(listGetTicketNoFood[index]['order_type_stat'] == '0'){
+                                              Navigator.of(context).push(viewUpComingFood(1,listGetTicketNoFood[index]['d_ticket_id'],listGetTicketNoFood[index]['d_mop'],listGetTicketNoFood[index]['order_type_stat']));
+                                            // }
+                                            // else{
+                                            //   print(listGetTicketNoFood[index]['d_ticket_id']);
+                                            //   Navigator.of(context).push(viewUpComingGood(listGetTicketNoFood[index]['d_ticket_id']));
+                                            // }
+                                          },
+                                          child: Container(
+                                            height: 90.0,
+                                            child: Card(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(10.0),
+                                              ),
+                                              elevation: 0.0,
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: <Widget>[
+                                                  Padding(
+                                                    padding: EdgeInsets.fromLTRB(5.0, 10.0, 10.0, 5.0),
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children:<Widget>[
+                                                        Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: <Widget>[
+                                                            Text('${listGetTicketNoFood[index]['d_mop']}',style: TextStyle(color: Colors.black),),
+                                                            Text('Ticket # ${listGetTicketNoFood[index]['d_ticket_id']}',style: TextStyle(fontSize: 20.0,color: Colors.black54, fontWeight: FontWeight.bold)),
+                                                          ],
+                                                        ),
+                                                        Container(
+                                                          height: screenHeight/15,
+                                                          width: screenWidth/15,
+                                                          // child: SvgPicture.asset(type),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    );
-                                  }),
-                              ),
-                            ],
+                                      );
+                                    }),
+                                ),
+                              ],
                           ),
                         ),
                       ),
@@ -378,7 +374,7 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                         onRefresh: toRefresh,
                         child: Scrollbar(
                           child: ListView(
-                            children: [
+                            children: <Widget> [
                               Padding(
                                 padding:EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
                                 child:ListView.builder(
@@ -386,27 +382,27 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                                     physics: BouncingScrollPhysics(),
                                     itemCount: listGetTicketOnTransit == null ? 0 : listGetTicketOnTransit.length,
                                     itemBuilder: (BuildContext context, int index) {
-                                      String type = "";
-                                      if(listGetTicketOnTransit[index]['order_type_stat'] == '0'){
-                                        type = "assets/svg/fast-food.svg";
-                                      }else{
-                                        type = "assets/svg/basket.svg";
-                                      }
+                                      // String type = "";
+                                      // if(listGetTicketOnTransit[index]['order_type_stat'] == '0'){
+                                      //   type = "assets/svg/fast-food.svg";
+                                      // }else{
+                                      //   type = "assets/svg/basket.svg";
+                                      // }
                                       return Padding(
                                         padding:EdgeInsets.symmetric(horizontal: 2.0, vertical: 0.0),
                                         child: InkWell(
                                           onTap:(){
-                                            if(listGetTicketOnTransit[index]['order_type_stat'] == '0'){
+                                            // if(listGetTicketOnTransit[index]['order_type_stat'] == '0'){
                                               Navigator.of(context).push(viewUpComingFood(0,listGetTicketOnTransit[index]['d_ticket_id'],listGetTicketOnTransit[index]['d_mop'],listGetTicketOnTransit[index]['order_type_stat']));
-                                            }
-                                            else{
-                                              print(listGetTicketNoFood[index]['d_ticket_id']);
-                                              Navigator.of(context).push(viewUpComingGood(listGetTicketNoFood[index]['d_ticket_id']));
-                                            }
+                                            // }
+                                            // else{
+                                            //   print(listGetTicketNoFood[index]['d_ticket_id']);
+                                            //   Navigator.of(context).push(viewUpComingGood(listGetTicketNoFood[index]['d_ticket_id']));
+                                            // }
                                             // viewInside(listGetTicketNoFood[index]['d_ticket_id'],listGetTicketNoFood[index]['d_customerId']);
                                           },
                                           child: Container(
-                                            height: 80.0,
+                                            height: 90.0,
                                             child: Card(
                                               shape: RoundedRectangleBorder(
                                                 borderRadius: BorderRadius.circular(10.0),
@@ -430,7 +426,7 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                                                         Container(
                                                           height: screenHeight/15,
                                                           width: screenWidth/15,
-                                                          child: SvgPicture.asset(type),
+                                                          // child: SvgPicture.asset(type),
                                                         ),
                                                       ],
                                                     ),
@@ -467,27 +463,27 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                                     physics: BouncingScrollPhysics(),
                                     itemCount: listGetTicketOnDelivered == null ? 0 : listGetTicketOnDelivered.length,
                                     itemBuilder: (BuildContext context, int index) {
-                                      String type = "";
-                                      if(listGetTicketOnDelivered[index]['order_type_stat'] == '0'){
-                                        type = "assets/svg/fast-food.svg";
-                                      }else{
-                                        type = "assets/svg/basket.svg";
-                                      }
+                                      // String type = "";
+                                      // if(listGetTicketOnDelivered[index]['order_type_stat'] == '0'){
+                                      //   type = "assets/svg/fast-food.svg";
+                                      // }else{
+                                      //   type = "assets/svg/basket.svg";
+                                      // }
                                       return Padding(
                                         padding:EdgeInsets.symmetric(horizontal: 2.0, vertical: 0.0),
                                         child: InkWell(
                                           onTap:(){
-                                            if(listGetTicketOnDelivered[index]['order_type_stat'] == '0'){
+                                            // if(listGetTicketOnDelivered[index]['order_type_stat'] == '0'){
                                               Navigator.of(context).push(viewUpComingFood(0,listGetTicketOnDelivered[index]['d_ticket_id'],listGetTicketOnDelivered[index]['d_mop'],listGetTicketOnDelivered[index]['order_type_stat']));
-                                            }
-                                            else{
-                                              print(listGetTicketNoFood[index]['d_ticket_id']);
-                                              Navigator.of(context).push(viewUpComingGood(listGetTicketNoFood[index]['d_ticket_id']));
-                                            }
+                                            // }
+                                            // else{
+                                            //   print(listGetTicketNoFood[index]['d_ticket_id']);
+                                            //   Navigator.of(context).push(viewUpComingGood(listGetTicketNoFood[index]['d_ticket_id']));
+                                            // }
                                             // viewInside(listGetTicketNoFood[index]['d_ticket_id'],listGetTicketNoFood[index]['d_customerId']);
                                           },
                                           child: Container(
-                                            height: 80.0,
+                                            height: 90.0,
                                             child: Card(
                                               shape: RoundedRectangleBorder(
                                                 borderRadius: BorderRadius.circular(10.0),
@@ -511,7 +507,7 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                                                         Container(
                                                           height: screenHeight/15,
                                                           width: screenWidth/15,
-                                                          child: SvgPicture.asset(type),
+                                                          // child: SvgPicture.asset(type),
                                                         ),
                                                       ],
                                                     ),
@@ -548,26 +544,26 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                                     physics: BouncingScrollPhysics(),
                                     itemCount: listGetTicketOnCancelled == null ? 0 : listGetTicketOnCancelled.length,
                                     itemBuilder: (BuildContext context, int index) {
-                                      String type = "";
-                                      if(listGetTicketNoFood[index]['order_type_stat'] == '0'){
-                                        type = "assets/svg/fast-food.svg";
-                                      }else{
-                                        type = "assets/svg/basket.svg";
-                                      }
+                                      // String type = "";
+                                      // if(listGetTicketOnCancelled[index]['order_type_stat'] == '0'){
+                                      //   type = "assets/svg/fast-food.svg";
+                                      // }else{
+                                      //   type = "assets/svg/basket.svg";
+                                      // }
                                       return Padding(
                                         padding:EdgeInsets.symmetric(horizontal: 2.0, vertical: 0.0),
                                         child: InkWell(
                                           onTap:(){
-                                            if(listGetTicketOnCancelled[index]['order_type_stat'] == '0'){
+                                            // if(listGetTicketOnCancelled[index]['order_type_stat'] == '0'){
                                               Navigator.of(context).push(viewUpComingFood(1,listGetTicketOnCancelled[index]['d_ticket_id'],listGetTicketOnCancelled[index]['d_mop'],listGetTicketOnCancelled[index]['order_type_stat']));
-                                            }
-                                            else{
-                                              print(listGetTicketOnCancelled[index]['d_ticket_id']);
-                                              Navigator.of(context).push(viewUpComingGood(listGetTicketOnCancelled[index]['d_ticket_id']));
-                                            }
+                                            // }
+                                            // else{
+                                            //   print(listGetTicketNoFood[index]['d_ticket_id']);
+                                            //   Navigator.of(context).push(viewUpComingGood(listGetTicketNoFood[index]['d_ticket_id']));
+                                            // }
                                           },
                                           child: Container(
-                                            height: 80.0,
+                                            height: 90.0,
                                             child: Card(
                                               shape: RoundedRectangleBorder(
                                                 borderRadius: BorderRadius.circular(10.0),
@@ -584,14 +580,14 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                                                         Column(
                                                           crossAxisAlignment: CrossAxisAlignment.start,
                                                           children: <Widget>[
-                                                            Text('${listGetTicketNoFood[index]['d_mop']}',style: TextStyle(color: Colors.black),),
-                                                            Text('Ticket # ${listGetTicketNoFood[index]['d_ticket_id']}',style: TextStyle(fontSize: 20.0,color: Colors.black54, fontWeight: FontWeight.bold)),
+                                                            Text('${listGetTicketOnCancelled[index]['d_mop']}',style: TextStyle(color: Colors.black),),
+                                                            Text('Ticket # ${listGetTicketOnCancelled[index]['d_ticket_id']}',style: TextStyle(fontSize: 20.0,color: Colors.black54, fontWeight: FontWeight.bold)),
                                                           ],
                                                         ),
                                                         Container(
                                                           height: screenHeight/15,
                                                           width: screenWidth/15,
-                                                          child: SvgPicture.asset(type),
+                                                          // child: SvgPicture.asset(type),
                                                         ),
                                                       ],
                                                     ),

@@ -1,3 +1,4 @@
+import 'package:arush/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
@@ -25,8 +26,9 @@ class LoadStore extends StatefulWidget {
   final storeLogo;
   final tenantCode;
   final tenantName;
+  final globalID;
 
-  LoadStore({Key key, @required this.categoryName, this.categoryId, this.buCode,this.storeLogo, this.tenantCode, this.tenantName}) : super(key: key);
+  LoadStore({Key key, @required this.categoryName, this.categoryId, this.buCode,this.storeLogo, this.tenantCode, this.tenantName, this.globalID}) : super(key: key);
   @override
   _LoadStore createState() => _LoadStore();
 }
@@ -182,7 +184,7 @@ class _LoadStore extends State<LoadStore> {
                                           decoration: new BoxDecoration(
                                             image: new DecorationImage(
                                               image: new NetworkImage(categoryData[index]['image']),
-                                              fit: BoxFit.cover,
+                                              fit: BoxFit.contain,
                                             ),
                                             borderRadius: new BorderRadius.all(new Radius.circular(50.0)),
                                             border: new Border.all(
@@ -283,7 +285,7 @@ class _LoadStore extends State<LoadStore> {
                 height: 60,
               ),
               Container(
-                padding: const EdgeInsets.all(8.0), child: Text("Menu",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),)
+                padding: const EdgeInsets.all(8.0), child: Text("Store",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),)
             ],
           ),
           leading: IconButton(
@@ -313,9 +315,9 @@ class _LoadStore extends State<LoadStore> {
                   await Navigator.of(context).push(_signIn());
                   loadProfile();
                   getCounter();
-                  loadProfilePic();
+
                 }else{
-                  await Navigator.of(context).push(_profilePage());
+                  await Navigator.of(context).push(profile());
                   loadProfile();
                   getCounter();
                   loadProfilePic();
@@ -334,22 +336,22 @@ class _LoadStore extends State<LoadStore> {
                 ),
               ),
             ),
-            // IconButton(
-            //     icon: Icon(Icons.person, color: Colors.black),
-            //     onPressed: () async {
-            //       SharedPreferences prefs = await SharedPreferences.getInstance();
-            //       String username = prefs.getString('s_customerId');
-            //       if(username == null){
-            //         await Navigator.of(context).push(_signIn());
-            //         getCounter();
-            //         loadProfile();
-            //       }else{
-            //         await Navigator.of(context).push(_profilePage());
-            //         getCounter();
-            //         loadProfile();
-            //       }
-            //     }
-            // ),
+            IconButton(
+                icon: Icon(Icons.receipt_long_rounded, color: Colors.black, size: 30.0,),
+                onPressed: () async {
+                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                  String username = prefs.getString('s_customerId');
+                  if(username == null){
+                    await Navigator.of(context).push(_signIn());
+                    getCounter();
+                    loadProfile();
+                  }else{
+                    await Navigator.of(context).push(_profilePage());
+                    getCounter();
+                    loadProfile();
+                  }
+                }
+            ),
           ],
         ),
         body: isLoading
@@ -369,9 +371,14 @@ class _LoadStore extends State<LoadStore> {
                     children: <Widget>[
                       Container(
                         decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage("assets/png/contact-chow-king-grill-and-buffet.jpg"),
-                            fit: BoxFit.cover,
+                          // image: DecorationImage(
+                          //   image: AssetImage("assets/png/contact-chow-king-grill-and-buffet.jpg"),
+                          //   fit: BoxFit.cover,
+                          // ),
+                          image: new DecorationImage(
+                            image: new NetworkImage(widget.storeLogo),
+                            fit: BoxFit.none,
+                            opacity: 65.0,
                           ),
                         ),
                         child: SizedBox(
@@ -414,7 +421,7 @@ class _LoadStore extends State<LoadStore> {
                                           fontSize: 15.0),
                                     ),
                                     subtitle: Text(
-                                      '40-60 minutes. Deliciously great!',
+                                      'Welcome! Select your best choice',
                                       style: GoogleFonts.openSans(
                                           color: Colors.white,
                                           fontStyle: FontStyle.normal,
@@ -428,22 +435,22 @@ class _LoadStore extends State<LoadStore> {
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(1, 20, 1, 5),
-                        child:  Container(
-                          child: NiceButton(
-                            width: screenWidth,
-                            background:Colors.redAccent ,
-                            radius: 20,
-                            padding: const EdgeInsets.all(15),
-                            text: "Order groceries here",
-                            gradientColors: [Colors.green, Colors.lightGreen],
-                            onPressed: () {
-                              Navigator.of(context).push(_loadGrocery());
-                            },
-                          ),
-                        ),
-                      ),
+                      // Padding(
+                      //   padding: EdgeInsets.fromLTRB(1, 20, 1, 5),
+                      //   child:  Container(
+                      //     child: NiceButton(
+                      //       width: screenWidth,
+                      //       background:Colors.redAccent ,
+                      //       radius: 20,
+                      //       padding: const EdgeInsets.all(15),
+                      //       text: "Order groceries here",
+                      //       gradientColors: [Colors.green, Colors.lightGreen],
+                      //       onPressed: () {
+                      //         Navigator.of(context).push(_loadGrocery());
+                      //       },
+                      //     ),
+                      //   ),
+                      // ),
                       Visibility(
                         visible: checkIfEmptyStore == false ? false : true,
                         child: Padding(
@@ -608,7 +615,8 @@ class _LoadStore extends State<LoadStore> {
                                       loadStoreData[index]['product_id'],
                                       loadStoreData[index]['product_uom'],
                                       loadStoreData[index]['unit_measure'],
-                                      loadStoreData[index]['price']
+                                      loadStoreData[index]['price'],
+                                      widget.globalID
                                   ));
                                   getCounter();
                                 },
@@ -680,6 +688,7 @@ class _LoadStore extends State<LoadStore> {
                                       getItemsByCategoriesList[index]['product_uom'],
                                       getItemsByCategoriesList[index]['unit_measure'],
                                       getItemsByCategoriesList[index]['price'],
+                                      widget.globalID
                                   ));
                                   getCounter();
                                 },
@@ -836,10 +845,10 @@ class _LoadStore extends State<LoadStore> {
 
 }
 
-Route _viewItem(buCode, tenantCode, prodId,productUom,unitOfMeasure,price) {
+Route _viewItem(buCode, tenantCode, prodId,productUom,unitOfMeasure,price, globalID) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) =>
-        ViewItem(buCode: buCode, tenantCode: tenantCode, prodId: prodId,productUom:productUom,unitOfMeasure:unitOfMeasure,price:price),
+        ViewItem(buCode: buCode, tenantCode: tenantCode, prodId: prodId,productUom:productUom,unitOfMeasure:unitOfMeasure,price:price,globalID:globalID),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;
@@ -922,6 +931,22 @@ Route _signIn() {
 Route _search() {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => Search(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route profile(){
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => ProfilePage(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1.0, 0.0);
       var end = Offset.zero;

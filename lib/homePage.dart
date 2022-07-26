@@ -1,27 +1,35 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter/services.dart';
-import 'create_account_signin.dart';
-import 'load_tenants.dart';
-import 'db_helper.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:arush/profile_page.dart';
-import 'load_cart.dart';
 import 'dart:async';
-import 'package:sleek_button/sleek_button.dart';
+import 'package:arush/profile_page.dart';
+import 'package:arush/track_order.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sleek_button/sleek_button.dart';
+import 'create_account_signin.dart';
+import 'db_helper.dart';
+import 'discountManager.dart';
+import 'electronicsAppliances.dart';
+import 'global_cat.dart';
 import 'grocery/groceryMain.dart';
-import 'package:arush/idmasterfile.dart';
-class MyHomePage extends StatefulWidget {
-  final globalCatID;
-  MyHomePage({Key key, @required this.globalCatID,}) : super(key: key);
+import 'load_bu.dart';
+import 'load_cart.dart';
+import 'load_tenants.dart';
+
+class HomePage extends StatefulWidget {
+
   @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-class _MyHomePageState extends State<MyHomePage>  {
-  final oCcy = new NumberFormat("#,##0.00", "en_US");
+  _HomePageState createState() => _HomePageState();
+  }
+
+class _HomePageState extends State<HomePage> {
   final db = RapidA();
+  List bUnits;
+  List globalCat;
+
+  final oCcy = new NumberFormat("#,##0.00", "en_US");
+
   final province = TextEditingController();
   final town = TextEditingController();
   List listCounter;
@@ -44,25 +52,24 @@ class _MyHomePageState extends State<MyHomePage>  {
   String placeRemark;
   String quotes = "";
   String author = "";
+  String status;
   int counter;
   int provinceId;
   int townID;
-  int globalCatID = 2;
+  int unitGroupId;
 
+  Future loadBu() async{
+    var res = await db.getBusinessUnitsCi();
+    if (!mounted) return;
+    setState(() {
+      buData = res['user_details'];
+    });
 
-  // Future loadBu() async{
-  //   print(unitGroupId);
-  //   print(widget.globalCatID);
-  //   var res = await db.getBusinessUnitsCi(unitGroupId,widget.globalCatID);
-  //   if (!mounted) return;
-  //   setState(() {
-  //     buData = res['user_details'];
-  //   });
-  //   Timer(Duration(milliseconds:500), () {
-  //     _needsScroll = true;
-  //     _scrollToEnd();
-  //   });
-  // }
+    Timer(Duration(milliseconds:500), () {
+      _needsScroll = true;
+      _scrollToEnd();
+    });
+  }
 
   _scrollToEnd() async{
     if (_needsScroll) {
@@ -70,6 +77,14 @@ class _MyHomePageState extends State<MyHomePage>  {
       _scrollController.animateTo(_scrollController.position.maxScrollExtent,
           duration: Duration(milliseconds: 200), curve: Curves.easeInOut);
     }
+  }
+
+  Future getGlobalCat() async{
+    var res = await db.getGlobalCat();
+    if (!mounted) return;
+    setState(() {
+      globalCat = res['user_details'];
+    });
   }
 
   Future loadProfilePic() async {
@@ -95,7 +110,6 @@ class _MyHomePageState extends State<MyHomePage>  {
     });
   }
 
-  String status;
   Future loadProfile() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     status  = prefs.getString('s_status');
@@ -138,12 +152,13 @@ class _MyHomePageState extends State<MyHomePage>  {
     });
   }
 
- List getProvinceData;
+  List getProvinceData;
   selectProvince() async{
     var res = await db.getProvince();
     if (!mounted) return;
     setState(() {
       getProvinceData = res['user_details'];
+      print(getProvinceData);
     });
     FocusScope.of(context).requestFocus(FocusNode());
     showDialog<void>(
@@ -215,6 +230,7 @@ class _MyHomePageState extends State<MyHomePage>  {
     if (!mounted) return;
     setState(() {
       getTownData = res['user_details'];
+      print(getTownData);
     });
     FocusScope.of(context).requestFocus(FocusNode());
     showDialog<void>(
@@ -280,25 +296,26 @@ class _MyHomePageState extends State<MyHomePage>  {
     );
   }
 
+
+  // Future getGlobalCat() async{
+  //   var res = await db.getGlobalCat();
+  //   if (!mounted) return;
+  //   setState(() {
+  //     globalCat = res['user_details'];
+  //   });
+  // }
+
+
   ScrollController _scrollController = new ScrollController();
   bool _needsScroll = false;
   final _formKey = GlobalKey<FormState>();
-
-  List globalCat;
-  Future getGlobalCat() async{
-    var res = await db.getGlobalCat();
-    if (!mounted) return;
-    setState(() {
-      globalCat = res['user_details'];
-    });
-  }
 
   @override
   void initState(){
     futureLoadQuotes();
     listenCartCount();
     loadProfile();
-    getGlobalCat();
+    // getGlobalCat();
     loadProfilePic();
     // loadBu();
     super.initState();
@@ -310,9 +327,9 @@ class _MyHomePageState extends State<MyHomePage>  {
   void dispose() {
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
+    // getGlobalCat();
     return Scaffold(
       appBar: AppBar(
         brightness: Brightness.light,
@@ -363,38 +380,42 @@ class _MyHomePageState extends State<MyHomePage>  {
               ),
             ),
           ),
-          //   IconButton(
-          //     icon: Icon(Icons.person, color: Colors.black),
-          //     onPressed: () async {
-          //       SharedPreferences prefs = await SharedPreferences.getInstance();
-          //       String username = prefs.getString('s_customerId');
-          //       if(username == null){
-          //         await Navigator.of(context).push(_signIn());
-          //         listenCartCount();
-          //         loadProfile();
-          //       }else{
-          //         await Navigator.of(context).push(profile());
-          //         listenCartCount();
-          //         loadProfile();
-          //       }
-          //     }
-          // ),
+            IconButton(
+              icon: Icon(Icons.receipt_long_rounded, color: Colors.black,
+                size: 30.0,),
+              onPressed: () async {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                String username = prefs.getString('s_customerId');
+                if(username == null){
+                  await Navigator.of(context).push(_signIn());
+                  listenCartCount();
+                  loadProfile();
+                }else{
+                  await Navigator.of(context).push(_profilePage());
+                  listenCartCount();
+                  loadProfile();
+                }
+              }
+          ),
         ],
         // title: Text("Order Food",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Image.asset(
-              'assets/png/logo_raider8.2.png',
+              'assets/png/alturush_text_logo.png',
               fit: BoxFit.contain,
-              height: 60,
+              height: 45,
             ),
-            Container(
-                padding: const EdgeInsets.all(8.0), child: Text("Order Food",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),)
+            // Container(
+            //   padding: const EdgeInsets.all(8.0), child: Text("Order Food",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),)
           ],
         ),
       ),
+
+
       drawer:Container(
+
         color: Colors.deepOrange,
         width: 280,
         child: Drawer(
@@ -418,31 +439,33 @@ class _MyHomePageState extends State<MyHomePage>  {
                         height: 50.0,
                       ),
                       ListView.builder(
-                        shrinkWrap: true,
-                        physics: BouncingScrollPhysics(),
-                        itemCount:  globalCat == null ? 0 : globalCat.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: Colors.transparent,
-                                child: Image.network(globalCat[index]['cat_picture']),
-                              ),
-                              title: Text(globalCat[index]['category'],style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 16.0),),
-                              onTap: () async{
-                                Navigator.pop(context);
-                                if(globalCat[index]['id'] == '1'){
-                                  Navigator.of(context).push(_foodRoute(globalCat[index]['id']));
-                                }if(globalCat[index]['id'] == '2'){
-                                  Navigator.of(context).push(_groceryRoute(globalCat[index]['id']));
-                                }if(globalCat[index]['id'] == '3'){
-                                  Navigator.of(context).push(_foodRoute(globalCat[index]['id']));
+
+                          shrinkWrap: true,
+                          physics: BouncingScrollPhysics(),
+                          itemCount:  globalCat == null ? 0 : globalCat.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return ListTile(
+
+                                leading: CircleAvatar(
+                                  backgroundColor: Colors.transparent,
+                                  child: Image.network(globalCat[index]['cat_picture']),
+                                ),
+                                title: Text(globalCat[index]['category'],style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 16.0),),
+                                onTap: () async{
+                                  Navigator.pop(context);
+                                  if(globalCat[index]['id'] == '1'){
+                                    Navigator.of(context).push(_foodRoute(globalCat[index]['id']));
+                                  }if(globalCat[index]['id'] == '2'){
+                                    Navigator.of(context).push(_groceryRoute(globalCat[index]['id']));
+                                  }if(globalCat[index]['id'] == '3'){
+                                    Navigator.of(context).push(_foodRoute(globalCat[index]['id']));
+                                  }
                                 }
-                              }
-                          );
-                         }
+                            );
+                          }
                       ),
                       ListTile(
-                          leading: Icon(Icons.person,size: 30.0,),
+                          leading: Icon(Icons.person,size: 30.0, color: Colors.deepOrange,),
                           title: Text('Profile',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 16.0),),
                           onTap: () async{
                             Navigator.of(context).pop();
@@ -455,7 +478,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                           }
                       ),
                       ListTile(
-                          leading: Icon(Icons.add,size: 30.0,),
+                          leading: Icon(Icons.add,size: 30.0, color: Colors.deepOrange,),
                           title: Text('Manage discount',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 16.0),),
                           onTap: () async{
                             Navigator.of(context).pop();
@@ -468,7 +491,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                               loadProfile();
                               loadProfilePic();
                             }else{
-                              await Navigator.of(context).push(_loadCart());
+                              await Navigator.of(context).push(_showDiscountPerson());
                               getCounter();
                               listenCartCount();
                               loadProfile();
@@ -481,7 +504,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                       //   title: Text('About',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 16.0),),
                       // ),
                       ListTile(
-                          leading: Icon(Icons.info_outline,size: 30.0,),
+                          leading: Icon(Icons.info_outline,size: 30.0, color: Colors.deepOrange),
                           title: Text('Data privacy',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 16.0),),
                           onTap: () {
                             Navigator.of(context).pop();
@@ -526,7 +549,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                       height: 35.0,
                     ),
                     Center(
-                      child:Text("Howdy ${firstName.toString()}",style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 23.0),),
+                      child:Text("Good Day ${firstName.toString()}",style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 23.0),),
                     ),
                     Center(
                       child:Text(quotes,style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 15.0),),
@@ -559,6 +582,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                                 child: InkWell(
                                   borderRadius: BorderRadius.circular(30.0),
                                   onTap: (){
+                                    // debugPrint('${getProvinceData[1]['prov_name']}');
                                     selectProvince();
                                   },
                                   child: IgnorePointer(
@@ -601,6 +625,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                                 child: InkWell(
                                   borderRadius: BorderRadius.circular(30.0),
                                   onTap: (){
+
                                     selectTown();
                                   },
                                   child: IgnorePointer(
@@ -638,7 +663,11 @@ class _MyHomePageState extends State<MyHomePage>  {
                                   child: OutlinedButton(
                                     onPressed: (){
                                       if (_formKey.currentState.validate()) {
-                                        // loadBu();
+                                        // getGlobalCat();
+
+                                        loadBu();
+
+
                                       }
                                     },
                                     style: TextButton.styleFrom(
@@ -666,9 +695,13 @@ class _MyHomePageState extends State<MyHomePage>  {
                         itemBuilder: (BuildContext context, int index) {
                           return InkWell(
                             onTap: () async{
-                              await Navigator.of(context).push(_gotoTenants(buData[index]['logo'],buData[index]['business_unit'],buData[index]['bunit_code']));
+
+
+                              await Navigator.of(context).push(_globalCat(buData[index]['logo'],buData[index]['business_unit'],buData[index]['bunit_code']));
                               getCounter();
                               listenCartCount();
+
+
                             },
                             child:Container(
                               height: 120.0,
@@ -777,30 +810,14 @@ class _MyHomePageState extends State<MyHomePage>  {
         ),
       ),
     );
+
   }
+
 }
 
-Route _gotoTenants(buLogo,buName,buCode) {
+Route _signIn() {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => LoadTenants(buLogo:buLogo, buName:buName, buCode:buCode),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      var begin = Offset(1.0, 0.0);
-      var end = Offset.zero;
-      var curve = Curves.decelerate;
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
-}
-
-
-
-Route _loadCart(){
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => LoadCart(),
+    pageBuilder: (context, animation, secondaryAnimation) => CreateAccountSignIn(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;
@@ -815,9 +832,9 @@ Route _loadCart(){
 }
 
 
-Route viewIds() {
+Route profile(){
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => IdMasterFile(),
+    pageBuilder: (context, animation, secondaryAnimation) => ProfilePage(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1.0, 0.0);
       var end = Offset.zero;
@@ -830,10 +847,9 @@ Route viewIds() {
     },
   );
 }
-
-Route _signIn() {
+Route _profilePage() {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => CreateAccountSignIn(),
+    pageBuilder: (context, animation, secondaryAnimation) => TrackOrder(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;
@@ -879,10 +895,9 @@ Route _groceryRoute(_groceryRoute) {
   );
 }
 
-
-Route profile(){
+Route _showDiscountPerson() {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => ProfilePage(),
+    pageBuilder: (context, animation, secondaryAnimation) => DiscountManager(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1.0, 0.0);
       var end = Offset.zero;
@@ -895,3 +910,71 @@ Route profile(){
     },
   );
 }
+
+Route _loadCart() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => LoadCart(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(0.0, 1.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route _gotoTenants(buLogo,buName,buCode) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => LoadTenants(buLogo:buLogo, buName:buName, buCode:buCode),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route _globalCat(buLogo,buName,buCode) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => GlobalCat(buLogo:buLogo, buName:buName, buCode:buCode),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route _electronicsRoute(_electronicsRoute) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => ElectronicsApp(electronicsRoute:_electronicsRoute),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(0.0, 1.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+
+
+

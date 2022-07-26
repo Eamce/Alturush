@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sleek_button/sleek_button.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -264,7 +265,7 @@ class _AddNewAddress extends State<AddNewAddress> {
               borderRadius: BorderRadius.all(Radius.circular(8.0))
           ),
           contentPadding: EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
-          title: Text('Select Town',),
+          title: Text('Select Barangay',),
           content: Container(
             height: 300.0,
             width: 300.0,
@@ -416,6 +417,7 @@ class _AddNewAddress extends State<AddNewAddress> {
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
                         child:TextFormField(
+                          textCapitalization: TextCapitalization.words,
                           textInputAction: TextInputAction.done,
                           cursorColor: Colors.deepOrange.withOpacity(0.8),
                           controller: firstName,
@@ -448,6 +450,7 @@ class _AddNewAddress extends State<AddNewAddress> {
                       Padding(
                         padding: EdgeInsets.symmetric( horizontal: 30.0, vertical: 5.0),
                         child:TextFormField(
+                          textCapitalization: TextCapitalization.words,
                           textInputAction: TextInputAction.done,
                           cursorColor: Colors.deepOrange.withOpacity(0.8),
                           controller: lastName,
@@ -724,6 +727,7 @@ class _AddNewAddress extends State<AddNewAddress> {
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
                         child:TextFormField(
+                          textCapitalization: TextCapitalization.words,
                           cursorColor: Colors.deepOrange.withOpacity(0.8),
                           controller: houseUnit,
                           validator: (value) {
@@ -756,6 +760,7 @@ class _AddNewAddress extends State<AddNewAddress> {
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
                         child:TextFormField(
+                          textCapitalization: TextCapitalization.words,
                           cursorColor: Colors.deepOrange.withOpacity(0.8),
                           controller: streetPurok,
                           validator: (value) {
@@ -784,6 +789,7 @@ class _AddNewAddress extends State<AddNewAddress> {
                       Padding(
                         padding:EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
                         child: new TextFormField(
+                          textCapitalization: TextCapitalization.words,
                           keyboardType: TextInputType.multiline,
                           textInputAction: TextInputAction.done,
                           cursorColor: Colors.deepOrange,
@@ -848,5 +854,14 @@ class _AddNewAddress extends State<AddNewAddress> {
       ),
     );
   }
+}
 
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    return TextEditingValue(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
+    );
+  }
 }

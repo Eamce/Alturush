@@ -45,18 +45,17 @@ class _GroceryMain extends State<GroceryMain> with SingleTickerProviderStateMixi
   int provinceId;
   int townID;
 
-
-  Future loadBu() async{
-      var res = await db.getBusinessUnitsCi(unitGroupId,1);
-      if (!mounted) return;
-      setState(() {
-        buData = res['user_details'];
-      });
-      Timer(Duration(milliseconds:500), () {
-        _needsScroll = true;
-        _scrollToEnd();
-      });
-  }
+  // Future loadBu() async{
+  //     var res = await db.getBusinessUnitsCi(unitGroupId,1);
+  //     if (!mounted) return;
+  //     setState(() {
+  //       buData = res['user_details'];
+  //     });
+  //     Timer(Duration(milliseconds:500), () {
+  //       _needsScroll = true;
+  //       _scrollToEnd();
+  //     });
+  // }
 
   _scrollToEnd() async{
     if (_needsScroll) {
@@ -360,7 +359,7 @@ class _GroceryMain extends State<GroceryMain> with SingleTickerProviderStateMixi
             ),
           );
         });
-  }
+      }
 
   ScrollController _scrollController = new ScrollController();
   bool _needsScroll = false;
@@ -604,14 +603,12 @@ class _GroceryMain extends State<GroceryMain> with SingleTickerProviderStateMixi
                                           return null;
                                         },
                                         decoration: InputDecoration(
-
                                           contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
                                           focusedBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                                 color: Colors.deepOrange.withOpacity(0.8),
                                                 width: 2.0),
                                           ),
-
                                           border: OutlineInputBorder(
                                               borderRadius: BorderRadius.circular(30.0)),
                                         )
@@ -669,7 +666,7 @@ class _GroceryMain extends State<GroceryMain> with SingleTickerProviderStateMixi
                                   child: OutlinedButton(
                                     onPressed: (){
                                       if (_formKey.currentState.validate()) {
-                                        loadBu();
+                                        // loadBu();
                                       }
                                     },
                                     style: TextButton.styleFrom(
@@ -978,3 +975,4 @@ Route profile(){
     },
   );
 }
+
