@@ -27,8 +27,9 @@ class LoadStore extends StatefulWidget {
   final tenantCode;
   final tenantName;
   final globalID;
+  final buAcroname;
 
-  LoadStore({Key key, @required this.categoryName, this.categoryId, this.buCode,this.storeLogo, this.tenantCode, this.tenantName, this.globalID}) : super(key: key);
+  LoadStore({Key key, @required this.categoryName, this.categoryId, this.buCode,this.storeLogo, this.tenantCode, this.tenantName, this.globalID, this.buAcroname}) : super(key: key);
   @override
   _LoadStore createState() => _LoadStore();
 }
@@ -48,10 +49,13 @@ class _LoadStore extends State<LoadStore> {
   int gridCount;
   List listCounter;
   List listSubtotal;
+  List buData;
   var checkIfEmptyStore;
   var subtotal;
   Timer timer;
   String categoryName = "";
+  String acro;
+  List<String> buCo = [];
 
   Future checkEmptyStore() async{
     var res = await db.checkEmptyStore(widget.tenantCode);
@@ -63,6 +67,22 @@ class _LoadStore extends State<LoadStore> {
      }
   }
 
+  Future loadBu() async{
+    var res = await db.getBusinessUnitsCi();
+    if (!mounted) return;
+    setState(() {
+      buData = res['user_details'];
+
+      for (int i=0;i<buData.length;i++){
+        if (buData[i]['bunit_code'] == widget.buCode){
+          acro = buData[i]['acroname'];
+        }
+      }
+
+      print(acro);
+    });
+  }
+
   Future loadStore() async {
     setState(() {
       isLoading = true;
@@ -72,6 +92,7 @@ class _LoadStore extends State<LoadStore> {
     setState(() {
       isLoading = false;
       loadStoreData = res['user_details'];
+      // print(loadStoreData);
     });
   }
 
@@ -109,6 +130,7 @@ class _LoadStore extends State<LoadStore> {
   void initState() {
     super.initState();
     getCounter();
+    loadBu();
     loadProfile();
     loadProfilePic();
     if(widget.categoryName == 'All items'){
@@ -144,7 +166,7 @@ class _LoadStore extends State<LoadStore> {
                 children: [
                   Padding(
                     padding: EdgeInsets.fromLTRB(25.0, 20.0, 20.0, 20.0),
-                    child:Text("Category",style: TextStyle(fontSize: 25.0,fontWeight: FontWeight.bold),),
+                    child:Text("Category",style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold),),
                   ),
                   Expanded(
                     child: ListView(
@@ -161,6 +183,7 @@ class _LoadStore extends State<LoadStore> {
                                     onTap: () {
                                       Navigator.pop(context);
                                       if(index == 0){
+                                        categoryName = 'All items';
                                         getItemsByCategoriesAll();
                                       }else{
                                         categoryName = categoryData[index]['category'];
@@ -179,8 +202,8 @@ class _LoadStore extends State<LoadStore> {
                                           children: <Widget>[
                                             index == 0 ? ListTile(
                                           leading:Container(
-                                          width: 60.0,
-                                          height: 60.0,
+                                          width: 50.0,
+                                          height: 50.0,
                                           decoration: new BoxDecoration(
                                             image: new DecorationImage(
                                               image: new NetworkImage(categoryData[index]['image']),
@@ -193,11 +216,11 @@ class _LoadStore extends State<LoadStore> {
                                             ),
                                           ),
                                         ),
-                                        title: Text("All items",style: GoogleFonts.openSans(color: Colors.black54,fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 22.0),),
+                                        title: Text("All items",style: GoogleFonts.openSans(color: Colors.black54,fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 18.0),),
                                       ) : ListTile(
                                               leading:Container(
-                                                width: 60.0,
-                                                height: 60.0,
+                                                width: 50.0,
+                                                height: 50.0,
                                                 decoration: new BoxDecoration(
                                                   image: new DecorationImage(
                                                     image: new NetworkImage(categoryData[index]['image']),
@@ -210,7 +233,7 @@ class _LoadStore extends State<LoadStore> {
                                                   ),
                                                 ),
                                               ),
-                                              title: Text(categoryData[index]['category'].toString(),style: GoogleFonts.openSans(color: Colors.black54,fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 22.0),),
+                                              title: Text(categoryData[index]['category'].toString(),style: GoogleFonts.openSans(color: Colors.black54,fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 18.0),),
                                             ),
                                           ],
                                         ),
@@ -275,26 +298,26 @@ class _LoadStore extends State<LoadStore> {
           brightness: Brightness.light,
           backgroundColor: Colors.white,
           elevation: 0.1,
-          iconTheme: new IconThemeData(color: Colors.black),
+          iconTheme: new IconThemeData(color: Colors.black, size: 20),
           title: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Image.asset(
-                'assets/png/logo_raider8.2.png',
+                'assets/png/alturush_text_logo.png',
                 fit: BoxFit.contain,
-                height: 60,
+                height: 30,
               ),
-              Container(
-                padding: const EdgeInsets.all(8.0), child: Text("Store",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),)
+              // Container(
+              //   padding: const EdgeInsets.all(8.0), child: Text("Store",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),)
             ],
           ),
           leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.black,size: 23,),
+            icon: Icon(Icons.arrow_back, color: Colors.black54,size: 20,),
             onPressed: () => Navigator.of(context).pop(),
           ),
           actions: [
             IconButton(
-                icon: Icon(Icons.search_outlined, color: Colors.black),
+                icon: Icon(Icons.search_outlined, color: Colors.black54, size: 25),
                 onPressed: () async {
                   Navigator.of(context).push(_search());
                 }
@@ -305,7 +328,7 @@ class _LoadStore extends State<LoadStore> {
                 getCounter();
                 loadProfile();
               },
-              child: Text("Login",style: GoogleFonts.openSans(color:Colors.deepOrange,fontWeight: FontWeight.bold,fontSize: 18.0),),
+              child: Text("Login",style: GoogleFonts.openSans(color:Colors.deepOrange,fontWeight: FontWeight.bold,fontSize: 16.0),),
             ): InkWell(
               customBorder: CircleBorder(),
               onTap: () async{
@@ -324,8 +347,8 @@ class _LoadStore extends State<LoadStore> {
                 }
               },
               child: Container(
-                width: 70.0,
-                height: 70.0,
+                width: 50.0,
+                height: 50.0,
                 child: Padding(
                   padding:EdgeInsets.all(5.0),
                   child: profileLoading ? CircularProgressIndicator(
@@ -337,7 +360,7 @@ class _LoadStore extends State<LoadStore> {
               ),
             ),
             IconButton(
-                icon: Icon(Icons.receipt_long_rounded, color: Colors.black, size: 30.0,),
+                icon: Icon(Icons.receipt_long_rounded, color: Colors.black54, size: 25.0,),
                 onPressed: () async {
                   SharedPreferences prefs = await SharedPreferences.getInstance();
                   String username = prefs.getString('s_customerId');
@@ -384,7 +407,7 @@ class _LoadStore extends State<LoadStore> {
                         child: SizedBox(
                           height: 200.0,
                           child: Padding(
-                            padding: EdgeInsets.fromLTRB(30, 55, 30, 55),
+                            padding: EdgeInsets.fromLTRB(25, 55, 25, 55),
                             child: Card(
                               color: Colors.transparent,
                               child: new Column(
@@ -413,20 +436,20 @@ class _LoadStore extends State<LoadStore> {
                                       ),
                                     ),
                                     title: Text(
-                                      widget.tenantName,
+                                      '${widget.tenantName} - ${acro}',
                                       style: GoogleFonts.openSans(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
                                           fontStyle: FontStyle.normal,
-                                          fontSize: 15.0),
+                                          fontSize: 20.0),
                                     ),
-                                    subtitle: Text(
-                                      'Welcome! Select your best choice',
-                                      style: GoogleFonts.openSans(
-                                          color: Colors.white,
-                                          fontStyle: FontStyle.normal,
-                                          fontSize: 13.0),
-                                    ),
+                                    // subtitle: Text(
+                                    //   'Welcome! Select your best choice',
+                                    //   style: GoogleFonts.openSans(
+                                    //       color: Colors.white,
+                                    //       fontStyle: FontStyle.normal,
+                                    //       fontSize: 13.0),
+                                    // ),
                                     dense: true,
                                   ),
                                 ],
@@ -454,15 +477,10 @@ class _LoadStore extends State<LoadStore> {
                       Visibility(
                         visible: checkIfEmptyStore == false ? false : true,
                         child: Padding(
-                          padding: EdgeInsets.fromLTRB(10, 20, 5, 5),
-                          child: new Text(categoryName, style: GoogleFonts.openSans(fontWeight: FontWeight.bold, fontStyle: FontStyle.normal, fontSize: 20.0),),
+                          padding: EdgeInsets.fromLTRB(10, 15, 5, 15),
+                          child: new Text(categoryName, style: GoogleFonts.openSans(fontWeight: FontWeight.bold, fontStyle: FontStyle.normal, fontSize: 18.0),),
                         ),
                       ),
-
-                      SizedBox(
-                        height: 20.0,
-                      ),
-
                       Visibility(
                         visible: checkIfEmptyStore == false ? false : true,
                         replacement: Container(
@@ -603,7 +621,7 @@ class _LoadStore extends State<LoadStore> {
                             itemCount: loadStoreData == null ? 0 : loadStoreData.length,
                             gridDelegate:SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: gridCount,
-                              childAspectRatio: MediaQuery.of(context).size.width / (MediaQuery.of(context).size.height / 1.2),
+                              childAspectRatio: MediaQuery.of(context).size.width / (MediaQuery.of(context).size.height / 1.5),
                             ),
                             itemBuilder: (BuildContext context, int index) {
 
@@ -644,7 +662,7 @@ class _LoadStore extends State<LoadStore> {
 //                                          ),
                                         ),
                                         SizedBox(
-                                          height: 25,
+                                          height: 5,
                                         ),
                                         ListTile(
                                           title: Text(loadStoreData[index]['product_name'],
@@ -661,7 +679,7 @@ class _LoadStore extends State<LoadStore> {
                                           ),
                                         ),
                                         SizedBox(
-                                          height: 25,
+                                          height: 5,
                                         ),
                                       ],
                                     ),
@@ -749,6 +767,7 @@ class _LoadStore extends State<LoadStore> {
             Padding(
               padding:EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   SleekButton(
                     onTap: () {
@@ -759,11 +778,11 @@ class _LoadStore extends State<LoadStore> {
                       color: Colors.deepOrange,
                       inverted: false,
                       rounded: true,
-                      size: SleekButtonSize.big,
+                      size: SleekButtonSize.normal,
                       context: context,
                     ),
                     child: Center(
-                      child:Text("Categories",style: TextStyle(fontSize: 14.0),)
+                      child:Text("CATEGORIES",style: TextStyle(fontSize: 14.0),)
                     ),
                   ),
                   SizedBox(
@@ -785,10 +804,11 @@ class _LoadStore extends State<LoadStore> {
                           }
                         },
                         style: SleekButtonStyle.flat(
+
                           color: Colors.deepOrange,
                           inverted: false,
                           rounded: true,
-                          size: SleekButtonSize.big,
+                          size: SleekButtonSize.normal,
                           context: context,
                         ),
                         child: Center(
@@ -802,11 +822,11 @@ class _LoadStore extends State<LoadStore> {
                                 valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
                               ),
                             ),
-                          ) : Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          ) : Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Text("View cart  ${cartCount.toString()}",style: TextStyle(
+                              Center(
+                                child: Text("VIEW CART ${cartCount.toString()}",style: TextStyle(
                                   shadows: [
                                     Shadow(
                                       blurRadius: 1.0,
@@ -816,7 +836,9 @@ class _LoadStore extends State<LoadStore> {
                                   ],
                                   fontStyle: FontStyle.normal,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 13.0),),
+                                  fontSize: 14.0)
+                                ),
+                              )
 //                              Text("₱ ${oCcy.format(num.parse(subtotal.toString()))}",style: TextStyle(
 //                                  shadows: [
 //                                    Shadow(

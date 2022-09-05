@@ -340,24 +340,25 @@ class _CreateAccountSignIn extends State<CreateAccountSignIn>
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(8.0))),
           contentPadding: EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
-          title: Text(
-            'Hello!',
-            style: TextStyle(fontSize: 18.0),
-          ),
+          title: Text('DATA PRIVACY CONSENT', style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),),
           content: SingleChildScrollView(
             child: Padding(
                 padding: EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
-                child: Text(
-                    "Please read our data privacy notice before proceeding.")),
+                child: Text("I understand and agree that by providing my personal data or by clicking the applicable icon or button, I am agreeing "
+                    "to the Privacy Notice and giving any full consent to Alturas Group of Companies (AGC), its respective subsidiaries, "
+                    "affiliates, associated companies and jointly controlled entities as well as its partners and service providers. If any, to "
+                    "collect, store, access and/or process any personal data it may provide herein, such as but not limited to my name and "
+                    "email address, whether manually or electronically for the period allowed under the applicable law and regulations. "
+                    "\n"
+                    "\n"
+                    "I acknowledge that the collection and processing of my personal data is necessary for the purposes detailed in the "
+                    "Privacy Notice. I am aware of my right to be informed, to access, to object, to erasure or blocking, to damages, to file "
+                    "a complaint, to rectify and to data portability, and I understand that there are procedures, conditions and exceptions "
+                    "to be complied with in order to exercise or invoke such rights.", style: TextStyle(fontSize: 16.0))),
           ),
           actions: <Widget>[
             TextButton(
-              child: Text(
-                'Proceed',
-                style: TextStyle(
-                  color: Colors.deepOrange,
-                ),
-              ),
+              child: Text('I AGREE', style: TextStyle(fontSize: 18.0, color: Colors.deepOrange,fontWeight: FontWeight.bold),),
               onPressed: () async {
                 Navigator.of(context).pop();
                 await Navigator.of(context).push(_showDpn());
@@ -505,7 +506,7 @@ class _CreateAccountSignIn extends State<CreateAccountSignIn>
       } else if (checkPassword == true) {
         warning = "Notice!";
         alert =
-            "Must be at least 8 characters long with a number and an uppercase letter";
+            "Must be at least 8 characters long with a number, an uppercase letter and a special character";
         alertDialog(alert, warning);
         FocusScope.of(context).requestFocus(FocusNode());
       } else if (birthday.text.isEmpty) {
@@ -825,10 +826,17 @@ class _CreateAccountSignIn extends State<CreateAccountSignIn>
 //                fontStyle: FontStyle.normal,
 //                fontSize: 24.0),
 //          ),
-            title: Image.asset(
-              'assets/png/alturush_text_logo.png',
-              height: 100.0,
-              width: 130.0,
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Image.asset(
+                  'assets/png/alturush_text_logo.png',
+                  fit: BoxFit.contain,
+                  height: 45,
+                ),
+                // Container(
+                //   padding: const EdgeInsets.all(8.0), child: Text("Order Food",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),)
+              ],
             ),
           ),
         ),
@@ -1123,7 +1131,7 @@ class _CreateAccountSignIn extends State<CreateAccountSignIn>
                                 setState(() {
                                   checkPassword = true;
                                   passwordError =
-                                      "Must be at least 8 characters long with a number and an uppercase letter";
+                                      "Must be at least 8 characters long with a number, an uppercase letter and a special character";
                                 });
                               } else {
                                 setState(() {

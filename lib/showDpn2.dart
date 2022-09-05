@@ -30,7 +30,7 @@ class _ShowDpn extends State<ShowDpn2> {
         backgroundColor: Colors.white,
         elevation: 0.1,
         automaticallyImplyLeading: false,
-        title: Text("Data privacy notice",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
+        title: Text("Privacy Notice",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,6 +40,10 @@ class _ShowDpn extends State<ShowDpn2> {
               child: ListView(
                 shrinkWrap: true,
                 children: [
+                  Padding(
+                    padding:EdgeInsets.fromLTRB(10.0, 5.0, 0.0, 10.0),
+                    child:Text("Effective: March 13, 2020",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16, color: Colors.black54),),
+                  ),
                   Padding(
                     padding:EdgeInsets.fromLTRB(10.0, 5.0, 0.0, 5.0),
                       child:Text("SCOPE OF THIS NOTICE",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 17,),),

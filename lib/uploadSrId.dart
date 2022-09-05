@@ -15,19 +15,29 @@ class UploadSrImage extends StatefulWidget {
 
 class _UploadSrImage extends State<UploadSrImage> {
   final db = RapidA();
-  File _image;
-  File _imageBooklet;
-  String newFileName;
+  final _formKey = GlobalKey<FormState>();
   final _idType = TextEditingController();
   final _name = TextEditingController();
   final _idNumber = TextEditingController();
   final _imageTxt = TextEditingController();
-
   final picker = ImagePicker();
-  List<String> selectedImages = List();
-  final _formKey = GlobalKey<FormState>();
+
+  File _image;
+  File _imageBooklet;
+
+  List<String> selectedImages = [];
+  List<String> _loadDiscount = [];
+  List<String> _loadDiscountID = [];
+  List loadDiscountID;
   List loadDiscount;
+
+  String newFileName;
+  String selectedValue;
+
+
   var discountId;
+  var discountID;
+  var id;
 
   camera() async{
     final pickedFile = await picker.getImage(source: ImageSource.camera);
@@ -39,7 +49,6 @@ class _UploadSrImage extends State<UploadSrImage> {
       }
     });
   }
-
 
   bookletCamera() async{
     final pickedFile = await picker.getImage(source: ImageSource.camera);
@@ -63,6 +72,32 @@ class _UploadSrImage extends State<UploadSrImage> {
       Navigator.of(context).pop();
       successMessage();
     }
+  }
+
+  Future showDiscount() async{
+    var res = await db.showDiscount();
+    if (!mounted) return;
+    setState(() {
+      loadDiscount = res['user_details'];
+      for (int i=0;i<loadDiscount.length;i++){
+        _loadDiscount.add(loadDiscount[i]['discount_name']);
+        _loadDiscountID.add(loadDiscount[i]['id']);
+      }
+    });
+    print(loadDiscount);
+    print(_loadDiscount);
+    print(_loadDiscountID);
+  }
+
+  Future getDiscountID(name) async{
+    var res = await db.getDiscountID(name);
+    if (!mounted) return;
+    setState(() {
+      loadDiscountID = res['user_details'];
+      print(loadDiscountID[0]['discount_id']);
+      discountID = loadDiscountID[0]['discount_id'];
+      print(discountID);
+    });
   }
 
   loading(){
@@ -134,56 +169,56 @@ class _UploadSrImage extends State<UploadSrImage> {
     );
   }
 
-   showDiscount() async{
-    var res = await db.showDiscount();
-    if (!mounted) return;
-    setState(() {
-      loadDiscount = res['user_details'];
-    });
-    showDialog<void>(
-      context: context,
-      barrierDismissible: true, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8.0))
-          ),
-          title: Text("Select Type"),
-          contentPadding: EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
-          content: Container(
-            height:200.0, // Change as per your requirement
-            width: 100.0, // Change as per your requirement
-            child: Scrollbar(
-              child: ListView.builder(
-                physics: BouncingScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: loadDiscount == null ? 0 : loadDiscount.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return InkWell(
-                    onTap: (){
-                      discountId = loadDiscount[index]['id'];
-                      _idType.text = loadDiscount[index]['discount_name'];
-                      Navigator.of(context).pop();
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(25.0, 15.0, 25.0, 15.0),
-                      child:Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(loadDiscount[index]['discount_name'],style: TextStyle(fontSize: 15.0,fontWeight: FontWeight.bold)),
-                         ],
-                      ),
-                      //                       child: Text('$f. ${lGetAmountPerTenant[index]['d_bu_name']} - ${lGetAmountPerTenant[index]['d_tenant']}  ₱${oCcy.format(double.parse(lGetAmountPerTenant[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
+  //  showDiscount() async{
+  //   var res = await db.showDiscount();
+  //   if (!mounted) return;
+  //   setState(() {
+  //     loadDiscount = res['user_details'];
+  //   });
+  //   showDialog<void>(
+  //     context: context,
+  //     barrierDismissible: true, // user must tap button!
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         shape: RoundedRectangleBorder(
+  //             borderRadius: BorderRadius.all(Radius.circular(8.0))
+  //         ),
+  //         title: Text("Select Type"),
+  //         contentPadding: EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
+  //         content: Container(
+  //           height:200.0, // Change as per your requirement
+  //           width: 100.0, // Change as per your requirement
+  //           child: Scrollbar(
+  //             child: ListView.builder(
+  //               physics: BouncingScrollPhysics(),
+  //               shrinkWrap: true,
+  //               itemCount: loadDiscount == null ? 0 : loadDiscount.length,
+  //               itemBuilder: (BuildContext context, int index) {
+  //                 return InkWell(
+  //                   onTap: (){
+  //                     discountId = loadDiscount[index]['id'];
+  //                     _idType.text = loadDiscount[index]['discount_name'];
+  //                     Navigator.of(context).pop();
+  //                   },
+  //                   child: Padding(
+  //                     padding: EdgeInsets.fromLTRB(25.0, 15.0, 25.0, 15.0),
+  //                     child:Row(
+  //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                       children: [
+  //                         Text(loadDiscount[index]['discount_name'],style: TextStyle(fontSize: 15.0,fontWeight: FontWeight.bold)),
+  //                        ],
+  //                     ),
+  //                     //                       child: Text('$f. ${lGetAmountPerTenant[index]['d_bu_name']} - ${lGetAmountPerTenant[index]['d_tenant']}  ₱${oCcy.format(double.parse(lGetAmountPerTenant[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
+  //                   ),
+  //                 );
+  //               },
+  //             ),
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 
   @override
   void initState() {
@@ -218,117 +253,110 @@ class _UploadSrImage extends State<UploadSrImage> {
                 shrinkWrap: true,
                 children: [
                   Padding(
-                    padding: EdgeInsets.fromLTRB(35, 15, 5, 0),
-                    child: new Text(
-                      "ID type",
-                      style: GoogleFonts.openSans(
-                          fontStyle: FontStyle.normal, fontSize: 15.0),
-                    ),
+                      padding: EdgeInsets.fromLTRB(20, 0, 0, 10),
+                      child: Text('Discount Type',style: GoogleFonts.openSans(fontStyle: FontStyle.normal, fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.black54),)
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
-                    child:InkWell(
-                      onTap: (){
-                        FocusScope.of(context).requestFocus(FocusNode());
-                        showDiscount();
-                      },
-                      child: IgnorePointer(
-                        child: TextFormField(
-                          textInputAction: TextInputAction.done,
-                          cursorColor: Colors.deepOrange.withOpacity(0.8),
-                          controller: _idType,
-                          validator: (value) {
-                            if (value.isEmpty) {
-                              return 'Please enter some value';
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Colors.deepOrange
-                                      .withOpacity(0.8),
-                                  width: 2.0),
-                            ),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(3.0)),
-                          ),
+                    padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                    child: DropdownButtonFormField(
+                      decoration: InputDecoration(
+                        //Add isDense true and zero Padding.
+                        //Add Horizontal padding using buttonPadding and Vertical padding by increasing buttonHeight instead of add Padding here so that The whole TextField Button become clickable, and also the dropdown menu open under The whole TextField Button.
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 10,
                         ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        //Add more decoration as you want here
+                        //Add label If you want but add hint outside the decoration to be aligned in the button perfectly.
                       ),
+                      isExpanded: true,
+                      hint: const Text(
+                        'Select Discount Type', style: TextStyle(fontStyle: FontStyle.normal, fontSize: 14, fontWeight: FontWeight.normal, color: Colors.black),
+                      ),
+                      icon: const Icon(
+                        Icons.arrow_drop_down,
+                        color: Colors.black45,
+                      ),
+                      iconSize: 30,
+                      items: _loadDiscount
+                          .map((item) =>
+                          DropdownMenuItem<String>(
+                            value: item,
+                            child: Text(
+                              item,
+                              style: GoogleFonts.openSans(fontStyle: FontStyle.normal, fontSize: 14.0, fontWeight: FontWeight.bold, color: Colors.black54),
+                            ),
+                          ))
+                          .toList(),
+                      // ignore: missing_return
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Please select discount type!';
+                        }
+                      },
+                      onChanged: (value) {
+                        setState(() {
+                          selectedValue = value;
+                          id = _loadDiscount.indexOf(value);
+                          print(id + 1);
+
+                          getDiscountID(selectedValue);
+                        });
+                        //Do something when changing the item if you want.
+                      },
+                      onSaved: (value) {
+                        selectedValue = value.toString();
+                        print(selectedValue);
+                      },
                     ),
                   ),
+
                   Padding(
-                    padding: EdgeInsets.fromLTRB(35, 15, 5, 0),
-                    child: new Text(
-                      "Full Name",
-                      style: GoogleFonts.openSans(
-                          fontStyle: FontStyle.normal, fontSize: 15.0),
-                    ),
+                      padding: EdgeInsets.fromLTRB(20, 10, 0, 10),
+                      child: Text('Full Name',style: GoogleFonts.openSans(fontStyle: FontStyle.normal, fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.black54),)
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric( horizontal: 30.0, vertical: 5.0),
-                    child:TextFormField(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: TextFormField(
+                      textCapitalization: TextCapitalization.words,
                       textInputAction: TextInputAction.done,
                       cursorColor: Colors.deepOrange.withOpacity(0.8),
                       controller: _name,
+                      decoration: InputDecoration(
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide(
+                              color: Colors.deepOrange.withOpacity(0.7),
+                              width: 2.0),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 10,
+                        ),
+                        hintText: 'Full Name ex. (Lastname, Firstname)',
+                        hintStyle: const TextStyle(fontStyle: FontStyle.normal, fontSize: 14, fontWeight: FontWeight.normal, color: Colors.black),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
                       validator: (value) {
                         if (value.isEmpty) {
-                          return 'Please enter some value';
+                          return 'Please enter some value!';
                         }
                         return null;
                       },
-                      decoration: InputDecoration(contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Colors.deepOrange
-                                  .withOpacity(0.8),
-                              width: 2.0),
-                        ),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(3.0)),
-                      ),
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.fromLTRB(35, 15, 5, 0),
-                    child: new Text(
-                      "ID number",
-                      style: GoogleFonts.openSans(
-                          fontStyle: FontStyle.normal, fontSize: 15.0),
-                    ),
+                      padding: EdgeInsets.fromLTRB(20, 10, 0, 10),
+                      child: Text('ID. Picture',style: GoogleFonts.openSans(fontStyle: FontStyle.normal, fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.black54),)
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
-                    child:TextFormField(
-                      cursorColor: Colors.deepOrange.withOpacity(0.8),
-                      controller: _idNumber,
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return 'Please enter some value';
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Colors.deepOrange.withOpacity(0.8),
-                              width: 2.0),
-                        ),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(3.0)),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(35, 15, 5, 0),
-                    child: new Text(
-                      "Upload id image",
-                      style: GoogleFonts.openSans(
-                          fontStyle: FontStyle.normal, fontSize: 15.0),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                    padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
                     child:InkWell(
                       onTap: (){
                         FocusScope.of(context).requestFocus(FocusNode());
@@ -337,25 +365,58 @@ class _UploadSrImage extends State<UploadSrImage> {
                       child: IgnorePointer(
                         child: TextFormField(
                           textInputAction: TextInputAction.done,
-                          cursorColor: Colors.deepOrange.withOpacity(0.8),
+                          cursorColor: Colors.deepOrange.withOpacity(0.5),
                           controller: _imageTxt,
                           validator: (value) {
                             if (value.isEmpty) {
-                              return 'Please capture an image';
+                              return 'Please capture an image!';
                             }
                             return null;
                           },
-                          decoration: InputDecoration(contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 25.0),
+                          decoration: InputDecoration(
+                            hintText: 'No File Choosen',
+                            hintStyle: const TextStyle(fontStyle: FontStyle.normal, fontSize: 14, fontWeight: FontWeight.normal, color: Colors.black),
+                            contentPadding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 25.0),
                             prefixIcon: Icon(Icons.camera_alt_outlined,color: Colors.grey,),
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                  color: Colors.deepOrange.withOpacity(0.8),
+                                  color: Colors.deepOrange.withOpacity(0.5),
                                   width: 2.0),
                             ),
                             border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(3.0)),
+                                borderRadius: BorderRadius.circular(15)),
                           ),
                         ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                      padding: EdgeInsets.fromLTRB(20, 10, 0, 10),
+                      child: Text('ID. Number',style: GoogleFonts.openSans(fontStyle: FontStyle.normal, fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.black54),)
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                    child:TextFormField(
+                      cursorColor: Colors.deepOrange.withOpacity(0.8),
+                      controller: _idNumber,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Please enter some value!';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'ID. Number',
+                        hintStyle: TextStyle(fontStyle: FontStyle.normal, fontSize: 14, fontWeight: FontWeight.normal, color: Colors.black),
+                        contentPadding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 25.0),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide(
+                              color: Colors.deepOrange.withOpacity(0.7),
+                              width: 2.0),
+                        ),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15.0)),
                       ),
                     ),
                   ),

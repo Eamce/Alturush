@@ -7,6 +7,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
+import 'homePage.dart';
 import 'profile/changePassword.dart';
 import 'profile/addressMasterFile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -92,6 +93,7 @@ class _ProfilePage extends State<ProfilePage> {
       await db.uploadProfilePic(base64Image);
       Navigator.of(context).pop();
       successMessage();
+      loadProfile();
     }
   }
 
@@ -254,8 +256,8 @@ class _ProfilePage extends State<ProfilePage> {
           title: Text("Profile",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
           actions: <Widget>[
             IconButton(
-                icon: Icon(Icons.receipt_long_rounded, color: Colors.black,
-                size: 30.0,),
+                icon: Icon(Icons.receipt_long_rounded, color: Colors.black54,
+                size: 25.0,),
                 onPressed: () async {
                   SharedPreferences prefs = await SharedPreferences.getInstance();
                   String username = prefs.getString('s_customerId');
@@ -425,13 +427,9 @@ class _ProfilePage extends State<ProfilePage> {
                           onTap: () async{
                             SharedPreferences prefs = await SharedPreferences.getInstance();
                             prefs.clear();
-                            // Navigator.of(context).pop();
-                            // Navigator.of(context).pop();
-                            // Navigator.of(context).pop();
-                            // Navigator.of(context).pop();
                             Navigator.of(context).pop();
                             Navigator.of(context).pop();
-                            Navigator.of(context).push(createAccountSignInRoute());
+                            Navigator.of(context).push(_homepage());
                           },
                           child: Card(
                             elevation: 0.0,
@@ -455,6 +453,22 @@ class _ProfilePage extends State<ProfilePage> {
       ),
     );
   }
+}
+
+Route _homepage() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => HomePage(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(0.0, 1.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
 }
 
 Route changePassword() {

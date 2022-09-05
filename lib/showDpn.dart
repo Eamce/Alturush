@@ -61,7 +61,7 @@ class _ShowDpn extends State<ShowDpn> {
           onPressed: () => Navigator.of(context).maybePop(),
         ),
         automaticallyImplyLeading: false,
-        title: Text("Data privacy notice",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
+        title: Text("Privacy Notice",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,6 +72,10 @@ class _ShowDpn extends State<ShowDpn> {
                 controller: scrollController,
                 shrinkWrap: true,
                 children: [
+                  Padding(
+                    padding:EdgeInsets.fromLTRB(10.0, 5.0, 0.0, 10.0),
+                    child:Text("Effective: March 13, 2020",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16, color: Colors.black54),),
+                  ),
                   Padding(
                     padding:EdgeInsets.fromLTRB(10.0, 5.0, 0.0, 5.0),
                       child:Text("SCOPE OF THIS NOTICE",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 17,),),

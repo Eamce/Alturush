@@ -240,6 +240,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                       town.text = getTownData[index]['town_name'];
                       townID = int.parse(getTownData[index]['town_id']);
                       unitGroupId = int.parse(getTownData[index]['bunit_group_id']);
+                      print(getTownData[index]['bunit_group_id']);
                       Navigator.of(context).pop();
                     },
                     child: ListTile(

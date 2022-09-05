@@ -28,8 +28,6 @@ class _LoadCart extends State<LoadCart> {
   var isLoading = true;
   var checkOutLoading = true;
   var profileLoading = true;
-  var subTotal;
-
   var labelFlavor = "";
   var labelDrinks = "";
   var labelFries = "";
@@ -40,12 +38,14 @@ class _LoadCart extends State<LoadCart> {
   int drinksGroupValue;
   int friesGroupValue;
   int sidesGroupValue;
-
   int flavorId;
   int drinkId, drinkUom;
   int friesId, friesUom;
   int sideId, sideUom;
   int grandTotal = 0;
+  int subTotal = 0;
+  int index = 0;
+  int option;
 
   var boolFlavorId = false;
   var boolDrinkId = false;
@@ -57,18 +57,29 @@ class _LoadCart extends State<LoadCart> {
   List loadFlavors;
   List loadAddons;
   List loadTotalData;
+  List loadTotalPrice;
   List getBu;
+  List<String> totalPrice = [];
+  String totPrice;
+  final _formKey = GlobalKey<FormState>();
+  var stores;
+  var items;
+
+  List<String> _options = ['Pay via Cash/COD']; // Option 2
+  String _selectOption; // Option 2
 
   Future loadCart() async {
     var res = await db.loadCartData();
     if (!mounted) return;
     setState(() {
-      isLoading = false;
+
       loadCartData = res['user_details'];
       loadIMainItems = loadCartData;
-
+      items = loadCartData.length;
+      isLoading = false;
     });
   }
+
 
   String status;
   Future loadProfilePic() async {
@@ -90,6 +101,8 @@ class _LoadCart extends State<LoadCart> {
     if (!mounted) return;
     setState(() {
       getBu = res['user_details'];
+      stores = getBu.length;
+      print(getBu);
     });
   }
 
@@ -97,10 +110,13 @@ class _LoadCart extends State<LoadCart> {
     var res = await db.loadSubTotal();
     if (!mounted) return;
     setState(() {
-      isLoading = false;
+
       loadTotalData = res['user_details'];
       grandTotal = int.parse(loadTotalData[0]['grand_total'].toString());
+      isLoading = false;
     });
+    print(grandTotal);
+
   }
 
   viewAddon(BuildContext context, mainItemIndex) {
@@ -115,163 +131,178 @@ class _LoadCart extends State<LoadCart> {
         builder: (ctx) {
           return Container(
             height: MediaQuery.of(context).size.height * 0.4,
-            child: Container(
-              child: Scrollbar(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // loadFlavors
-                    // loadAddons
-                    SizedBox(height: 15.0),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(25.0, 0.0, 20.0, 0.0),
-                      child: Text(
-                        "Add ons",
-                        style: TextStyle(
-                            fontSize: 20.0, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    //addon
-                    ListView.builder(
-                      physics: BouncingScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: loadIMainItems[mainItemIndex]['addons'].length == null ? 0 : loadIMainItems[mainItemIndex]['addons'].length,
-                      itemBuilder: (BuildContext context, int index) {
-                        if(loadIMainItems[mainItemIndex]['addons'][index]['unit_measure'] == null){
-                          return Padding(
-                            padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 5.0),
-                            child: Container(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                      child: Text(
-                                        ' + ${loadIMainItems[mainItemIndex]['addons'][index]['product_name']} - ₱ ${loadIMainItems[mainItemIndex]['addons'][index]['addon_price']}',
-                                        style: TextStyle(fontSize: 18.0,), maxLines: 6, overflow: TextOverflow.ellipsis,
-                                      )
-                                  ),
-                                ],
-                              ),
-                            ),
-//                          child: Text('$f. ${lGetAmountPerTenant[index]['d_bu_name']} - ${lGetAmountPerTenant[index]['d_tenant']}  ₱${oCcy.format(double.parse(lGetAmountPerTenant[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
-                          );
-                        }
-                          return Padding(
-                            padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 5.0),
-                            child: Container(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                      child: Text(
-                                        ' + ${loadIMainItems[mainItemIndex]['addons'][index]['product_name']} ${loadIMainItems[mainItemIndex]['addons'][index]['unit_measure']} - ₱ ${loadIMainItems[mainItemIndex]['addons'][index]['addon_price']}',
-                                        style: TextStyle(fontSize: 18.0,), maxLines: 6, overflow: TextOverflow.ellipsis,
-                                      )
-                                  ),
-                                ],
-                              ),
-                            ),
-//                          child: Text('$f. ${lGetAmountPerTenant[index]['d_bu_name']} - ${lGetAmountPerTenant[index]['d_tenant']}  ₱${oCcy.format(double.parse(lGetAmountPerTenant[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
-                          );
-
-                      },
-                    ),
-
-                    ListView.builder(
-                      physics: BouncingScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: loadIMainItems[mainItemIndex]['choices'].length == null ? 0 : loadIMainItems[mainItemIndex]['choices'].length,
-                      itemBuilder: (BuildContext context, int index) {
-                        if(loadIMainItems[mainItemIndex]['choices'][index]['unit_measure'] == null) {
-                          return Padding(
-                            padding:
-                            EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 5.0),
-                            child: Container(
-                              child: Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                      child: Text(
-                                        ' + ${loadIMainItems[mainItemIndex]['choices'][index]['product_name']} - ₱ ${loadIMainItems[mainItemIndex]['choices'][index]['addon_price']}',
-                                        style: TextStyle(
-                                          fontSize: 18.0,
-                                        ),
-                                        maxLines: 6,
-                                        overflow: TextOverflow.ellipsis,
-                                      )),
-                                ],
-                              ),
-                            ),
-//                          child: Text('$f. ${lGetAmountPerTenant[index]['d_bu_name']} - ${lGetAmountPerTenant[index]['d_tenant']}  ₱${oCcy.format(double.parse(lGetAmountPerTenant[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
-                          );
-                        }
-                            return Padding(
-                              padding:
-                              EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 5.0),
-                              child: Container(
-                                child: Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                        child: Text(
-                                          ' + ${loadIMainItems[mainItemIndex]['choices'][index]['product_name']} ${loadIMainItems[mainItemIndex]['choices'][index]['unit_measure']} - ₱ ${loadIMainItems[mainItemIndex]['choices'][index]['addon_price']}',
-                                          style: TextStyle(
-                                            fontSize: 18.0,
-                                          ),
-                                          maxLines: 6,
-                                          overflow: TextOverflow.ellipsis,
-                                        )),
-                                  ],
-                                ),
-                              ),
-//                          child: Text('$f. ${lGetAmountPerTenant[index]['d_bu_name']} - ${lGetAmountPerTenant[index]['d_tenant']}  ₱${oCcy.format(double.parse(lGetAmountPerTenant[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
-                            );
-                      },
-                    ),
-                    ListView.builder(
-                      physics: BouncingScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: loadIMainItems == null ? 0 : loadIMainItems.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        var f = index;
-                        if (f == mainItemIndex) {
-                          if (loadIMainItems[mainItemIndex]['flavors'].length >
-                              0) {
-                            return Padding(
-                              padding:
-                              EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 5.0),
-                              child: Container(
-                                child: Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                        child: Text(
-                                          ' + ${loadIMainItems[mainItemIndex]['flavors'][0]['flavor']} - ₱ ${loadIMainItems[mainItemIndex]['flavors'][0]['addon_price']}',
-                                          style: TextStyle(
-                                            fontSize: 18.0,
-                                          ),
-                                          maxLines: 6,
-                                          overflow: TextOverflow.ellipsis,
-                                        )),
-                                  ],
-                                ),
-                              ),
-//                          child: Text('$f. ${lGetAmountPerTenant[index]['d_bu_name']} - ${lGetAmountPerTenant[index]['d_tenant']}  ₱${oCcy.format(double.parse(lGetAmountPerTenant[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
-                            );
-                          }
-                          return SizedBox();
-                        }
-                        return SizedBox();
-                      },
-                    ),
-                  ],
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // loadFlavors
+                // loadAddons
+                Padding(
+                  padding: EdgeInsets.fromLTRB(10.0, 10.0, 0.0, 0.0),
+                  child: Text(
+                    "Add ons",
+                    style: TextStyle(
+                        fontSize: 20.0, fontWeight: FontWeight.bold, color: Colors.deepOrangeAccent),
+                  ),
                 ),
 
+                Divider(thickness: 2, color: Colors.deepOrangeAccent,),
+
+                Expanded(
+                  child: Scrollbar(
+                    child: ListView(
+                      shrinkWrap: true,
+                      children: <Widget>[
+                        ListView.builder(
+                          physics: BouncingScrollPhysics(),
+                          padding: EdgeInsets.all(0),
+                          shrinkWrap: true,
+                          itemCount: loadIMainItems == null ? 0 : loadIMainItems.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            String flavorPrice;
+                            var f = index;
+                            if (f == mainItemIndex) {
+                              if (loadIMainItems[mainItemIndex]['flavors'].length > 0) {
+                                if (loadIMainItems[mainItemIndex]['flavors'][0]['addon_price'] == '0.00'){
+                                  flavorPrice = "";
+                                }else{
+                                  flavorPrice = (' ₱ ${loadIMainItems[mainItemIndex]['flavors'][0]['addon_price']}');
+                                }
+                                return Padding(
+                                  padding:
+                                  EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
+                                  child: Container(
+                                    child: Row(
+                                      mainAxisAlignment : MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Expanded(
+                                            child: Text(
+                                              '+ ${loadIMainItems[mainItemIndex]['flavors'][0]['flavor']} ${flavorPrice}',
+                                              style: TextStyle(
+                                                fontSize: 14.0,
+                                              ),
+                                              maxLines: 6,
+                                              overflow: TextOverflow.ellipsis,
+                                            )
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
+                            return SizedBox();
+                          },
+                        ),
+
+                        ListView.builder(
+                          padding: EdgeInsets.all(0),
+                          physics: BouncingScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: loadIMainItems[mainItemIndex]['choices'].length == null ? 0 : loadIMainItems[mainItemIndex]['choices'].length,
+                          itemBuilder: (BuildContext context, int index) {
+                            String choicesPrice;
+                            if (loadIMainItems[mainItemIndex]['choices'][index]['addon_price'] == '0.00') {
+                              choicesPrice = "";
+                            } else {
+                              choicesPrice = ('- ₱ ${loadIMainItems[mainItemIndex]['choices'][index]['addon_price']}');
+                            }
+                            if(loadIMainItems[mainItemIndex]['choices'][index]['unit_measure'] == null) {
+                              return Padding(
+                                padding:
+                                EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
+                                child: Container(
+                                  child: Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      Expanded(
+                                          child: Text(
+                                            ' ${loadIMainItems[mainItemIndex]['choices'][index]['product_name']} ${choicesPrice}',
+                                            style: TextStyle(
+                                              fontSize: 14.0,
+                                            ),
+                                            maxLines: 6,
+                                            overflow: TextOverflow.ellipsis,)
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }
+                            return Padding(
+                              padding:
+                              EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
+                              child: Container(
+                                child: Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Expanded(
+                                        child: Text(
+                                          ' + ${loadIMainItems[mainItemIndex]['choices'][index]['product_name']} - ${loadIMainItems[mainItemIndex]['choices'][index]['unit_measure']} ${choicesPrice}',
+                                          style: TextStyle(
+                                            fontSize: 14.0,
+                                          ),
+                                          maxLines: 6,
+                                          overflow: TextOverflow.ellipsis,
+                                        )
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        //addon
+                        ListView.builder(
+                          padding: EdgeInsets.all(0),
+                          physics: BouncingScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: loadIMainItems[mainItemIndex]['addons'].length == null ? 0 : loadIMainItems[mainItemIndex]['addons'].length,
+                          itemBuilder: (BuildContext context, int index) {
+                            if(loadIMainItems[mainItemIndex]['addons'][index]['unit_measure'] == null){
+                              return Padding(
+                                padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
+                                child: Container(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      Expanded(
+                                          child: Text(
+                                            ' + ${loadIMainItems[mainItemIndex]['addons'][index]['product_name']} - ₱ ${loadIMainItems[mainItemIndex]['addons'][index]['addon_price']}',
+                                            style: TextStyle(fontSize: 14.0,), maxLines: 6, overflow: TextOverflow.ellipsis,
+                                          )
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }
+                            return Padding(
+                              padding: EdgeInsets.fromLTRB(10.0, 5.0, 25.0, 5.0),
+                              child: Container(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Expanded(
+                                        child: Text(
+                                          ' + ${loadIMainItems[mainItemIndex]['addons'][index]['product_name']} ${loadIMainItems[mainItemIndex]['addons'][index]['unit_measure']} - ₱ ${loadIMainItems[mainItemIndex]['addons'][index]['addon_price']}',
+                                          style: TextStyle(fontSize: 14.0,), maxLines: 6, overflow: TextOverflow.ellipsis,
+                                        )
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  )
+                )
+              ],
             ),
-            ),
+
           );
         });
   }
@@ -280,8 +311,10 @@ class _LoadCart extends State<LoadCart> {
     var res = await db.getAmountPerTenant();
     if (!mounted) return;
     setState(() {
-      isLoading = false;
+
       lGetAmountPerTenant = res['user_details'];
+      isLoading = false;
+      print(lGetAmountPerTenant);
     });
     showModalBottomSheet(
         isScrollControlled: true,
@@ -294,51 +327,120 @@ class _LoadCart extends State<LoadCart> {
         builder: (ctx) {
           return Container(
             height: MediaQuery.of(context).size.height * 0.4,
-            child: Container(
+            child:Container(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 10.0),
                   Padding(
-                    padding: EdgeInsets.fromLTRB(25.0, 0.0, 20.0, 0.0),
+                    padding: EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 0.0),
                     child: Text(
-                      "Your stores",
-                      style: TextStyle(
-                          fontSize: 18.0, fontWeight: FontWeight.bold),
-                    ),
+                      "YOUR STORES",
+                      style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.deepOrangeAccent),),
                   ),
-                  Scrollbar(
-                    child: ListView.builder(
-                      physics: BouncingScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: lGetAmountPerTenant == null ? 0 : lGetAmountPerTenant.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        var f = index;
-                        f++;
-                        return Padding(
-                          padding: EdgeInsets.fromLTRB(25.0, 15.0, 25.0, 5.0),
-                          child: Container(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                    '$f. ${lGetAmountPerTenant[index]['bu_name']} ${lGetAmountPerTenant[index]['tenant_name']} ',
-                                    style: TextStyle(
-                                        fontSize: 15.0,
-                                        fontWeight: FontWeight.bold)),
-                                Text(
-                                    '₱${oCcy.format(int.parse(lGetAmountPerTenant[index]['total'].toString()))}',
-                                    style: TextStyle(
-                                        fontSize: 15.0,
-                                        fontWeight: FontWeight.bold)),
-                              ],
-                            ),
+                  Divider(thickness: 2,),
+                  Expanded(
+                    child: Scrollbar(
+                      child: ListView(
+                        shrinkWrap: true,
+                        children: [
+                          ListView.builder(
+                            physics: BouncingScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: lGetAmountPerTenant == null ? 0 : lGetAmountPerTenant.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              var f = index;
+                              f++;
+                              return Padding(
+                                padding: EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 0.0),
+                                child: Container(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                              '${lGetAmountPerTenant[index]['acroname']} - ${lGetAmountPerTenant[index]['tenant_name']}',
+                                              style: TextStyle(
+                                                  fontSize: 15.0,
+                                                  fontWeight: FontWeight.bold)),
+                                        ],
+                                      ),
+                                      Divider(thickness: 2,),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                              'No. of Item(s):',
+                                              style: TextStyle(
+                                                  fontSize: 15.0,
+                                                  fontWeight: FontWeight.bold)),
+                                          Text(
+                                              '${lGetAmountPerTenant[index]['count']}',
+                                              style: TextStyle(
+                                                  fontSize: 15.0,
+                                                  fontWeight: FontWeight.normal)),
+                                        ],
+                                      ),
+                                      Divider(),
+
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                              'Subtotal Amount:',
+                                              style: TextStyle(
+                                                  fontSize: 15.0,
+                                                  fontWeight: FontWeight.bold)),
+                                          Text(
+                                              '₱${oCcy.format(int.parse(lGetAmountPerTenant[index]['total'].toString()))}',
+                                              style: TextStyle(
+                                              fontSize: 15.0,
+                                              fontWeight: FontWeight.normal)),
+                                        ],
+                                      ),
+                                      Divider(),
+
+                                      // ListView.builder(
+                                      //   shrinkWrap: true,
+                                      //   itemCount: loadCartData == null ? 0 : loadCartData.length,
+                                      //   itemBuilder: (BuildContext context, int index1) {
+                                      //     return Padding(
+                                      //       padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                      //       child: Column(
+                                      //         crossAxisAlignment: CrossAxisAlignment.start,
+                                      //         children: [
+                                      //           Row(
+                                      //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      //             children: [
+                                      //               Text(
+                                      //                   'No of. Item(s)',
+                                      //                   style: TextStyle(
+                                      //                       fontSize: 15.0,
+                                      //                       fontWeight: FontWeight.bold)),
+                                      //               Text(
+                                      //                   '??',
+                                      //                   style: TextStyle(
+                                      //                       fontSize: 15.0,
+                                      //                       fontWeight: FontWeight.bold)),
+                                      //             ],
+                                      //           ),
+                                      //         ]
+                                      //       ),
+                                      //     );
+                                      //   },
+                                      // ),
+                                    ],
+                                  )
+                                ),
+                              );
+                            },
                           ),
-//                          child: Text('$f. ${lGetAmountPerTenant[index]['d_bu_name']} - ${lGetAmountPerTenant[index]['d_tenant']}  ₱${oCcy.format(double.parse(lGetAmountPerTenant[index]['d_subtotalPerTenant']))}',style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold)),
-                        );
-                      },
+                        ],
+                      )
                     ),
-                  ),
+                  )
                 ],
               ),
             ),
@@ -360,7 +462,7 @@ class _LoadCart extends State<LoadCart> {
             height: MediaQuery.of(context).size.height / 3.4,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+              children: <Widget>[
                 Expanded(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -369,7 +471,7 @@ class _LoadCart extends State<LoadCart> {
                         onTap: () {
                           Navigator.pop(context);
                           Navigator.of(context)
-                              .push(_placeOrderDelivery(loadIMainItems));
+                              .push(_placeOrderDelivery(loadIMainItems, _selectOption));
                         },
                         child: Container(
                           width: 130,
@@ -396,7 +498,7 @@ class _LoadCart extends State<LoadCart> {
                       GestureDetector(
                         onTap: () {
                           Navigator.pop(context);
-                          Navigator.of(context).push(_placeOrderPickUp());
+                          Navigator.of(context).push(_placeOrderPickUp(_selectOption));
                         },
                         child: Container(
                           width: 130,
@@ -456,8 +558,9 @@ class _LoadCart extends State<LoadCart> {
     var res = await db.getAmountPerTenant();
     if (!mounted) return;
     setState(() {
-      isLoading = false;
+
       lGetAmountPerTenant = res['user_details'];
+      isLoading = false;
       Navigator.of(context).pop();
     });
 
@@ -513,8 +616,9 @@ class _LoadCart extends State<LoadCart> {
     var res = await db.checkIfBf();
     if (!mounted) return;
     setState(() {
-      isLoading = false;
+
       lGetAmountPerTenant = res['user_details'];
+      isLoading = false;
     });
     if (lGetAmountPerTenant[0]['isavail'] == false) {
       ignorePointer = true;
@@ -574,7 +678,6 @@ class _LoadCart extends State<LoadCart> {
 //  StreamController _event =StreamController<int>.broadcast();
   updateCartQty(id, qty) async {
     await db.updateCartQty(id, qty);
-    loadTotal();
   }
 
   @override
@@ -585,6 +688,7 @@ class _LoadCart extends State<LoadCart> {
     getBuSegregate();
     checkIfBf();
     loadProfilePic();
+    option = 0;
   }
 
   @override
@@ -663,13 +767,14 @@ class _LoadCart extends State<LoadCart> {
       },
       child: Scaffold(
         appBar: AppBar(
+          titleSpacing: 0,
           brightness: Brightness.light,
           backgroundColor: Colors.white,
           elevation: 0.1,
           leading: IconButton(
             icon: Icon(
               Icons.arrow_back,
-              color: Colors.black,
+              color: Colors.black54,
               size: 23,
             ),
             onPressed: () => Navigator.of(context).pop(),
@@ -679,7 +784,7 @@ class _LoadCart extends State<LoadCart> {
             style: GoogleFonts.openSans(
                 color: Colors.black54,
                 fontWeight: FontWeight.bold,
-                fontSize: 18.0),
+                fontSize: 16.0),
           ),
           actions: <Widget>[
             InkWell(
@@ -719,341 +824,539 @@ class _LoadCart extends State<LoadCart> {
         ),
         body: isLoading
             ? Center(
-                child: CircularProgressIndicator(
-                  valueColor:
-                      new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
-                ),
-              )
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(
-                    child: RefreshIndicator(
-                      onRefresh: loadCart,
-                      child: Scrollbar(
-                        child: ListView.builder(
-                            itemCount: getBu == null ? 0 : getBu.length,
-                            itemBuilder: (BuildContext context, int index0) {
-                              return Container(
-                                  child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                    Padding(
-                                      padding: EdgeInsets.fromLTRB(
-                                          17.0, 25.0, 0.0, 0.0),
-                                      child: Text(
-                                          '${getBu[index0]['d_bu_name'].toString()} ${getBu[index0]['d_tenant_name'].toString()}',
-                                          style: TextStyle(
-                                              color: Colors.black54,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 17.0)),
+          child: CircularProgressIndicator(
+            valueColor: new AlwaysStoppedAnimation<Color>(Colors.deepOrange)),
+        ) :
+        Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: loadCart,
+                  child: Scrollbar(
+                    child: ListView.builder(
+                      itemCount: getBu == null ? 0 : getBu.length,
+                      itemBuilder: (BuildContext context, int index0) {
+                        return Container(
+                          child: Column(
+                            crossAxisAlignment : CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Divider(thickness: 2, color: Colors.deepOrangeAccent,),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 10),
+                                child: Text(
+                                    '${getBu[index0]['d_tenant_name'].toString()} - ${getBu[index0]['d_acroname'].toString()}',
+                                    style: TextStyle(
+                                        color: Colors.deepOrangeAccent,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16.0)),
+                              ),
+                              Divider(thickness: 2, color: Colors.deepOrangeAccent,),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 10),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('Product Details',
+                                      style: GoogleFonts.openSans(fontStyle: FontStyle.normal ,fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black54),
                                     ),
-                                    ListView.builder(
-                                        physics:
-                                            NeverScrollableScrollPhysics(), //
-                                        shrinkWrap: true,
-                                        itemCount: loadCartData == null ? 0 : loadCartData.length,
-                                        itemBuilder:
-                                            (BuildContext context, int index) {
-                                          return Visibility(
-                                            visible: loadCartData[index]['main_item']['tenant_id'] != getBu[index0]['d_tenant_id'] ? false : true,
-                                            child: Container(height: 150.0, width: 30.0,
-                                              child: Card(color: Colors.transparent,
-                                                child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-                                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                  children: [
-                                                    Divider(),
-                                                    Row(
-                                                      children: <Widget>[
-                                                        Padding(
-                                                          padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
-                                                          child: Container(
-                                                              width: 80.0, height: 60.0,
-                                                              decoration: new BoxDecoration(
-                                                                shape: BoxShape.circle,
-                                                                image: new DecorationImage(
-                                                                  image: new NetworkImage(
-                                                                      loadCartData[index]['main_item']['image']),
-                                                                  fit: BoxFit.scaleDown,
-                                                                ),
-                                                              )),
+                                    Text('Total Price',
+                                      style: GoogleFonts.openSans(fontStyle: FontStyle.normal ,fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black54),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Divider(),
+                              ListView.builder(
+                                  physics: NeverScrollableScrollPhysics(), //
+                                  shrinkWrap: true,
+                                  itemCount: loadCartData == null ? 0 : loadCartData.length,
+                                  itemBuilder: (BuildContext context, int index) {
+
+                                  return Visibility(
+                                    visible: loadCartData[index]['main_item']['tenant_id'] != getBu[index0]['d_tenant_id'] ? false : true,
+                                    child: Container(
+                                      height: 125.0,
+                                      child: Card(color: Colors.transparent,
+                                        child: Column(
+                                          // crossAxisAlignment: CrossAxisAlignment.start,
+                                          // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                          children: [
+                                            Row(
+                                              children: <Widget>[
+                                                Padding(
+                                                  padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                                                  child: Column(
+                                                    children: <Widget>[
+                                                      Container(
+                                                          width: 90.0, height: 75.0,
+                                                          decoration: new BoxDecoration(
+                                                            shape: BoxShape.circle,
+                                                            image: new DecorationImage(
+                                                              image: new NetworkImage(
+                                                                  loadCartData[index]['main_item']['image']),
+                                                              fit: BoxFit.scaleDown,
+                                                            ),
+                                                          )),
+
+                                                      Padding(
+                                                        padding: EdgeInsets.fromLTRB(0, 5, 10, 0),
+                                                        child: Text("₱ ${loadCartData[index]['main_item']['price'].toString()}",
+                                                          style: TextStyle(fontWeight: FontWeight.normal, fontSize: 14,
+                                                            color: Colors.black54,),
                                                         ),
-                                                        Container(
-                                                          child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                                                      ),
+                                                    ],
+                                                  )
+                                                ),
+                                                Expanded(
+                                                  child: Column(
+                                                    children: <Widget>[
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        children: <Widget>[
+                                                          Flexible(
+                                                            child: Padding(
+                                                              padding: EdgeInsets.fromLTRB(20, 0, 5, 0),
+                                                              child: RichText(
+                                                                overflow: TextOverflow.ellipsis,
+                                                                text: TextSpan(
+                                                                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.normal, fontSize: 14),
+                                                                    text: '${loadCartData[index]['main_item']['product_name']}'),
+                                                              ),
+                                                            ),
+                                                          ),
+
+                                                          Padding(
+                                                            padding: EdgeInsets.fromLTRB(0, 2, 20, 0),
+                                                            child: Text("₱ ${loadCartData[index]['main_item']['total_price'].toString()}",
+                                                              style: TextStyle(fontWeight: FontWeight.normal, fontSize: 14,
+                                                                color: Colors.black,),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        children: <Widget>[
+                                                          Row(
                                                             children: <Widget>[
-                                                              Row(
-                                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                                children: <Widget>[
-                                                                  Padding(
-                                                                    padding: EdgeInsets.fromLTRB(0, 10, 5, 5),
-                                                                    child: Text('${loadCartData[index]['main_item']['product_name']}',
-                                                                      style: GoogleFonts.openSans(fontStyle: FontStyle.normal, fontSize: 11.0),
-                                                                    ),
+                                                              Padding(
+                                                                padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                                                child: Container(
+                                                                  width: 30.0,
+                                                                  child:
+                                                                  TextButton(style: TextButton.styleFrom(backgroundColor: Colors.white12,
+                                                                    primary: Colors.black, onSurface: Colors.red,
                                                                   ),
-                                                                ],
-                                                              ),
-                                                              Row(
-                                                                children: <Widget>[
-                                                                  Padding(
-                                                                    padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
-                                                                    child:
-                                                                        new Text("₱ ${loadCartData[index]['main_item']['price'].toString()}",
-                                                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15,
-                                                                        color: Colors.deepOrange,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              Row(
-                                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                                children: <Widget>[
-                                                                  Padding(
-                                                                      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                                                      child:
-                                                                          RawMaterialButton(
-                                                                        onPressed:
-                                                                            () async {
-                                                                          SharedPreferences prefs = await SharedPreferences.getInstance();
-                                                                          String username = prefs.getString('s_customerId');
-                                                                          if (username == null) {
-                                                                            await Navigator.of(context).push(_signIn());
-                                                                          } else {
+                                                                    child: Text('-', style: TextStyle(fontSize: 16.0)),
+                                                                    onPressed:
+                                                                        () async {
+                                                                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                                                                      String username = prefs.getString('s_customerId');
+                                                                      if (username == null) {
+                                                                        await Navigator.of(context).push(_signIn());
+                                                                      } else {
+                                                                        setState(() {
+                                                                          var x = loadCartData[index]['main_item']['quantity'];
+                                                                          int d = int.parse(x.toString());
+                                                                          loadCartData[index]['main_item']['quantity'] = d -= 1; //code ni boss rene
+                                                                          if (d < 1 || d == 0) {
+                                                                            loadCartData[index]['main_item']['quantity'] = 1;
                                                                             removeFromCart(loadCartData[index]['main_item']['id']);
                                                                           }
-                                                                        },
-                                                                        elevation: 1.0,
-                                                                        child:
-                                                                            Icon(
-                                                                              Icons.delete_outline, size: 25.0,
-                                                                        ),
-                                                                        shape:
-                                                                            CircleBorder(),
-                                                                      )),
-                                                                  Padding(
-                                                                    padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                                                    child:
-                                                                        Container(
-                                                                      width: 50.0,
-                                                                      child:
-                                                                          TextButton(style: TextButton.styleFrom(backgroundColor: Colors.white12,
-                                                                          primary: Colors.black, onSurface: Colors.red,
-                                                                        ),
-                                                                        child: Text('-', style: TextStyle(fontSize: 18.0)),
-                                                                        onPressed:
-                                                                            () async {
-                                                                          SharedPreferences prefs = await SharedPreferences.getInstance();
-                                                                          String username = prefs.getString('s_customerId');
-                                                                          if (username == null) {
-                                                                            await Navigator.of(context).push(_signIn());
-                                                                          } else {
-                                                                            setState(() {
-                                                                              var x = loadCartData[index]['main_item']['quantity'];
-                                                                              int d = int.parse(x.toString());
-                                                                              loadCartData[index]['main_item']['quantity'] = d -= 1; //code ni boss rene
-                                                                              if (d < 1 || d == 0) {
-                                                                                loadCartData[index]['main_item']['quantity'] = 1;
-                                                                                removeFromCart(loadCartData[index]['main_item']['id']);
-                                                                              }
-                                                                            });
-                                                                            updateCartQty(loadCartData[index]['main_item']['id'].toString(),
-                                                                                loadCartData[index]['main_item']['quantity'].toString());
-                                                                          }
-                                                                        },
-                                                                      ),
-                                                                    ),
+                                                                        });
+                                                                        loadTotal();
+                                                                        loadCart();
+                                                                        updateCartQty(loadCartData[index]['main_item']['id'].toString(),
+                                                                            loadCartData[index]['main_item']['quantity'].toString());
+                                                                        totPrice = loadCartData[index]['main_item']['total_price'].toString();
+                                                                      }
+                                                                    },
                                                                   ),
-                                                                  Padding(
-                                                                    padding: EdgeInsets.fromLTRB(15, 5, 15, 5),
-                                                                    child: Text(
-                                                                      loadCartData[index]['main_item']['quantity'].toString(),
-                                                                      style: TextStyle(fontSize: 17.0),
-                                                                    ),
-                                                                  ),
-                                                                  Padding(
-                                                                    padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                                                    child:
-                                                                        Container(
-                                                                      width: 50.0,
-                                                                          child:
-                                                                          TextButton(
-                                                                        style: TextButton.styleFrom(backgroundColor: Colors.white12,
-                                                                          primary: Colors.black, onSurface: Colors.red,
-                                                                        ),
-                                                                        child: Text('+', style: TextStyle(fontSize: 18.0)),
-                                                                        onPressed:
-                                                                            () async {
-                                                                          SharedPreferences prefs = await SharedPreferences.getInstance();
-                                                                          String username = prefs.getString('s_customerId');
-                                                                          if (username == null) {
-                                                                            await Navigator.of(context).push(_signIn());
-                                                                          } else {
-                                                                            setState(() {
-                                                                              var x = loadCartData[index]['main_item']['quantity'];
-                                                                              int d = int.parse(x.toString());
-                                                                              loadCartData[index]['main_item']['quantity'] = d += 1; //code ni boss rene
-                                                                            });
-                                                                            updateCartQty(loadCartData[index]['main_item']['id'].toString(),
-                                                                                loadCartData[index]['main_item']['quantity'].toString());
-                                                                          }
-                                                                        },
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                  Visibility(
+                                                                ),
+                                                              ),
+                                                              Padding(
+                                                                padding: EdgeInsets.fromLTRB(15, 5, 15, 5),
+                                                                child: Text(
+                                                                  loadCartData[index]['main_item']['quantity'].toString(),
+                                                                  style: TextStyle(fontSize: 14.0),
+                                                                ),
+                                                              ),
 
-                                                                    visible: loadCartData[index]['main_item']['addon_length'] > 0 ? true : false,
-                                                                    // visible: loadCartData[index]['addon_length'] == 0 ? false : true,
-                                                                    child:
-                                                                        Padding(
-                                                                      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                                                      child:
-                                                                          Container(
-                                                                        width: 70.0,
-                                                                        child: OutlinedButton(
-                                                                          style:TextButton.styleFrom(primary: Colors.red, onSurface: Colors.red,
-                                                                            shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
-                                                                          ),
-                                                                          child: Text('${loadCartData[index]['main_item']['addon_length'].toString()}  more',
-                                                                            style:TextStyle(fontSize: 10.0),
-                                                                          ),
-                                                                          onPressed:
-                                                                              () async {
-                                                                            viewAddon(context, index);
-                                                                            // debugPrint('${loadIMainItems[index]['choices'][index]['product_name']}');
-                                                                          },
-
-                                                                        ),
-                                                                      ),
+                                                              Padding(
+                                                                padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                                                child:
+                                                                Container(
+                                                                  width: 30.0,
+                                                                  child:
+                                                                  TextButton(
+                                                                    style: TextButton.styleFrom(backgroundColor: Colors.white12,
+                                                                      primary: Colors.black, onSurface: Colors.red,
                                                                     ),
+                                                                    child: Text('+', style: TextStyle(fontSize: 15.0)),
+                                                                    onPressed:
+                                                                        () async {
+                                                                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                                                                      String username = prefs.getString('s_customerId');
+                                                                      if (username == null) {
+                                                                        await Navigator.of(context).push(_signIn());
+                                                                      } else {
+                                                                        setState(() {
+                                                                          var x = loadCartData[index]['main_item']['quantity'];
+                                                                          int d = int.parse(x.toString());
+                                                                          loadCartData[index]['main_item']['quantity'] = d += 1; //code ni boss rene
+                                                                        });
+                                                                        loadTotal();
+                                                                        loadCart();
+                                                                        updateCartQty(loadCartData[index]['main_item']['id'].toString(),
+                                                                            loadCartData[index]['main_item']['quantity'].toString());
+                                                                        totPrice = loadCartData[index]['main_item']['total_price'].toString();
+                                                                      }
+                                                                    },
                                                                   ),
-                                                                ],
-                                                              )
+                                                                ),
+                                                              ),
                                                             ],
                                                           ),
-                                                        ),
-                                                      ],
-                                                    )
-                                                  ],
+
+                                                          Padding(
+                                                            padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                                                            child:
+                                                            OutlinedButton(
+                                                            onPressed:
+                                                                () async {
+                                                              SharedPreferences prefs = await SharedPreferences.getInstance();
+                                                              String username = prefs.getString('s_customerId');
+                                                              if (username == null) {
+                                                                await Navigator.of(context).push(_signIn());
+                                                              } else {
+                                                                removeFromCart(loadCartData[index]['main_item']['id']);
+                                                              }
+                                                            },
+                                                            style: OutlinedButton.styleFrom(
+                                                              shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+                                                              side: BorderSide(width: 1.0, color: Colors.deepOrangeAccent),
+                                                              primary: Colors.deepOrangeAccent
+                                                            ),
+                                                            child:
+                                                            Text('DELETE', style: TextStyle(fontStyle: FontStyle.normal, fontSize: 11),)
+                                                            )
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      Padding(
+                                                        padding: EdgeInsets.only(left: 10),
+                                                        child: Row(
+                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                          children: [
+                                                            Visibility(
+                                                              visible: loadCartData[index]['main_item']['addon_length'] > 0 ? true : false,
+                                                              // visible: loadCartData[index]['addon_length'] == 0 ? false : true,
+                                                              child:
+                                                              Padding(
+                                                                padding: EdgeInsets.fromLTRB(5, 0, 15, 0),
+                                                                child:
+                                                                Container(
+                                                                  width: 70.0,
+                                                                  child: OutlinedButton(
+                                                                    style: OutlinedButton.styleFrom(
+                                                                        shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+                                                                        side: BorderSide(width: 1.0, color: Colors.deepOrangeAccent),
+                                                                        primary: Colors.deepOrangeAccent
+                                                                    ),
+                                                                    child: Text('${loadCartData[index]['main_item']['addon_length'].toString()}  more',
+                                                                      style:TextStyle(fontSize: 10.0),
+                                                                    ),
+                                                                    onPressed:
+                                                                        () async {
+                                                                      viewAddon(context, index);
+                                                                      // debugPrint('${loadIMainItems[index]['choices'][index]['product_name']}');
+                                                                    },
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        )
+                                                      )
+                                                    ],
+                                                  ),
                                                 ),
-                                                elevation: 0,
-                                                margin: EdgeInsets.all(3),
-                                              ),
+                                              ],
                                             ),
-                                          );
-                                        }),
-                                  ]));
-                            }),
-                      ),
+                                            // Divider(),
+                                          ],
+                                        ),
+                                        elevation: 0,
+                                        margin: EdgeInsets.all(3),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              ),
+                            ]
+                          )
+                        );
+                      }
                     ),
                   ),
-                  Visibility(
-                    visible: loadCartData.isEmpty ? false : true,
-                    replacement: Padding(
-                      padding:
-                          EdgeInsets.symmetric(vertical: screenHeight / 3.0),
-                      child: Center(
-                        child: Column(
-                          children: <Widget>[
-                            Container(
-                              height: 100,
-                              width: 100,
-                              child:
-                                  SvgPicture.asset("assets/svg/empty-cart.svg"),
+                ),
+              ),
+
+              Divider(),
+
+              Visibility(
+                  visible: loadCartData.isEmpty ? false : true,
+                  child: Container(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          child: Text("TOTAL SUMMARY", style: TextStyle(fontStyle: FontStyle.normal,fontSize: 14.0, fontWeight: FontWeight.bold, color: Colors.black54 )),
+                        ),
+                        Divider(),
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('No. of Store(s)',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 14.0, fontWeight: FontWeight.bold, color: Colors.black54)),
+
+                              Text('$stores',style: TextStyle(fontStyle: FontStyle.normal,fontSize: 14.0, fontWeight: FontWeight.normal, color: Colors.black54)),
+                            ],
+                          ),
+                        ),
+                        Divider(),
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('No. of Item(s)',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 14.0, fontWeight: FontWeight.bold, color: Colors.black54)),
+
+                              Text('$items',style: TextStyle(fontStyle: FontStyle.normal,fontSize: 14.0, fontWeight: FontWeight.normal, color: Colors.black54)),
+                            ],
+                          ),
+                        ),
+                        Divider(),
+                        Padding(
+                            padding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                                child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Total Amount Order',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 14.0, fontWeight: FontWeight.bold, color: Colors.black54)),
+
+                              Text('₱ ${oCcy.format(grandTotal)}',style: TextStyle(fontStyle: FontStyle.normal,fontSize: 14.0, fontWeight: FontWeight.normal, color: Colors.black54)),
+                            ],
+                          ),
+                        ),
+                        Divider(),
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('TOTAL AMOUNT TO PAY',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 14.0, fontWeight: FontWeight.bold, color: Colors.black54)),
+
+                              Text('₱ ${oCcy.format(grandTotal)}',style: TextStyle(fontStyle: FontStyle.normal,fontSize: 14.0, fontWeight: FontWeight.normal, color: Colors.black54)),
+                            ],
+                          ),
+                        ),
+                        Divider(),
+                        Padding(
+                          padding: EdgeInsets.only(left: 10, right: 10),
+                          child: DropdownButtonFormField(
+                            decoration: InputDecoration(
+                              //Add isDense true and zero Padding.
+                              //Add Horizontal padding using buttonPadding and Vertical padding by increasing buttonHeight instead of add Padding here so that The whole TextField Button become clickable, and also the dropdown menu open under The whole TextField Button.
+                              isDense: true,
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              //Add more decoration as you want here
+                              //Add label If you want but add hint outside the decoration to be aligned in the button perfectly.
                             ),
-                          ],
+                            isExpanded: true,
+                            hint: const Text(
+                              'PAYMENT METHOD',
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                            ),
+                            icon: const Icon(
+                              Icons.arrow_drop_down,
+                              color: Colors.black45,
+                            ),
+                            iconSize: 30,
+                            items: _options
+                                .map((item) =>
+                                DropdownMenuItem<String>(
+                                  value: item,
+                                  child: Text(
+                                    item,
+                                    style: GoogleFonts.openSans(fontStyle: FontStyle.normal, fontSize: 14.0, fontWeight: FontWeight.bold, color: Colors.black54),
+                                  ),
+                                ))
+                                .toList(),
+                            // ignore: missing_return
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Please select option';
+                              }
+                            },
+                            onChanged: (value) {
+                              setState(() {
+                                _selectOption = value;
+                                option = _options.indexOf(value);
+                                print(_selectOption);
+                              });
+                              //Do something when changing the item if you want.
+                            },
+                            onSaved: (value) {
+                              _selectOption = value.toString();
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+              ),
+
+
+
+              Visibility(
+                visible: loadCartData.isEmpty ? false : true,
+                replacement: Padding(
+                  padding:
+                  EdgeInsets.symmetric(vertical: screenHeight / 3.0),
+                  child: Center(
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          height: 100,
+                          width: 100,
+                          child:
+                          SvgPicture.asset("assets/svg/empty-cart.svg"),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 10.0, vertical: 10.0),
+                  child: Row(
+                    children: <Widget>[
+                      Container(
+                        width: MediaQuery.of(context).size.width / 5.5,
+                        child: SleekButton(
+                          onTap: () async {
+                            SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                            String status = prefs.getString('s_status');
+                            status != null
+                                ? displayBottomSheet(context)
+                                : Navigator.of(context).push(_signIn());
+                          },
+                          style: SleekButtonStyle.flat(
+                            color: Colors.deepOrange,
+                            inverted: false,
+                            rounded: true,
+                            size: SleekButtonSize.normal,
+                            context: context,
+                          ),
+                          child: Center(
+                            child: Icon(
+                              Icons.remove_red_eye,
+                              size: 18.0,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 30.0, vertical: 10.0),
-                      child: Row(
-                        children: <Widget>[
-                          Container(
-                            width: MediaQuery.of(context).size.width / 5.5,
-                            child: SleekButton(
-                              onTap: () async {
-                                SharedPreferences prefs =
-                                    await SharedPreferences.getInstance();
-                                String status = prefs.getString('s_status');
-                                status != null
-                                    ? displayBottomSheet(context)
-                                    : Navigator.of(context).push(_signIn());
-                              },
-                              style: SleekButtonStyle.flat(
-                                color: Colors.deepOrange,
-                                inverted: false,
-                                rounded: true,
-                                size: SleekButtonSize.big,
-                                context: context,
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  Icons.remove_red_eye,
-                                  size: 17.0,
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 2.0,
-                          ),
-                          Flexible(
-                            child: IgnorePointer(
-                              ignoring: ignorePointer,
-                              child: SleekButton(
-                                onTap: () async {
-                                  SharedPreferences prefs =
-                                      await SharedPreferences.getInstance();
-                                  String username =
-                                      prefs.getString('s_customerId');
-                                  if (username == null) {
-                                    await Navigator.of(context).push(_signIn());
-                                  } else {
-                                    if (lGetAmountPerTenant[0]['isavail'] ==
-                                        false) {
-                                      checkIfBf();
-                                    } else {
-                                      selectType(context);
-                                    }
-                                  }
-                                },
-                                style: SleekButtonStyle.flat(
-                                  color: Colors.deepOrange,
-                                  inverted: false,
-                                  rounded: true,
-                                  size: SleekButtonSize.big,
-                                  context: context,
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    "₱ ${oCcy.format(grandTotal)} Next",
-                                    style: TextStyle(
-                                        fontStyle: FontStyle.normal,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13.0),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                      SizedBox(
+                        width: 2.0,
                       ),
-                    ),
+                      Flexible(
+                        child: IgnorePointer(
+                          ignoring: ignorePointer,
+                          child: SleekButton(
+                            onTap: () async {
+                              SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+                              String username =
+                              prefs.getString('s_customerId');
+                              if (username == null) {
+                                await Navigator.of(context).push(_signIn());
+                              } else {
+                                if (lGetAmountPerTenant[0]['isavail'] ==
+                                    false) {
+                                  checkIfBf();
+                                } else {
+                                  if (_formKey.currentState.validate()) {
+                                    selectType(context);
+                                  }
+
+                                }
+                              }
+                            },
+                            style: SleekButtonStyle.flat(
+                              color: Colors.deepOrange,
+                              inverted: false,
+                              rounded: true,
+                              size: SleekButtonSize.normal,
+                              context: context,
+                            ),
+                            child: Center(
+                              child: Text(
+                                "PROCESS CHECKOUT",
+                                style: TextStyle(
+                                    fontStyle: FontStyle.normal,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14.0),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
+            ],
+          ),
+        )
 //      ),
       ),
     );
   }
 }
 
-Route _placeOrderPickUp() {
+int groupValue = 0;
+Widget _myRadioButton({String title, int value, Function onChanged}) {
+  return Theme(
+    data: ThemeData.light(),
+    child: RadioListTile(
+      activeColor: Colors.deepOrange,
+      value: value,
+      groupValue: groupValue,
+      onChanged: onChanged,
+      title: Text(title),
+    ),
+  );
+}
+
+Route _placeOrderPickUp(paymentMethod) {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => PlaceOrderPickUp(),
+    pageBuilder: (context, animation, secondaryAnimation) => PlaceOrderPickUp(paymentMethod: paymentMethod),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;
@@ -1067,9 +1370,9 @@ Route _placeOrderPickUp() {
   );
 }
 
-Route _placeOrderDelivery(List loadIMainItems) {
+Route _placeOrderDelivery(List loadIMainItems, paymentMethod) {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => PlaceOrderDelivery(cartItems: loadIMainItems),
+    pageBuilder: (context, animation, secondaryAnimation) => PlaceOrderDelivery(cartItems: loadIMainItems, paymentMethod: paymentMethod),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;

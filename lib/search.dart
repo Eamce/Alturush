@@ -45,15 +45,15 @@ class _Search extends State<Search> {
         return true;
       },
       child: Scaffold(
-        appBar: AppBar(
-          // automaticallyImplyLeading: false,
-          brightness: Brightness.light,
-          backgroundColor: Colors.white,
-          iconTheme: new IconThemeData(color: Colors.black),
-          elevation: 0.0,
-          title: Container(
-            height: 40.0,
-            child: CupertinoTextField(
+          appBar: AppBar(
+            // automaticallyImplyLeading: false,
+            brightness: Brightness.light,
+            backgroundColor: Colors.white,
+            iconTheme: new IconThemeData(color: Colors.black),
+            elevation: 0.0,
+            title: Container(
+              height: 40.0,
+              child: CupertinoTextField(
                 autofocus: true,
                 style: TextStyle(fontSize: 15.0),
                 keyboardType: TextInputType.text,
@@ -73,51 +73,51 @@ class _Search extends State<Search> {
                 suffix: Padding(
                   padding: EdgeInsets.only(right: 10),
                   child: GestureDetector(
-                    onTap: (){
-                      search.clear();
-                      load = true;
-                      setState(() {
-                        searchProdData.clear();
-                      });
-                      print(load);
-                    },
+                      onTap: (){
+                        search.clear();
+                        load = true;
+                        setState(() {
+                          searchProdData.clear();
+                        });
+                        print(load);
+                      },
                       child: Icon(Icons.close_rounded,color: Colors.black54,)),
                 ),
                 cursorColor: Colors.black54,
                 placeholder: "Search here...",
+              ),
             ),
-          ),
-          actions: [
-            TextButton(
-                style: TextButton.styleFrom(
-                  primary: Colors.white,
-                ),
-                onPressed: (){
-                  FocusScope.of(context).requestFocus(FocusNode());
-                  searchProd();
-                },
-                child: Text("Search",style: TextStyle(color: Colors.black),)
-            )
-          ],),
-        body: Scrollbar(
-          child: searchProdData.length !=0 || load == true ? ListView.builder(
-              physics: BouncingScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: searchProdData == null ? 0 : searchProdData.length,
-              itemBuilder: (BuildContext context, int index){
-                return InkWell(
-                  onTap: (){
-                    FocusScope.of(context).unfocus();
-                    Navigator.of(context).push(_viewItem(
-                        searchProdData[index]['bu_id'],
-                        searchProdData[index]['tenant_id'],
-                        searchProdData[index]['product_id'],
-                        searchProdData[index]['product_uom'],
-                        searchProdData[index]['unit_measure'],
-                        searchProdData[index]['price']
-                    ));
+            actions: [
+              TextButton(
+                  style: TextButton.styleFrom(
+                    primary: Colors.white,
+                  ),
+                  onPressed: (){
+                    FocusScope.of(context).requestFocus(FocusNode());
+                    searchProd();
                   },
-                  child:Padding(
+                  child: Text("Search",style: TextStyle(color: Colors.black),)
+              )
+            ],),
+          body: Scrollbar(
+            child: searchProdData.length !=0 || load == true ? ListView.builder(
+                physics: BouncingScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: searchProdData == null ? 0 : searchProdData.length,
+                itemBuilder: (BuildContext context, int index){
+                  return InkWell(
+                    onTap: (){
+                      FocusScope.of(context).unfocus();
+                      Navigator.of(context).push(_viewItem(
+                          searchProdData[index]['bu_id'],
+                          searchProdData[index]['tenant_id'],
+                          searchProdData[index]['product_id'],
+                          searchProdData[index]['product_uom'],
+                          searchProdData[index]['unit_measure'],
+                          searchProdData[index]['price']
+                      ));
+                    },
+                    child:Padding(
                       padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 15.0),
                       child: Row(
                         children:[
@@ -149,10 +149,10 @@ class _Search extends State<Search> {
 
                         ],
                       ),
-                  ),
-                );
-              }
-          ): Center(
+                    ),
+                  );
+                }
+            ): Center(
               child:Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -166,8 +166,8 @@ class _Search extends State<Search> {
                   Text("We can't find any item matching your search",style: TextStyle(color: Colors.black54,),),
                 ],
               ),
-          ),
-        )
+            ),
+          )
       ),
     );
   }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
@@ -7,7 +9,18 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:async';
 import 'splashScreen.dart';
 
-void main() => runApp(MyApp());
+void main(){
+  HttpOverrides.global = new MyHttpOverrides();
+  runApp(MyApp());
+}
+
+class MyHttpOverrides extends HttpOverrides{
+  @override
+  HttpClient createHttpClient(SecurityContext context){
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port)=> true;
+  }
+}
 
 class MyApp extends StatefulWidget {
   @override
@@ -80,7 +93,10 @@ class _MyApp extends State<MyApp>{
         home: Splash(),
       ),
     );
+
+
   }
+
 }
 
 

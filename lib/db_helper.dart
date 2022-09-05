@@ -6,6 +6,9 @@ import 'package:encrypt/encrypt.dart';
 
 List loadIdList;
 List<bool> side = [];
+List<bool> side1 = [];
+List<bool> side2 = [];
+List<bool> side3 = [];
 List<String> selectedDiscountType = [];
 int unitGroupId;
 String bUnitCodeGc;
@@ -19,15 +22,14 @@ class RapidA {
 
   // String server = "https://app1.alturush.com";
   String server = "http://172.16.43.147/rapida";
-     // String server = "http://172.16.46.130/rapida";
-//  String server = "http://192.168.1.2:3333/rapida";
-//  String server = "http://203.177.223.59:8006/";
+  // String server = "http://172.16.46.130/rapida";
+  // String server = "http://192.168.1.2:3333/rapida";
+  // String server = "http://203.177.223.59:8006/";
 
   final key = Key.fromUtf8('SoAxVBnw8PYHzHHTFBQdG0MFCLNdmGFf'); //32 chars
   final iv = IV.fromUtf8('T1g994xo2UAqG81M'); //16 chars
 
   //mysql query code
-
 
 
   Future loadCartData() async {
@@ -94,13 +96,10 @@ class RapidA {
     var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var userID =  prefs.getString('s_customerId');
-    print(userID);
     Map dataUser;
     final response = await client.post(Uri.parse("$server/getPlaceOrderData_r"),body:{
       'cusId':encrypt(userID)
     });
-    print("json");
-    print(response.body);
     dataUser = jsonDecode(response.body);
     client.close();
     return dataUser;
@@ -153,32 +152,30 @@ class RapidA {
     return dataUser;
   }
 
-  Future placeOrder(townId,barrioId,contact,landmark,specialInstruction,houseNo,changeFor,
-      street,deliveryCharge,deliveryDate,deliveryTime,groupValue) async{
+  Future placeOrder(
+      deliveryDateData,
+      deliveryTimeData,
+      getTenantData,
+      specialInstruction,
+      deliveryCharge,
+      amountTender
+      ) async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var client = http.Client();
-     await client.post(Uri.parse("$server/placeOrder_r"),body:{
-      // 'cusId':prefs.getString('s_customerId'),
-      // 'townId':townId,
-      // 'barrioId':barrioId,
-      // 'contact':contact,
-      // 'landmark':landmark,
-      // 'specialInstruction':specialInstruction,
-      // 'houseNo':houseNo,
-      // 'changeFor':changeFor,
-      // 'street':street,
-      // 'deliveryCharge':deliveryCharge,
-      // 'radioVal':groupValue,
-      // 'deliveryDate':deliveryDate,
-      // 'deliveryTime':deliveryTime,
-      // 'selectedDiscountType':selectedDiscountType.toString(),
-       'cusId':prefs.getString('s_customerId'),
-       'deliveryDate':deliveryDate,
-       'deliveryTime':deliveryTime,
-       'selectedDiscountType':selectedDiscountType.toString(),
-       'deliveryCharge':deliveryCharge,
-       'changeFor':changeFor
+    await client.post(Uri.parse("$server/placeOrder_r"),body:{
+      'cusId':prefs.getString('s_customerId'),
+      'deliveryDateData':deliveryDateData.toString(),
+      'deliveryTimeData':deliveryTimeData.toString(),
+      'selectedDiscountType':selectedDiscountType.toString(),
+      'deliveryCharge':deliveryCharge.toString(),
+      'amountTender':amountTender.toString(),
+      'specialInstruction':specialInstruction.toString(),
+      'getTenantData':getTenantData.toString(),
+
+
     });
+    print(deliveryTimeData);
+    print(deliveryDateData);
     client.close();
   }
 
@@ -245,6 +242,19 @@ class RapidA {
     final response = await client.post(Uri.parse("$server/displayOrder_r"),body:{
       'cusId':prefs.getString('s_customerId'),
       'tenantId':tenantId
+    });
+    dataUser = jsonDecode(response.body);
+    client.close();
+    return dataUser;
+  }
+
+  Future getDiscountID(discountName) async{
+    var client = http.Client();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map dataUser;
+    final response = await client.post(Uri.parse("$server/getDiscountID_r"),body:{
+      'cusId':prefs.getString('s_customerId'),
+      'discountName':discountName
     });
     dataUser = jsonDecode(response.body);
     client.close();
@@ -333,10 +343,43 @@ class RapidA {
     return dataUser;
   }
 
+  Future orderTimeFrame(ticketNo) async{
+    var client = http.Client();
+    Map dataUser;
+    final response = await client.post(Uri.parse("$server/orderTimeFrame_r"),body:{
+      'ticketNo':ticketNo
+    });
+    dataUser = jsonDecode(response.body);
+    client.close();
+    return dataUser;
+  }
+
+  Future cancelStatus(ticketNo) async{
+    var client = http.Client();
+    Map dataUser;
+    final response = await client.post(Uri.parse("$server/getCancelStatus_r"),body:{
+      'ticketNo':ticketNo
+    });
+    dataUser = jsonDecode(response.body);
+    client.close();
+    return dataUser;
+  }
+
   Future lookItemsSegregate(ticketNo) async{
     var client = http.Client();
     Map dataUser;
     final response = await client.post(Uri.parse("$server/lookItems_segregate_r"),body:{
+      'ticketNo':encrypt(ticketNo)
+    });
+    dataUser = jsonDecode(response.body);
+    client.close();
+    return dataUser;
+  }
+
+  Future getAmountPerTenantmod(ticketNo) async{
+    var client = http.Client();
+    Map dataUser;
+    final response = await client.post(Uri.parse("$server/getAmountPerTenantmod_r"),body:{
       'ticketNo':encrypt(ticketNo)
     });
     dataUser = jsonDecode(response.body);
@@ -365,6 +408,18 @@ class RapidA {
     client.close();
     return dataUser;
   }
+
+  Future getSTotal(ticketNo) async{
+    var client = http.Client();
+    Map dataUser;
+    final response = await client.post(Uri.parse("$server/getSubTotal_r"),body:{
+      'ticketNo':encrypt(ticketNo),
+    });
+    dataUser = jsonDecode(response.body);
+    client.close();
+    return dataUser;
+  }
+
 
 
   Future checkIfOnGoing(ticketNo) async{
@@ -462,13 +517,16 @@ class RapidA {
 //    else{
 //      productUom = productUom;
 //    }
-
     Map dataUser;
     final response = await client.post(Uri.parse("$server/display_item_data_r"),body:{
       'prodId':prodId.toString(),
       'productUom':productUom.toString()
     });
-    dataUser = jsonDecode(response.body);
+    try {
+      dataUser = jsonDecode(response.body);
+    } catch (e) {
+      print('caught error: $e');
+    }
     client.close();
     return dataUser;
   }
@@ -512,28 +570,7 @@ class RapidA {
     client.close();
   }
 
-  Future addToCartNew(prodId,uomId,_counter,uomPrice,choiceUomId,choiceId,choicePrice,flavorId,
-      flavorPrice,selectedSideOnPrice,selectedSideItems ,selectedSideItemsUom) async{
-    var client = http.Client();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String userID = prefs.getString('s_customerId');
-    await client.post(Uri.parse("$server/addToCartNew_r"),body:{
-      'userID':userID,
-      'prodId':prodId,
-      'uomId':uomId.toString(),
-      '_counter':_counter.toString(),
-      'uomPrice':uomPrice,
-      'choiceUomId':choiceUomId.toString(),
-      'choiceId':choiceId.toString(),
-      'choicePrice':choicePrice.toString(),
-      'flavorId':flavorId.toString(),
-      'flavorPrice':flavorPrice.toString(),
-      'selectedSideOnPrice':selectedSideOnPrice.toString(),
-      'selectedSideItems':selectedSideItems.toString(),
-      'selectedSideItemsUom':selectedSideItemsUom.toString()
-    });
-    client.close();
-  }
+
   Future selectSuffixCi() async{
     var client = http.Client();
     Map dataUser;
@@ -572,6 +609,15 @@ class RapidA {
     client.close();
   }
 
+  Future updateCartStk(id,stk) async{
+    var client = http.Client();
+    await client.post(Uri.parse("$server/updateCartStk_r"),body:{
+      'id':id,
+      'stk':stk.toString()
+    });
+    client.close();
+  }
+
   Future getCounter() async{
     var client = http.Client();
     String userID;
@@ -591,19 +637,21 @@ class RapidA {
     return dataUser;
   }
 
-  Future savePickup(deliveryDateData,deliveryTimeData,subtotal,) async{
-   print(deliveryDateData);
-   print(deliveryTimeData);
-   print(subtotal);
+  Future savePickup(deliveryDateData,deliveryTimeData,getTenantData,specialInstruction,subtotal,) async{
     var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await client.post(Uri.parse("$server/savePickup_r"),body:{
-       'customerId':encrypt(prefs.getString('s_customerId').toString()),
-       'deliveryDateData':deliveryDateData.toString(),
-       'deliveryTimeData':deliveryTimeData.toString(),
-       'subtotal':encrypt(subtotal.toString()),
-       'selectedDiscountType':encrypt(selectedDiscountType.toString()),
+      'customerId' : prefs.getString('s_customerId').toString(),
+      'deliveryDateData' : deliveryDateData.toString(),
+      'deliveryTimeData' : deliveryTimeData.toString(),
+      'getTenantData' : getTenantData.toString(),
+      'specialInstruction' : specialInstruction.toString(),
+      'subtotal' : subtotal.toString(),
+      'selectedDiscountType' : selectedDiscountType.toString(),
     });
+    print('try daw');
+    print(deliveryDateData);
+    print(deliveryTimeData);
     client.close();
   }
 
@@ -797,7 +845,7 @@ class RapidA {
     var client = http.Client();
     Map dataUser;
     final response = await client.post(Uri.parse("$server/getItemsByCategoriesAll_r"),body:{
-        'tenantCode':tenantCode
+      'tenantCode':tenantCode
     });
     dataUser = jsonDecode(response.body);
     client.close();
@@ -808,9 +856,9 @@ class RapidA {
     var client = http.Client();
     Map dataUser;
     final response = await client.post(Uri.parse("$server/getGcItems_r"),body:{
-        'offset':offset,
-        'categoryNo':categoryNo,
-        'itemSearch':itemSearch
+      'offset':offset,
+      'categoryNo':categoryNo,
+      'itemSearch':itemSearch
     });
     dataUser = jsonDecode(response.body);
     client.close();
@@ -1082,7 +1130,7 @@ class RapidA {
   Future saveOTPNumber(realMobileNumber) async{
     var client = http.Client();
     await client.post(Uri.parse("$server/saveOTPNumber_r"),body:{
-        'mobileNumber':realMobileNumber
+      'mobileNumber':realMobileNumber
     });
     client.close();
   }
@@ -1176,11 +1224,68 @@ class RapidA {
     return dataUser;
   }
 
+  Future addToCartNew(prodId,uomId,_counter,uomPrice,
+      choiceUomIdDrinks,choiceIdDrinks,choicePriceDrinks,
+      choiceUomIdFries,choiceIdFries,choicePriceFries,
+      choiceUomIdSides,choiceIdSides,choicePriceSides,flavorId,
+      flavorPrice,selectedSideOnPrice,selectedSideItems ,selectedSideItemsUom) async{
+    var client = http.Client();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userID = prefs.getString('s_customerId');
+    await client.post(Uri.parse("$server/addToCartNew_r"),body:{
+      'userID':userID,
+      'prodId':prodId,
+      'uomId':uomId.toString(),
+      '_counter':_counter.toString(),
+      'uomPrice':uomPrice,
+      'choiceUomIdDrinks':choiceUomIdDrinks.toString(),
+      'choiceIdDrinks':choiceIdDrinks.toString(),
+      'choicePriceDrinks':choicePriceDrinks.toString(),
+      'choiceUomIdFries':choiceUomIdFries.toString(),
+      'choiceIdFries':choiceIdFries.toString(),
+      'choicePriceFries':choicePriceFries.toString(),
+      'choiceUomIdSides':choiceUomIdSides.toString(),
+      'choiceIdSides':choiceIdSides.toString(),
+      'choicePriceSides':choicePriceSides.toString(),
+      'flavorId':flavorId.toString(),
+      'flavorPrice':flavorPrice.toString(),
+      'selectedSideOnPrice':selectedSideOnPrice.toString(),
+      'selectedSideItems':selectedSideItems.toString(),
+      'selectedSideItemsUom':selectedSideItemsUom.toString()
+    });
+    print(selectedSideOnPrice.toString());
+    print(selectedSideItems.toString());
+    print(selectedSideItemsUom.toString());
+    client.close();
+  }
+
+  Future updateNewAddress(id, firstName, lastName, mobileNum, houseUnit, streetPurok, landMark, barangayID, buildingID) async{
+    var client = http.Client();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var userID = prefs.getString('s_customerId');
+    await client.post(Uri.parse("$server/updateNewAddress_r"),body:{
+      'id':encrypt(id),
+      'userID':encrypt(userID),
+      'firstName':encrypt(firstName),
+      'lastName':encrypt(lastName),
+      'mobileNum':encrypt(mobileNum),
+      'houseUnit':encrypt(houseUnit),
+      'streetPurok':encrypt(streetPurok),
+      'landMark':encrypt(landMark),
+      'barangayID':encrypt(barangayID.toString()),
+      'buildingID':encrypt(buildingID.toString())
+    });
+    print(barangayID);
+    print(buildingID);
+    print(streetPurok);
+    client.close();
+  }
+
   Future submitNewAddress(firstName,lastName,mobileNum,houseUnit,streetPurok,landMark,barangayID,buildingID) async{
     var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var userID = prefs.getString('s_customerId');
-    final response = await client.post(Uri.parse("$server/submitNewAddress_r"),body:{
+    await client.post(Uri.parse("$server/submitNewAddress_r"),body:{
       'userID':encrypt(userID),
       'firstName':encrypt(firstName),
       'lastName':encrypt(lastName),
@@ -1192,7 +1297,30 @@ class RapidA {
       'buildingID':encrypt(buildingID.toString())
     });
     client.close();
-    return response.body;
+  }
+
+  Future selectCategory(tenantId) async{
+    var client = http.Client();
+    Map dataUser;
+    final response = await client.post(Uri.parse("$server/viewTenantCategories_r"),body:{
+      'tenantId':encrypt(tenantId)
+    });
+    dataUser = jsonDecode(response.body);
+    client.close();
+    return dataUser;
+  }
+
+  Future loadAddresses(idd, cusId) async{
+    var client = http.Client();
+    Map dataUser;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final response = await client.post(Uri.parse("$server/loadAdresses_r"),body:{
+      'idd':encrypt(idd),
+      'userID':encrypt(cusId)
+    });
+    dataUser = jsonDecode(response.body);
+    client.close();
+    return dataUser;
   }
 
   Future loadAddress() async{
@@ -1211,6 +1339,14 @@ class RapidA {
   Future deleteAddress(id) async{
     var client = http.Client();
     await client.post(Uri.parse("$server/deleteAddress_r"),body:{
+      'id':encrypt(id)
+    });
+    client.close();
+  }
+
+  Future deleteDiscountID(id) async{
+    var client = http.Client();
+    await client.post(Uri.parse("$server/deleteDiscountID_r"),body:{
       'id':encrypt(id)
     });
     client.close();
@@ -1249,15 +1385,16 @@ class RapidA {
     client.close();
   }
 
-  Future selectCategory(tenantId) async{
+  Future updatePickupAt(date,time) async{
     var client = http.Client();
-    Map dataUser;
-    final response = await client.post(Uri.parse("$server/viewTenantCategories_r"),body:{
-      'tenantId':encrypt(tenantId)
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var userID = prefs.getString('s_customerId');
+    await client.post(Uri.parse("$server/updatePickupAt_r"),body:{
+      'date':date,
+      'time':time,
+      'userID':userID
     });
-    dataUser = jsonDecode(response.body);
     client.close();
-    return dataUser;
   }
 
   Future checkIfBf() async{
@@ -1277,7 +1414,7 @@ class RapidA {
     var client = http.Client();
     Map dataUser;
     final response = await client.post(Uri.parse("$server/getTotalFee_r"),body:{
-          'ticketID':ticketID.toString()
+      'ticketID':ticketID.toString()
     });
     dataUser = jsonDecode(response.body);
     client.close();
@@ -1411,7 +1548,6 @@ class RapidA {
     client.close();
   }
 }
-
 
 
 

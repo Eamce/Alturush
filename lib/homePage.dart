@@ -21,7 +21,7 @@ class HomePage extends StatefulWidget {
 
   @override
   _HomePageState createState() => _HomePageState();
-  }
+}
 
 class _HomePageState extends State<HomePage> {
   final db = RapidA();
@@ -41,6 +41,8 @@ class _HomePageState extends State<HomePage> {
   List listProfile;
   var isLoading = true;
   var isVisible = true;
+  var login = true;
+  var logout = true;
   var cartCount;
   var subtotal;
   var locationString;
@@ -56,15 +58,14 @@ class _HomePageState extends State<HomePage> {
   int counter;
   int provinceId;
   int townID;
-  int unitGroupId;
 
   Future loadBu() async{
     var res = await db.getBusinessUnitsCi();
     if (!mounted) return;
     setState(() {
       buData = res['user_details'];
+      print(buData);
     });
-
     Timer(Duration(milliseconds:500), () {
       _needsScroll = true;
       _scrollToEnd();
@@ -121,14 +122,15 @@ class _HomePageState extends State<HomePage> {
         firstName = loadProfileData[0]['d_fname'];
         isLoading = false;
         isVisible = true;
+        logout = true;
       });
-    }
-    else{
+    } else {
       locationString = "Location";
       firstName = "";
       profilePhoto = "";
       isVisible = false;
       isLoading = false;
+      logout = false;
     }
   }
 
@@ -158,7 +160,6 @@ class _HomePageState extends State<HomePage> {
     if (!mounted) return;
     setState(() {
       getProvinceData = res['user_details'];
-      print(getProvinceData);
     });
     FocusScope.of(context).requestFocus(FocusNode());
     showDialog<void>(
@@ -168,30 +169,48 @@ class _HomePageState extends State<HomePage> {
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(8.0))
           ),
-          contentPadding: EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
-          title: Text('Select Province',),
+          contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 15.0),
+          title: Text('Select Province',style: TextStyle(color: Colors.deepOrangeAccent),),
           content: Container(
-            height: 90.0,
+            height: 100.0,
             width: 300.0,
-            child: Scrollbar(
-              child: ListView.builder(
-                physics: BouncingScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: getProvinceData == null ? 0 : getProvinceData.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return InkWell(
-                    onTap:(){
-                      province.text = getProvinceData[index]['prov_name'];
-                      provinceId = int.parse(getProvinceData[index]['prov_id']);
-                      town.clear();
-                      Navigator.of(context).pop();
-                    },
-                    child: ListTile(
-                      title: Text(getProvinceData[index]['prov_name']),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Divider(thickness: 1, color: Colors.deepOrangeAccent),
+                Expanded(
+                  child: Scrollbar(
+                    child: ListView.builder(
+                      physics: BouncingScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: getProvinceData == null ? 0 : getProvinceData.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return InkWell(
+                          onTap:(){
+                            province.text = getProvinceData[index]['prov_name'];
+                            provinceId = int.parse(getProvinceData[index]['prov_id']);
+                            town.clear();
+                            Navigator.of(context).pop();
+                          },
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(left: 10),
+                                child: SizedBox(height: 40,
+                                  child: ListTile(
+                                    title: Text(getProvinceData[index]['prov_name']),
+                                  ),
+                                )
+                              )
+                            ],
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
+                  ),
+                )
+              ],
             ),
           ),
           actions: <Widget>[
@@ -207,10 +226,19 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             TextButton(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.deepOrangeAccent),
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                    side: BorderSide(color: Colors.deepOrangeAccent)
+                  )
+                )
+              ),
               child: Text(
                 'Clear',
                 style: TextStyle(
-                  color: Colors.grey.withOpacity(0.8),
+                  color: Colors.white.withOpacity(0.8),
                 ),
               ),
               onPressed: () {
@@ -230,7 +258,6 @@ class _HomePageState extends State<HomePage> {
     if (!mounted) return;
     setState(() {
       getTownData = res['user_details'];
-      print(getTownData);
     });
     FocusScope.of(context).requestFocus(FocusNode());
     showDialog<void>(
@@ -240,31 +267,49 @@ class _HomePageState extends State<HomePage> {
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(8.0))
           ),
-          contentPadding: EdgeInsets.symmetric(horizontal: 1.0, vertical: 20.0),
-          title: Text('Select Town',),
+          contentPadding: EdgeInsets.symmetric(horizontal: 1.0, vertical: 5.0),
+          title: Text('Select Town', style: TextStyle(color: Colors.deepOrangeAccent),),
           content: Container(
             height: 300.0,
             width: 300.0,
-            child: Scrollbar(
-              child:ListView.builder(
-                physics: BouncingScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: getTownData == null ? 0 : getTownData.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return InkWell(
-                    onTap:(){
-                      town.text = getTownData[index]['town_name'];
-                      townID = int.parse(getTownData[index]['town_id']);
-                      unitGroupId = int.parse(getTownData[index]['bunit_group_id']);
-                      Navigator.of(context).pop();
-                    },
-                    child: ListTile(
-                      title: Text(getTownData[index]['town_name']),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Divider(color: Colors.deepOrangeAccent),
+                Expanded(
+                  child: Scrollbar(
+                    child:ListView.builder(
+                      physics: BouncingScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: getTownData == null ? 0 : getTownData.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return InkWell(
+                          onTap:(){
+                            town.text = getTownData[index]['town_name'];
+                            townID = int.parse(getTownData[index]['town_id']);
+                            unitGroupId = int.parse(getTownData[index]['bunit_group_id']);
+                            Navigator.of(context).pop();
+                          },
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(left: 10),
+                                child: SizedBox(height: 40,
+                                  child: ListTile(
+                                    title: Text(getTownData[index]['town_name']),
+                                  ),
+                                )
+                              )
+                            ],
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
-            ),
+                  ),
+                )
+              ],
+            )
           ),
           actions: <Widget>[
             TextButton(
@@ -279,10 +324,19 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             TextButton(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.deepOrangeAccent),
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                    side: BorderSide(color: Colors.red)
+                  )
+                )
+              ),
               child: Text(
                 'Clear',
                 style: TextStyle(
-                  color: Colors.grey.withOpacity(0.8),
+                  color: Colors.white.withOpacity(0.8),
                 ),
               ),
               onPressed: () {
@@ -295,8 +349,6 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
-
-
   // Future getGlobalCat() async{
   //   var res = await db.getGlobalCat();
   //   if (!mounted) return;
@@ -304,8 +356,6 @@ class _HomePageState extends State<HomePage> {
   //     globalCat = res['user_details'];
   //   });
   // }
-
-
   ScrollController _scrollController = new ScrollController();
   bool _needsScroll = false;
   final _formKey = GlobalKey<FormState>();
@@ -335,7 +385,7 @@ class _HomePageState extends State<HomePage> {
         brightness: Brightness.light,
         backgroundColor: Colors.white,
         elevation: 0.1,
-        iconTheme: new IconThemeData(color: Colors.black),
+        iconTheme: new IconThemeData(color: Colors.black54, size: 25),
         actions: [
           status == null ? TextButton(
             style: TextButton.styleFrom(
@@ -348,7 +398,7 @@ class _HomePageState extends State<HomePage> {
               loadProfile();
               loadProfilePic();
             },
-            child: Text("Login",style: GoogleFonts.openSans(color:Colors.deepOrange,fontWeight: FontWeight.bold,fontSize: 18.0),),
+            child: Text("Login",style: GoogleFonts.openSans(color:Colors.deepOrange,fontWeight: FontWeight.bold,fontSize: 16.0),),
           ):
           InkWell(
             customBorder: CircleBorder(),
@@ -368,8 +418,8 @@ class _HomePageState extends State<HomePage> {
               }
             },
             child: Container(
-              width: 70.0,
-              height: 70.0,
+              width: 50.0,
+              height: 50.0,
               child: Padding(
                 padding:EdgeInsets.all(5.0),
                 child: profileLoading ? CircularProgressIndicator(
@@ -380,9 +430,9 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-            IconButton(
-              icon: Icon(Icons.receipt_long_rounded, color: Colors.black,
-                size: 30.0,),
+          IconButton(
+              icon: Icon(Icons.receipt_long_rounded, color: Colors.black54,
+                size: 25.0,),
               onPressed: () async {
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 String username = prefs.getString('s_customerId');
@@ -405,7 +455,7 @@ class _HomePageState extends State<HomePage> {
             Image.asset(
               'assets/png/alturush_text_logo.png',
               fit: BoxFit.contain,
-              height: 45,
+              height: 30,
             ),
             // Container(
             //   padding: const EdgeInsets.all(8.0), child: Text("Order Food",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),)
@@ -415,7 +465,6 @@ class _HomePageState extends State<HomePage> {
 
 
       drawer:Container(
-
         color: Colors.deepOrange,
         width: 280,
         child: Drawer(
@@ -438,32 +487,32 @@ class _HomePageState extends State<HomePage> {
                       SizedBox(
                         height: 50.0,
                       ),
-                      ListView.builder(
-
-                          shrinkWrap: true,
-                          physics: BouncingScrollPhysics(),
-                          itemCount:  globalCat == null ? 0 : globalCat.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return ListTile(
-
-                                leading: CircleAvatar(
-                                  backgroundColor: Colors.transparent,
-                                  child: Image.network(globalCat[index]['cat_picture']),
-                                ),
-                                title: Text(globalCat[index]['category'],style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 16.0),),
-                                onTap: () async{
-                                  Navigator.pop(context);
-                                  if(globalCat[index]['id'] == '1'){
-                                    Navigator.of(context).push(_foodRoute(globalCat[index]['id']));
-                                  }if(globalCat[index]['id'] == '2'){
-                                    Navigator.of(context).push(_groceryRoute(globalCat[index]['id']));
-                                  }if(globalCat[index]['id'] == '3'){
-                                    Navigator.of(context).push(_foodRoute(globalCat[index]['id']));
-                                  }
-                                }
-                            );
-                          }
-                      ),
+                      // ListView.builder(
+                      //
+                      //     shrinkWrap: true,
+                      //     physics: BouncingScrollPhysics(),
+                      //     itemCount:  globalCat == null ? 0 : globalCat.length,
+                      //     itemBuilder: (BuildContext context, int index) {
+                      //       return ListTile(
+                      //
+                      //           leading: CircleAvatar(
+                      //             backgroundColor: Colors.transparent,
+                      //             child: Image.network(globalCat[index]['cat_picture']),
+                      //           ),
+                      //           title: Text(globalCat[index]['category'],style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 16.0),),
+                      //           onTap: () async{
+                      //             Navigator.pop(context);
+                      //             if(globalCat[index]['id'] == '1'){
+                      //               Navigator.of(context).push(_foodRoute(globalCat[index]['id']));
+                      //             }if(globalCat[index]['id'] == '2'){
+                      //               Navigator.of(context).push(_groceryRoute(globalCat[index]['id']));
+                      //             }if(globalCat[index]['id'] == '3'){
+                      //               Navigator.of(context).push(_foodRoute(globalCat[index]['id']));
+                      //             }
+                      //           }
+                      //       );
+                      //     }
+                      // ),
                       ListTile(
                           leading: Icon(Icons.person,size: 30.0, color: Colors.deepOrange,),
                           title: Text('Profile',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontSize: 16.0),),
@@ -512,16 +561,22 @@ class _HomePageState extends State<HomePage> {
                           }
                       ),
 
-//                      ListTile(
-//                            leading: Icon(Icons.help_outline,size: 30.0,color: Colors.deepOrange,),
-//                            title: Text('Log out',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 16.0),),
-//                            onTap: () async{
-//                                Navigator.of(context).pop();
-//                                _googleSignIn.signOut();
-//                                SharedPreferences prefs = await SharedPreferences.getInstance();
-//                                prefs.clear();
-//                            }
-//                        ),
+                     Visibility(
+                         visible: logout,
+                         child: ListTile(
+                             leading: Icon(Icons.logout ,size: 30.0,color: Colors.deepOrange,),
+                             title: Text('Log out',style: GoogleFonts.openSans(fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 16.0),),
+                             onTap: () async{
+                               Navigator.of(context).pop();
+                               Navigator.of(context).pop();
+                               Navigator.of(context).push(_homepage());
+                               SharedPreferences prefs = await SharedPreferences.getInstance();
+                               prefs.clear();
+                             }
+                         ),
+
+                     ),
+
                     ],
                   ),
                 ),
@@ -570,7 +625,7 @@ class _HomePageState extends State<HomePage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: EdgeInsets.fromLTRB(40, 10, 5, 5),
+                                padding: EdgeInsets.fromLTRB(10, 10, 5, 5),
                                 child: new Text(
                                   "Select Province",
                                   style: GoogleFonts.openSans(
@@ -578,7 +633,7 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 5.0),
+                                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
                                 child: InkWell(
                                   borderRadius: BorderRadius.circular(30.0),
                                   onTap: (){
@@ -613,7 +668,7 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.fromLTRB(40, 10, 5, 5),
+                                padding: EdgeInsets.fromLTRB(10, 10, 5, 5),
                                 child: new Text(
                                   "Select town",
                                   style: GoogleFonts.openSans(
@@ -621,11 +676,10 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 5.0),
+                                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
                                 child: InkWell(
                                   borderRadius: BorderRadius.circular(30.0),
                                   onTap: (){
-
                                     selectTown();
                                   },
                                   child: IgnorePointer(
@@ -657,17 +711,15 @@ class _HomePageState extends State<HomePage> {
                                 height: 10.0,
                               ),
                               Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 5.0),
+                                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
                                 child: Container(
                                   height: 50.0,
                                   child: OutlinedButton(
                                     onPressed: (){
                                       if (_formKey.currentState.validate()) {
                                         // getGlobalCat();
-
                                         loadBu();
-
-
+                                        print("business units: "); print(buData);
                                       }
                                     },
                                     style: TextButton.styleFrom(
@@ -695,16 +747,12 @@ class _HomePageState extends State<HomePage> {
                         itemBuilder: (BuildContext context, int index) {
                           return InkWell(
                             onTap: () async{
-
-
-                              await Navigator.of(context).push(_globalCat(buData[index]['logo'],buData[index]['business_unit'],buData[index]['bunit_code']));
+                              await Navigator.of(context).push(_globalCat(buData[index]['logo'],buData[index]['business_unit'],buData[index]['acroname'],buData[index]['bunit_code']));
                               getCounter();
                               listenCartCount();
-
-
                             },
                             child:Container(
-                              height: 120.0,
+                              height: 90.0,
                               width: 30.0,
                               child: Card(
                                 color: Colors.white,
@@ -713,8 +761,8 @@ class _HomePageState extends State<HomePage> {
                                   children: <Widget>[
                                     ListTile(
                                       leading:Container(
-                                        width: 60.0,
-                                        height: 60.0,
+                                        width: 50.0,
+                                        height: 50.0,
                                         decoration: new BoxDecoration(
                                           image: new DecorationImage(
                                             image: new NetworkImage(buData[index]['logo']),
@@ -727,7 +775,7 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                         ),
                                       ),
-                                      title: Text(buData[index]['business_unit'],style: GoogleFonts.openSans(color: Colors.black54,fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 22.0),),
+                                      title: Text(buData[index]['business_unit'],style: GoogleFonts.openSans(color: Colors.black54,fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 18.0),),
                                     ),
                                   ],
                                 ),
@@ -746,7 +794,7 @@ class _HomePageState extends State<HomePage> {
             Visibility(
               visible:cartCount == 0 ? false : true,
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
+                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
                 child: Row(
                   children: <Widget>[
                     Flexible(
@@ -818,6 +866,22 @@ class _HomePageState extends State<HomePage> {
 Route _signIn() {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => CreateAccountSignIn(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(0.0, 1.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route _homepage() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => HomePage(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;
@@ -943,9 +1007,9 @@ Route _gotoTenants(buLogo,buName,buCode) {
   );
 }
 
-Route _globalCat(buLogo,buName,buCode) {
+Route _globalCat(buLogo,buName,buAcroname,buCode) {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => GlobalCat(buLogo:buLogo, buName:buName, buCode:buCode),
+    pageBuilder: (context, animation, secondaryAnimation) => GlobalCat(buLogo:buLogo, buName:buName, buAcroname:buAcroname, buCode:buCode),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1.0, 0.0);
       var end = Offset.zero;

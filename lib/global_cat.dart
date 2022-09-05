@@ -9,6 +9,8 @@ import 'package:sleek_button/sleek_button.dart';
 
 import 'create_account_signin.dart';
 import 'db_helper.dart';
+import 'grocery/gc_loadStore.dart';
+import 'grocery/groceryMain.dart';
 import 'load_cart.dart';
 import 'load_tenants.dart';
 
@@ -17,7 +19,8 @@ class GlobalCat extends StatefulWidget {
   final buCode;
   final buLogo;
   final buName;
-  GlobalCat({Key key, @required this.buLogo,this.buName,this.buCode}) : super(key: key);
+  final buAcroname;
+  GlobalCat({Key key, @required this.buLogo,this.buName,this.buCode, this.buAcroname}) : super(key: key);
   @override
   _GlobalCat createState() => _GlobalCat();
 }
@@ -58,6 +61,7 @@ class _GlobalCat extends State<GlobalCat>{
     setState(() {
       isLoading = false;
       globalCat = res['user_details'];
+      print(globalCat);
     });
   }
 
@@ -105,7 +109,7 @@ class _GlobalCat extends State<GlobalCat>{
     super.initState();
     getGlobalCat();
     getCounter();
-    // loadTenant();
+   print(widget.buAcroname);
     loadProfile();
     loadProfilePic();
   }
@@ -136,21 +140,21 @@ class _GlobalCat extends State<GlobalCat>{
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Image.asset(
-                'assets/png/logo_raider8.2.png',
+                'assets/png/alturush_text_logo.png',
                 fit: BoxFit.contain,
-                height: 60,
+                height: 30,
               ),
-              Container(
-                padding: const EdgeInsets.all(8.0), child: Text("Categories",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),)
+              // Container(
+              //   padding: const EdgeInsets.all(8.0), child: Text("Categories",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),)
             ],
           ),
           leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.black,size: 23,),
+            icon: Icon(Icons.arrow_back, color: Colors.black54,size: 20,),
             onPressed: () => Navigator.of(context).pop(),
           ),
           actions: <Widget>[
             IconButton(
-                icon: Icon(Icons.search_outlined, color: Colors.black),
+                icon: Icon(Icons.search_outlined, color: Colors.black54, size: 25,),
                 onPressed: () async {
                   Navigator.of(context).push(_search());
                 }
@@ -161,7 +165,7 @@ class _GlobalCat extends State<GlobalCat>{
                 getCounter();
                 loadProfile();
               },
-              child: Text("Login",style: GoogleFonts.openSans(color:Colors.deepOrange,fontWeight: FontWeight.bold,fontSize: 18.0),),
+              child: Text("Login",style: GoogleFonts.openSans(color:Colors.deepOrange,fontWeight: FontWeight.bold,fontSize: 16.0),),
             ):        InkWell(
               customBorder: CircleBorder(),
               onTap: () async{
@@ -180,8 +184,8 @@ class _GlobalCat extends State<GlobalCat>{
                 }
               },
               child: Container(
-                width: 70.0,
-                height: 70.0,
+                width: 50.0,
+                height: 50.0,
                 child: Padding(
                   padding:EdgeInsets.all(5.0),
                   child: profileLoading ? CircularProgressIndicator(
@@ -193,7 +197,7 @@ class _GlobalCat extends State<GlobalCat>{
               ),
             ),
             IconButton(
-                icon: Icon(Icons.receipt_long_rounded, color: Colors.black, size: 30.0,),
+                icon: Icon(Icons.receipt_long_rounded, color: Colors.black54, size: 25.0,),
                 onPressed: () async {
                   SharedPreferences prefs = await SharedPreferences.getInstance();
                   String username = prefs.getString('s_customerId');
@@ -226,9 +230,9 @@ class _GlobalCat extends State<GlobalCat>{
                     physics: AlwaysScrollableScrollPhysics(),
                     children: <Widget>[
                       SizedBox(
-                        height: 150.0,
+                        height: 120.0,
                         child: Padding(
-                          padding: EdgeInsets.fromLTRB(25, 20, 25, 5),
+                          padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                           child: Card(
                             child: new Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -252,18 +256,18 @@ class _GlobalCat extends State<GlobalCat>{
                                   ),
                                   title: Text(widget.buName,
                                     style: GoogleFonts.openSans(
-                                        color: Colors.black,
+                                        color: Colors.black54,
                                         fontWeight: FontWeight.bold,
                                         fontStyle: FontStyle.normal,
-                                        fontSize: 15.0),
+                                        fontSize: 20.0),
                                   ),
-                                  subtitle: Text(
-                                    'Select Categories',
-                                    style: GoogleFonts.openSans(
-                                        color: Colors.black,
-                                        fontStyle: FontStyle.normal,
-                                        fontSize: 13.0),
-                                  ),
+                                  // subtitle: Text(
+                                  //   'Select Categories',
+                                  //   style: GoogleFonts.openSans(
+                                  //       color: Colors.black,
+                                  //       fontStyle: FontStyle.normal,
+                                  //       fontSize: 13.0),
+                                  // ),
                                   dense: true,
                                 ),
                               ],
@@ -272,12 +276,20 @@ class _GlobalCat extends State<GlobalCat>{
                         ),
                       ),
                       SizedBox(
-                        height: 20.0,
+                        height: 5.0,
                       ),
-//
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(20, 5, 0, 20),
+                        child: Text('CATEGORIES',style: GoogleFonts.openSans(
+                            color: Colors.black54,
+                            fontWeight: FontWeight.bold,
+                            fontStyle: FontStyle.normal,
+                            fontSize: 18.0)),
+                      ),
                       SizedBox(
-                        height: 20.0,
+                        height: 5.0,
                       ),
+
                       ListView.builder(
                           physics: BouncingScrollPhysics(),
                           shrinkWrap: true,
@@ -285,14 +297,32 @@ class _GlobalCat extends State<GlobalCat>{
                           itemBuilder: (BuildContext context, int index) {
                             return InkWell(
                               onTap: () async{
-                                await Navigator.of(context).push(_gotoTenants(widget.buLogo, widget.buName, widget.buCode, globalCat[index]['cat_picture'], globalCat[index]['category'], globalCat[index]['id']
-                                ));
+                                if (globalCat[index]['id'] != '2'){
+                                  await Navigator.of(context).push(_gotoTenants(
+                                      widget.buLogo,
+                                      widget.buName,
+                                      widget.buAcroname,
+                                      widget.buCode,
+                                      globalCat[index]['cat_picture'],
+                                      globalCat[index]['category'],
+                                      globalCat[index]['id']
+                                  ));
+                                } else {
+                                  print('unya naka');
+                                  // Navigator.of(context).push(_loadGC(
+                                  //     widget.buLogo,
+                                  //     globalCat[index]['category'],
+                                  //     globalCat[index]['id'],
+                                  //     widget.buName,
+                                  //     widget.buCode
+                                  // ));
+                                }
 
 
                                 // selectCategory(context,widget.buCode,loadTenants[index]['logo'], loadTenants[index]['tenant_id'], loadTenants[index]['d_tenant_name']);
                               },
                               child:Container(
-                                height: 120.0,
+                                height: 100.0,
                                 width: 30.0,
 
                                 child: Card(
@@ -302,8 +332,8 @@ class _GlobalCat extends State<GlobalCat>{
                                     children: <Widget>[
                                       ListTile(
                                         leading:Container(
-                                          width: 60.0,
-                                          height: 60.0,
+                                          width: 50.0,
+                                          height: 50.0,
                                           decoration: new BoxDecoration(
                                             image: new DecorationImage(
                                               image: new NetworkImage(globalCat[index]['cat_picture']),
@@ -316,7 +346,7 @@ class _GlobalCat extends State<GlobalCat>{
                                             ),
                                           ),
                                         ),
-                                        title: Text(globalCat[index]['category'].toString(),style: GoogleFonts.openSans(color: Colors.black54,fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 22.0),),
+                                        title: Text(globalCat[index]['category'].toString(),style: GoogleFonts.openSans(color: Colors.black54,fontStyle: FontStyle.normal,fontWeight:FontWeight.bold,fontSize: 18.0),),
                                       ),
                                     ],
                                   ),
@@ -477,9 +507,9 @@ Route _loadCart() {
   );
 }
 
-Route _gotoTenants(buLogo, buName, buCode, globalPic, globalCat, globalID) {
+Route _gotoTenants(buLogo, buName, buAcroname, buCode, globalPic, globalCat, globalID) {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => LoadTenants(buLogo:buLogo, buName:buName, buCode:buCode, globalPic:globalPic, globalCat:globalCat, globalID:globalID),
+    pageBuilder: (context, animation, secondaryAnimation) => LoadTenants(buLogo:buLogo, buName:buName, buAcroname:buAcroname, buCode:buCode, globalPic:globalPic, globalCat:globalCat, globalID:globalID),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1.0, 0.0);
       var end = Offset.zero;
@@ -498,6 +528,38 @@ Route profile(){
     pageBuilder: (context, animation, secondaryAnimation) => ProfilePage(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route _groceryRoute(_groceryRoute) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => GroceryMain(groceryRoute:_groceryRoute),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(0.0, 1.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route _loadGC(logo,categoryName,categoryNo,businessUnit,bUnitCode){
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => GcLoadStore(logo:logo,categoryName:categoryName,categoryNo:categoryNo,businessUnit:businessUnit,bUnitCode:bUnitCode),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(0.0, 1.0);
       var end = Offset.zero;
       var curve = Curves.decelerate;
       var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));

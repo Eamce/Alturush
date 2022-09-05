@@ -4,6 +4,7 @@ import 'package:sleek_button/sleek_button.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:arush/db_helper.dart';
 import 'addNewAddress.dart';
+import 'editAddress.dart';
 
 class AddressMasterFile extends StatefulWidget {
   @override
@@ -22,8 +23,9 @@ class _AddressMasterFile extends State<AddressMasterFile> {
    var res = await db.loadAddress();
     if (!mounted) return;
     setState(() {
-      isLoading = false;
+
       loadIdList = res['user_details'];
+      isLoading = false;
       print(loadIdList);
     });
   }
@@ -45,7 +47,7 @@ class _AddressMasterFile extends State<AddressMasterFile> {
           content: SingleChildScrollView(
             child:Padding(
                 padding:EdgeInsets.fromLTRB(25.0, 0.0, 20.0, 0.0),
-                child: Text("Hello, do you want to delete this address?")
+                child: Text("Do you want to delete this address?")
             ),
           ),
           actions: <Widget>[
@@ -118,12 +120,12 @@ class _AddressMasterFile extends State<AddressMasterFile> {
         ),
         title: Text("Your Addresses",style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
       ),
-      body: isLoading ?
-      Center(
-        child: CircularProgressIndicator(
-          valueColor: new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
-         ),
-        ):
+      body:
+      // Center(
+      //   child: CircularProgressIndicator(
+      //     valueColor: new AlwaysStoppedAnimation<Color>(Colors.deepOrange),
+      //    ),
+      //   ):
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -134,7 +136,7 @@ class _AddressMasterFile extends State<AddressMasterFile> {
                 child: ListView(
                   shrinkWrap: true,
                   children: [
-                    exist == false ? Padding(
+                    if (exist == false) Padding(
                       padding: EdgeInsets.symmetric(vertical: screenHeight / 3.0),
                           child: Center(
                             child:Column(
@@ -151,7 +153,7 @@ class _AddressMasterFile extends State<AddressMasterFile> {
                               ],
                             ),
                           ),
-                        ) : ListView.builder(
+                        ) else ListView.builder(
                         shrinkWrap: true,
                         physics: BouncingScrollPhysics(),
                         itemCount: loadIdList == null ? 0 : loadIdList.length,
@@ -159,84 +161,139 @@ class _AddressMasterFile extends State<AddressMasterFile> {
                           var q = index;
                           q++;
                           return InkWell(
-                            onTap: (){
-
+                            onTap: () {
+                              // print("Tap item index: $index");
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        EditAddress(
+                                            idd: loadIdList[index]['id'], cusId: loadIdList[index]['d_customerId'])),
+                              );
                             },
-                            child: Padding(
-                              padding:EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
-                              child: Padding(
-                                padding:EdgeInsets.fromLTRB(5.0, 0.0, 0.0, 5.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Padding(
-                                      padding:EdgeInsets.fromLTRB(5.0, 5.0, 0.0, 0.0),
-                                      child:Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
 
-                                          Text('$q. ${loadIdList[index]['firstname']} ${loadIdList[index]['lastname']}',style: TextStyle(fontSize: 20,),),
-                                          Text('    ${loadIdList[index]['d_townName']}, ${loadIdList[index]['d_brgName']}',style: TextStyle(fontSize: 20,),),
-                                          Text('    ${loadIdList[index]['street_purok']}',style: TextStyle(fontSize: 20,),),
-                                          Text('    ${loadIdList[index]['d_contact']}',style: TextStyle(fontSize: 20,),),
-                                          // Text('   ${loadIdList[index]['buildingName']}',style: TextStyle(fontSize: 20,),),
-                                          ButtonBar(
-                                            children: <Widget>[
-                                              OutlineButton(
-                                                child: Stack(
-                                                  children: <Widget>[
-                                                    Align(
-                                                        alignment: Alignment.topRight,
-                                                        child: Icon(Icons.delete_outline_outlined,color: Colors.black)
-                                                    )
-                                                  ],
-                                                ),
-                                                highlightedBorderColor: Colors.black,
-                                                highlightColor: Colors.transparent,
-                                                shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
-                                                onPressed: () {
-                                                  deleteAddress(loadIdList[index]['id']);
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    // ButtonBar(
-                                    //   children: <Widget>[
-                                    //     // OutlineButton(
-                                    //     //   highlightedBorderColor: Colors.black,
-                                    //     //   highlightColor: Colors.transparent,
-                                    //     //   shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
-                                    //     //   child: Icon(Icons.edit_outlined,color: Colors.black,),
-                                    //     //   onPressed: () {
-                                    //     //
-                                    //     //   },
-                                    //     // ),
-                                    //     OutlineButton(
-                                    //       child: Stack(
-                                    //         children: <Widget>[
-                                    //           Align(
-                                    //             alignment: Alignment.topRight,
-                                    //               child: Icon(Icons.delete_outline_outlined,color: Colors.black)
-                                    //           )
-                                    //         ],
-                                    //       ),
-                                    //       highlightedBorderColor: Colors.black,
-                                    //       highlightColor: Colors.transparent,
-                                    //       shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
-                                    //       onPressed: () {
-                                    //          deleteAddress(loadIdList[index]['id']);
-                                    //       },
-                                    //     ),
-                                    //   ],
+                              child: Dismissible(
+                                key: UniqueKey(),
+
+                                // only allows the user swipe from right to left
+                                direction: DismissDirection.endToStart,
+
+                                // Remove this product from the list
+                                // In production enviroment, you may want to send some request to delete it on server side
+                                onDismissed: (_) {
+                                  setState(() {
+                                    deleteAddress(loadIdList[index]['id']);
+                                  });
+                                },
+
+
+                                // Display item's title, price...
+                                child: Card(
+                                  margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  child: ListTile(
+                                    leading: const Icon(Icons.location_on),
+                                    // CircleAvatar(
+                                    //     backgroundColor: Colors.deepOrangeAccent,
+                                    //     child: Text('$q.',style: TextStyle(fontSize: 18, color: Colors.white,  fontWeight: FontWeight.bold),)
                                     // ),
-                                  ],
+                                    title: Text('${loadIdList[index]['firstname']} ${loadIdList[index]['lastname']}',style: TextStyle(fontSize: 20,),),
+                                    subtitle: Text('${loadIdList[index]['d_townName']}, ${loadIdList[index]['d_brgName']}, ${loadIdList[index]['street_purok']} \n${loadIdList[index]['d_contact']}', style: TextStyle(fontSize: 16,),),
+                                    trailing: const Icon(Icons.arrow_back),
+
+                                  ),
                                 ),
-                              ),
-                            ),
+
+                                // This will show up when the user performs dismissal action
+                                // It is a red background and a trash icon
+                                background: Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius: BorderRadius.all(Radius.circular(5))
+                                    ),
+                                    margin: const EdgeInsets.symmetric(horizontal: 10),
+                                    alignment: Alignment.centerRight,
+                                    child: Padding(
+                                      padding: EdgeInsets.fromLTRB(0.0, 0.0, 15.0, 0.0),
+                                      child: const Icon(
+                                        Icons.delete,
+                                        color: Colors.white,
+                                      ),)
+
+                                ),
+                              )
                           );
+
+                          // return InkWell(
+                          //   onTap: (){
+                          //
+                          //   },
+                          //   child: Padding(padding:EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
+                          //     child: Padding(padding:EdgeInsets.fromLTRB(5.0, 0.0, 0.0, 5.0),
+                          //       child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                          //         children: <Widget>[
+                          //           Padding(padding:EdgeInsets.fromLTRB(5.0, 5.0, 0.0, 0.0),
+                          //             child:Column(crossAxisAlignment: CrossAxisAlignment.start,
+                          //               children: [
+                          //                 Text('$q. ${loadIdList[index]['firstname']} ${loadIdList[index]['lastname']}',style: TextStyle(fontSize: 20,),),
+                          //                 Text('    ${loadIdList[index]['d_townName']}, ${loadIdList[index]['d_brgName']}',style: TextStyle(fontSize: 20,),),
+                          //                 Text('    ${loadIdList[index]['street_purok']}',style: TextStyle(fontSize: 20,),),
+                          //                 Text('    ${loadIdList[index]['d_contact']}',style: TextStyle(fontSize: 20,),),
+                          //
+                          //                 ButtonBar(
+                          //                   children: <Widget>[
+                          //                     OutlineButton(
+                          //                       child: Stack(
+                          //                       children: <Widget>[
+                          //                           Align(alignment: Alignment.bottomRight, child: Icon(Icons.delete_outline_outlined,color: Colors.black)
+                          //                           )
+                          //                         ],
+                          //                       ),
+                          //                       highlightedBorderColor: Colors.black,
+                          //                       highlightColor: Colors.transparent,
+                          //                       shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                          //                       onPressed: () {
+                          //                         deleteAddress(loadIdList[index]['id']);
+                          //                       },
+                          //                     ),
+                          //                   ],
+                          //                 ),
+                          //               ],
+                          //             ),
+                          //           ),
+                          //           // ButtonBar(
+                          //           //   children: <Widget>[
+                          //           //     // OutlineButton(
+                          //           //     //   highlightedBorderColor: Colors.black,
+                          //           //     //   highlightColor: Colors.transparent,
+                          //           //     //   shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                          //           //     //   child: Icon(Icons.edit_outlined,color: Colors.black,),
+                          //           //     //   onPressed: () {
+                          //           //     //
+                          //           //     //   },
+                          //           //     // ),
+                          //           //     OutlineButton(
+                          //           //       child: Stack(
+                          //           //         children: <Widget>[
+                          //           //           Align(
+                          //           //             alignment: Alignment.topRight,
+                          //           //               child: Icon(Icons.delete_outline_outlined,color: Colors.black)
+                          //           //           )
+                          //           //         ],
+                          //           //       ),
+                          //           //       highlightedBorderColor: Colors.black,
+                          //           //       highlightColor: Colors.transparent,
+                          //           //       shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                          //           //       onPressed: () {
+                          //           //          deleteAddress(loadIdList[index]['id']);
+                          //           //       },
+                          //           //     ),
+                          //           //   ],
+                          //           // ),
+                          //         ],
+                          //       ),
+                          //     ),
+                          //   ),
+                          // );
                         }
                     ),
                   ],
@@ -246,14 +303,11 @@ class _AddressMasterFile extends State<AddressMasterFile> {
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
-            child: Row(
-              children: <Widget>[
-                SizedBox(
-                  width: 2.0,
+            child: Row(children: <Widget>[
+                SizedBox(width: 2.0,
                 ),
-                Flexible(
-                  child: SleekButton(
-                    onTap: () async {
+                Flexible(child: SleekButton(
+                  onTap: () async {
                       await Navigator.of(context).push(addNewAddress());
                       loadAddress();
                       checkIfHasId();
@@ -280,11 +334,25 @@ class _AddressMasterFile extends State<AddressMasterFile> {
   }
 }
 
-
-
 Route addNewAddress() {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => AddNewAddress(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route editAddress() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => EditAddress(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1.0, 0.0);
       var end = Offset.zero;

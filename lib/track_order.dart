@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
@@ -266,16 +267,16 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
               labelColor: Colors.black87,
               tabs: [
                 Tab(
-                    child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('$pendingCounter',style: TextStyle(fontSize: 15.0),), child: Text("Pending",style: TextStyle(fontWeight: FontWeight.bold),))
+                    child: Badge( badgeColor: Colors.white, position: BadgePosition.topEnd(top: -20, end: -16),badgeContent: Text('$pendingCounter',style: TextStyle(fontSize: 15.0, color: Colors.black54),), child: Text("Pending",style: TextStyle(fontWeight: FontWeight.bold),))
                 ),
                 Tab(
-                    child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('$onTransitCounter',style: TextStyle(fontSize: 15.0),), child: Text("On transit",style: TextStyle(fontWeight: FontWeight.bold),))
+                    child: Badge( badgeColor: Colors.white, position: BadgePosition.topEnd(top: -20, end: -16),badgeContent: Text('$onTransitCounter',style: TextStyle(fontSize: 15.0, color: Colors.black54),), child: Text("In transit",style: TextStyle(fontWeight: FontWeight.bold),))
                 ),
                 Tab(
-                    child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('$deliveredCounter',style: TextStyle(fontSize: 15.0),), child: Text("Delivered",style: TextStyle(fontWeight: FontWeight.bold),))
+                    child: Badge( badgeColor: Colors.white, position: BadgePosition.topEnd(top: -20, end: -16),badgeContent: Text('$deliveredCounter',style: TextStyle(fontSize: 15.0, color: Colors.black54),), child: Text("Completed",style: TextStyle(fontWeight: FontWeight.bold),))
                 ),
                 Tab(
-                    child: Badge( badgeColor: Colors.white70,position: BadgePosition.topEnd(top: -16, end: -15),badgeContent: Text('$cancelledCounter',style: TextStyle(fontSize: 15.0),), child: Text("Cancelled",style: TextStyle(fontWeight: FontWeight.bold),))
+                    child: Badge( badgeColor: Colors.white, position: BadgePosition.topEnd(top: -20, end: -16),badgeContent: Text('$cancelledCounter',style: TextStyle(fontSize: 15.0, color: Colors.black54),), child: Text("Cancelled",style: TextStyle(fontWeight: FontWeight.bold),))
                 ),
               ],
             ),
@@ -292,7 +293,7 @@ class _TrackOrder extends State<TrackOrder> with SingleTickerProviderStateMixin{
                   children: <Widget>[
                     Expanded(
                       child: RefreshIndicator(
-                        onRefresh: getTicketNoFood,
+                        onRefresh: toRefresh,
                         child: Scrollbar(
                           child: ListView(
                             children: [

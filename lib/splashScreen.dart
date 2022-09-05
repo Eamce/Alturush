@@ -132,13 +132,13 @@ class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
   }
 
 
-  Future getGlobalCat() async{
-    var res = await db.getGlobalCat();
-    if (!mounted) return;
-    setState(() {
-      globalCat = res['user_details'];
-    });
-  }
+  // Future getGlobalCat() async{
+  //   var res = await db.getGlobalCat();
+  //   if (!mounted) return;
+  //   setState(() {
+  //     globalCat = res['user_details'];
+  //   });
+  // }
 
   Future loadProfile() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -164,7 +164,7 @@ class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
 
   @override
   void initState() {
-    getGlobalCat();
+    // getGlobalCat();
     loadProfile();
     initPlatformState();
     super.initState();
@@ -293,7 +293,7 @@ class _Splash extends State<Splash> with SingleTickerProviderStateMixin{
               child:Padding(
                 padding: EdgeInsets.fromLTRB(10.0,0.0, 10.0,10.0),
                 child: SizedBox(
-                  width: width-50,
+                  width: width-10,
                   height: 50.0,
                   child:  OutlinedButton(
                     style: TextButton.styleFrom(

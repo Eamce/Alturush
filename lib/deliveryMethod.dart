@@ -675,7 +675,7 @@ class _PlaceOrder extends State<PlaceOrder>    with SingleTickerProviderStateMix
       );
     }
     else {
-      Navigator.of(context).push(_submitOrder(changeFor.text,townId,barrioId,placeContactNo.text,placeOrderTown.text,placeOrderBrg.text,street.text,houseNo.text,placeRemarks.text,changeForFinal,deliveryCharge,grandTotal,deliveryDate.text,deliveryTime.text,groupValue));
+      // Navigator.of(context).push(_submitOrder(changeFor.text,townId,barrioId,placeContactNo.text,placeOrderTown.text,placeOrderBrg.text,street.text,houseNo.text,placeRemarks.text,changeForFinal,deliveryCharge,grandTotal,deliveryDate.text,deliveryTime.text,groupValue));
     }
   }
 
@@ -1302,7 +1302,7 @@ class _PlaceOrder extends State<PlaceOrder>    with SingleTickerProviderStateMix
                                   Divider(),
                                   Padding(
                                     padding:EdgeInsets.fromLTRB(49.0, 7.0, 5.0, 5.0),
-                                    child: new Text("GRAND TOTAL: ₱ ${ oCcy.format(grandTotal).toString()}", style: TextStyle(color: Colors.deepOrange,fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 20.0),),
+                                    child: new Text("Total Amount: ₱ ${ oCcy.format(grandTotal).toString()}", style: TextStyle(color: Colors.deepOrange,fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 20.0),),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.fromLTRB(35, 30, 5, 5),
@@ -1627,7 +1627,7 @@ class _PlaceOrder extends State<PlaceOrder>    with SingleTickerProviderStateMix
                                   Divider(),
                                   Padding(
                                     padding:EdgeInsets.fromLTRB(49.0, 7.0, 5.0, 5.0),
-                                    child: new Text("GRAND TOTAL: ₱ ${ oCcy.format(grandTotal).toString()}", style: TextStyle(color: Colors.deepOrange,fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 20.0),),
+                                    child: new Text("Total Amount: ₱ ${ oCcy.format(grandTotal).toString()}", style: TextStyle(color: Colors.deepOrange,fontWeight: FontWeight.bold,fontStyle: FontStyle.normal,fontSize: 20.0),),
                                   ),
                                 ],
                               )
@@ -1641,7 +1641,7 @@ class _PlaceOrder extends State<PlaceOrder>    with SingleTickerProviderStateMix
                         Flexible(
                           child: SleekButton(
                             onTap: () {
-                              Navigator.of(context).push(_submitOrder(changeForPickup.text,townId,barrioId,placeContactNo.text,placeOrderTown,placeOrderBrg,street,houseNo,placeRemarks.text,changeFor,deliveryCharge,grandTotal,deliveryDate,deliveryTime,groupValue));
+                              // Navigator.of(context).push(_submitOrder(changeForPickup.text,townId,barrioId,placeContactNo.text,placeOrderTown,placeOrderBrg,street,houseNo,placeRemarks.text,changeFor,deliveryCharge,grandTotal,deliveryDate,deliveryTime,groupValue));
                             },
 
                             style: SleekButtonStyle.flat(
@@ -1689,21 +1689,21 @@ Widget _myRadioButton({String title, int value, Function onChanged}) {
 }
 
 
-Route _submitOrder(changeForText,townId,barrioId,contactNo,placeOrderTown,placeOrderBrg,street,houseNo,placeRemark,changeFor,deliveryCharge,grandTotal,deliveryDate,deliveryTime,groupValue) {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => SubmitOrder(changeForText:changeForText,townId:townId,barrioId:barrioId,contactNo:contactNo,placeOrderTown:placeOrderTown,placeOrderBrg:placeOrderBrg,street:street,houseNo:houseNo,placeRemark:placeRemark,deliveryCharge:deliveryCharge,grandTotal:grandTotal,deliveryDate:deliveryDate,deliveryTime:deliveryTime,groupValue:groupValue),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      var begin = Offset(0.0, 1.0);
-      var end = Offset.zero;
-      var curve = Curves.decelerate;
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
-}
+// Route _submitOrder(changeForText,townId,barrioId,contactNo,placeOrderTown,placeOrderBrg,street,houseNo,placeRemark,changeFor,deliveryCharge,grandTotal,deliveryDate,deliveryTime,groupValue) {
+//   return PageRouteBuilder(
+//     pageBuilder: (context, animation, secondaryAnimation) => SubmitOrder(changeForText:changeForText,townId:townId,barrioId:barrioId,contactNo:contactNo,placeOrderTown:placeOrderTown,placeOrderBrg:placeOrderBrg,street:street,houseNo:houseNo,placeRemark:placeRemark,deliveryCharge:deliveryCharge,grandTotal:grandTotal,deliveryDate:deliveryDate,deliveryTime:deliveryTime,groupValue:groupValue),
+//     transitionsBuilder: (context, animation, secondaryAnimation, child) {
+//       var begin = Offset(0.0, 1.0);
+//       var end = Offset.zero;
+//       var curve = Curves.decelerate;
+//       var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+//       return SlideTransition(
+//         position: animation.drive(tween),
+//         child: child,
+//       );
+//     },
+//   );
+// }
 
 //
 // Route submitPickUpRoute(options,groupValue,changeForPickup,subtotal) {

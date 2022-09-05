@@ -11,6 +11,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'create_account_signin.dart';
 
 import 'dart:async';
+
+import 'order_timeframe.dart';
 class ToDeliverFood extends StatefulWidget {
   final pend;
   final ticketNo;
@@ -26,7 +28,7 @@ class _ToDeliver extends State<ToDeliverFood> {
   final oCcy = new NumberFormat("#,##0.00", "en_US");
   var isLoading = true;
   List loadItems, lookItemsSegregateList, loadItems1;
-  List loadTotal,lGetAmountPerTenant;
+  List loadTotal,lGetAmountPerTenant, loadSTotal;
 
 
   cancelOrder(tomsId,ticketId) async{
@@ -79,15 +81,31 @@ class _ToDeliver extends State<ToDeliverFood> {
   }
   // var delCharge;
   var grandTotal = 0;
+  var subTotal = 0;
+  var deliveryCharge = 0;
+  var index = 0;
   Future getTotal() async{
     var res = await db.getTotal(widget.ticketNo);
     if (!mounted) return;
     setState(() {
       // grandTotal = 0.0;
       loadTotal = res['user_details'];
-      grandTotal = loadTotal[0]['total_price'];
+      grandTotal = loadTotal[index]['total_price'];
+      subTotal = loadTotal[index]['sub_total'];
+      deliveryCharge = loadTotal[index]['delivery_charge'];
     });
   }
+
+  // var subTotal = 0;
+  // Future getSubTotal() async{
+  //   var res = await db.getSTotal(widget.ticketNo);
+  //   if (!mounted) return;
+  //   setState(() {
+  //     // grandTotal = 0.0;
+  //     loadSTotal = res['user_details'];
+  //     subTotal = loadSTotal[0]['sub_total'];
+  //   });
+  // }
 
   Future cancelOrderSingle(tomsId,ticketId) async{
     if(widget.type == '0'){
@@ -100,6 +118,7 @@ class _ToDeliver extends State<ToDeliverFood> {
     lookItemsFood();
     lookItemsGood();
     getTotal();
+    // getSubTotal();
   }
 
   Future refresh() async{
@@ -113,7 +132,7 @@ class _ToDeliver extends State<ToDeliverFood> {
   }
 
   void displayBottomSheet(BuildContext context) async{
-    var res = await db.lookItemsSegregate(widget.ticketNo);
+    var res = await db.getAmountPerTenantmod(widget.ticketNo);
     if (!mounted) return;
     setState(() {
       isLoading = false;
@@ -150,7 +169,7 @@ class _ToDeliver extends State<ToDeliverFood> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('$f. ${lGetAmountPerTenant[index]['bu_name']} ${lGetAmountPerTenant[index]['tenant_name']} ',style: TextStyle(fontSize: 15.0,fontWeight: FontWeight.bold)),
+                              Text('$f. ${lGetAmountPerTenant[index]['tenant_name']} ${lGetAmountPerTenant[index]['tenant_name']} ',style: TextStyle(fontSize: 15.0,fontWeight: FontWeight.bold)),
                               Text('₱${oCcy.format(int.parse(lGetAmountPerTenant[index]['sumpertenats'].toString()))}',style: TextStyle(fontSize: 15.0,fontWeight: FontWeight.bold)),
                             ],
                           ),
@@ -349,6 +368,7 @@ class _ToDeliver extends State<ToDeliverFood> {
       isLoading = false;
       loadItems = res['user_details'];
     });
+      print(loadItems);
   }
 
   Future lookItemsSegregate() async{
@@ -428,10 +448,12 @@ class _ToDeliver extends State<ToDeliverFood> {
   @override
   void initState(){
 
+    print("order: " + widget.dmop);
     print(widget.pend);
     super.initState();
     selectType();
     getTotal();
+    // getSubTotal();
     if(widget.dmop=='Pick-up' || widget.pend == 1){
       visible = false;
     }
@@ -458,8 +480,20 @@ class _ToDeliver extends State<ToDeliverFood> {
             icon: Icon(Icons.arrow_back, color: Colors.black,size: 23,),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          title: Text(widget.ticketNo,style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
+          title: Text("For "+widget.dmop+": " +widget.ticketNo,style: GoogleFonts.openSans(color:Colors.black54,fontWeight: FontWeight.bold,fontSize: 18.0),),
+          actions: [
+            IconButton(
+                icon: Icon(Icons.info_outline, color: Colors.black),
+                onPressed: () async {
+
+                  Navigator.of(context).push(_orderTimeFrame(widget.ticketNo));
+
+
+                }
+            ),
+          ],
         ),
+
         body: isLoading
             ? Center(
                 child: CircularProgressIndicator(
@@ -491,7 +525,7 @@ class _ToDeliver extends State<ToDeliverFood> {
                       onRefresh: refresh,
                       child: Scrollbar(
                         child:ListView.builder(
-                          itemCount:  lookItemsSegregateList == null ? 0 : lookItemsSegregateList.length,
+                          itemCount: lookItemsSegregateList == null ? 0 : lookItemsSegregateList.length,
                           itemBuilder: (BuildContext context, int index0) {
                             return Container(
                                 child:Column(
@@ -660,6 +694,29 @@ class _ToDeliver extends State<ToDeliverFood> {
                       ),
                     ),
                   ),
+                  Divider(),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(25.0,5.0, 25.0,5.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Total: ',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18.0,color: Colors.black45),),
+                        Text("₱ ${oCcy.format(int.parse(subTotal.toString()))}",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18.0,color: Colors.black45),),
+                      ],
+                    ),
+                  ),
+                  Divider(),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(25.0,5.0, 25.0,5.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Delivery Fee: ',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18.0,color: Colors.black45),),
+                        Text("₱ ${oCcy.format(int.parse(deliveryCharge.toString()))}",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18.0,color: Colors.black45),),
+                      ],
+                    ),
+                  ),
+                  Divider(),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
                     child: Row(
@@ -706,7 +763,7 @@ class _ToDeliver extends State<ToDeliverFood> {
                             ),
                             child: Center(
                                 // ₱${oCcy.format(int.parse(lGetAmountPerTenant[index]['sumpertenats'].toString()))}
-                                child: Text("Total ₱ ${oCcy.format(int.parse(grandTotal.toString()))}", style:TextStyle(fontStyle: FontStyle.normal, fontWeight: FontWeight.bold, fontSize: 18.0),
+                                child: Text("Grand Total ₱ ${oCcy.format(int.parse(grandTotal.toString()))}", style:TextStyle(fontStyle: FontStyle.normal, fontWeight: FontWeight.bold, fontSize: 18.0),
                               ),
                             ),
                           ),
@@ -740,6 +797,22 @@ Route _viewOrderStatus(ticketNo) {
 Route _signIn() {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => CreateAccountSignIn(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(0.0, 1.0);
+      var end = Offset.zero;
+      var curve = Curves.decelerate;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route _orderTimeFrame(ticketNo) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => OrderTimeFrame(ticketNo:ticketNo),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;
